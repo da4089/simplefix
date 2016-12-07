@@ -23,6 +23,8 @@
 #
 ########################################################################
 
+"""A simple FIX protocol implementation for Python."""
+
 # FIX field delimiter character.
 SOH = '\001'
 
