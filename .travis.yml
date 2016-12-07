@@ -12,5 +12,6 @@ script:
  - cd test
  - env PYTHONPATH=.. python -m unittest --verbose all
  - cd ..
+ - env PYTHONPATH=. coverage run test/all.py
 after_success:
-- coveralls
+ - coveralls
