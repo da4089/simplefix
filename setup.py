@@ -26,7 +26,7 @@
 from distutils.core import setup
 
 setup(name="simplefix",
-      version="1.0.1",
+      version="1.0.2",
       description="Simple FIX Protocol implementation for Python",
       url="https://github.com/da4089/simplefix",
       author="David Arnold",

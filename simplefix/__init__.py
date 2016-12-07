@@ -25,8 +25,8 @@
 
 """A simple FIX protocol implementation for Python."""
 
-from message import FixMessage, SOH
-from parser import FixParser
+from .message import FixMessage, SOH
+from .parser import FixParser
 
 
 def print_fix(s):

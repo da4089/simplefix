@@ -23,7 +23,7 @@
 #
 ########################################################################
 
-from message import FixMessage, SOH
+from .message import FixMessage, SOH
 
 
 class FixParser(object):
