@@ -10,6 +10,7 @@ install:
 - pip install coveralls
 script:
  - cd test
- - env PYTHONOPATH=.. python -m unittest --verbose all
+ - env PYTHONPATH=.. python -m unittest --verbose all
+ - cd ..
 after_success:
 - coveralls
