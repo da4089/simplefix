@@ -3,6 +3,7 @@ A simple FIX protocol implementation for Python
 
 [![Build Status](https://travis-ci.org/da4089/simplefix.svg?branch=master)](https://travis-ci.org/da4089/simplefix)
 [![Code Health](https://landscape.io/github/da4089/simplefix/master/landscape.svg?style=flat)](https://landscape.io/github/da4089/simplefix/master)
+[![Coverage Status](https://coveralls.io/repos/github/da4089/simplefix/badge.svg?branch=master)](https://coveralls.io/github/da4089/simplefix?branch=master)
 
 FIX (Financial Information eXchange) Protocol is a widely-used,
 text-based protocol for interaction between parties in financial
