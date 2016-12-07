@@ -25,9 +25,6 @@
 
 """A simple FIX protocol implementation for Python."""
 
-# FIX field delimiter character.
-SOH = '\001'
-
 from message import FixMessage
 from parser import FixParser
 

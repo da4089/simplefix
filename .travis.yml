@@ -5,5 +5,11 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
-install: true
-script: true
+install:
+- pip install coverage
+- pip install coveralls
+script:
+ - cd test
+ - env PYTHONOPATH=.. python -m unittest --verbose all
+after_success:
+- coveralls

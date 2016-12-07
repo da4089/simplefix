@@ -35,6 +35,10 @@
 # supply these tags in the wrong order for testing error handling.
 
 
+# FIX field delimiter character.
+SOH = '\001'
+
+
 class FixMessage(object):
     """FIX protocol message.
 
