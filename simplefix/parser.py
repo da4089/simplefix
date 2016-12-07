@@ -23,16 +23,55 @@
 #
 ########################################################################
 
-# FIX field delimiter character.
-SOH = '\001'
-
-from message import FixMessage
-from parser import FixParser
+from simplefix import FixMessage, SOH
 
 
-def print_fix(s):
-    cooked = s.replace(SOH, '|')
-    print cooked
+class FixParser(object):
+
+    def __init__(self):
+        self.buf = ''
+        self.pairs = []
+        return
+
+    def append_buffer(self, buf):
+        self.buf += buf
+        return
+
+    def get_message(self):
+        # Break buffer into tag=value pairs.
+        pairs = self.buf.split(SOH)
+        if len(pairs) > 0:
+            self.pairs.extend(pairs[:-1])
+            if pairs[-1] == '':
+                self.buf = ''
+            else:
+                self.buf = pairs[-1]
+
+        if len(self.pairs) == 0:
+            return None
+
+        # Check first pair is FIX BeginString.
+        while self.pairs and self.pairs[0][:6] != "8=FIX.":
+            # Discard pairs until we find the beginning of a message.
+            self.pairs.pop(0)
+
+        if len(self.pairs) == 0:
+            return None
+
+        # Look for checksum.
+        index = 0
+        while index < len(self.pairs) and self.pairs[index][:3] != "10=":
+            index += 1
+
+        if index == len(self.pairs):
+            return None
+
+        # Found checksum, so we have a complete message.
+        m = FixMessage()
+        m.append_strings(self.pairs[:index + 1])
+        self.pairs = self.pairs[index:]
+
+        return m
 
 
 ########################################################################
