@@ -14,7 +14,21 @@ setup(name="simplefix",
       author="David Arnold",
       author_email="d+simplefix@0x1.org",
       license="MIT",
-      packages=["simplefix"])
+      packages=["simplefix"],
+      classifiers=[
+        'Development Status :: 4 - Beta',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: System :: Networking',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        ],
+      )
 
 
 ########################################################################
