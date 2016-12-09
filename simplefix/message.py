@@ -53,75 +53,9 @@ class FixMessage(object):
     def __init__(self):
         """Initialise a FIX message."""
 
-        self.begin_string = ""
-        self.major = 0
-        self.minor = 0
-        self.message_type = 0
-        self.body_length = 0
-        self.checksum = 0
-
-        self.raw = False
-
+        self.begin_string = None
+        self.message_type = None
         self.pairs = []
-        return
-
-    def set_raw(self):
-        """Set this message into raw mode.
-
-        In raw mode, only set_session_version() and the append functions
-        are used to control the contents of the message.  No fields are
-        added automatically (eg. Body Length, Checksum, etc), and
-        fields are ordered strictly in the order supplied.
-
-        Normally, raw mode is False, and Begin String (8), Body Length (9),
-        Message Type (35) and Checksum (10) are handled specially.
-
-        Raw mode is useful for testing low-level errors in a FIX
-        message stream."""
-
-        self.raw = True
-        return
-
-    def set_session_version(self, begin_string):
-        """Set FIX protocol version.
-
-        :param begin_string: Value of tag 8."""
-
-        self.begin_string = begin_string
-        return
-
-    def set_message_type(self, message_type):
-        """Set FIX message type.
-
-        :param message_type: FIX message type code.
-
-        All messages should have their message type set with this
-        function, or by setting a 35=x field, unless testing a scenario
-        where the message type is unset."""
-
-        self.message_type = str(message_type)
-        return
-
-    def set_body_length(self, body_length):
-        """Override calculated body length.
-
-        :param body_length: Body length in bytes.
-
-        This function is useful for testing scenarios requiring an
-        incorrect body length in a message."""
-
-        self.body_length = body_length
-        return
-
-    def set_checksum(self, checksum):
-        """Override calculated checksum value.
-
-        :param checksum: Integer checksum value.
-
-        This function is useful for testing scenarios requiring an
-        invalid checksum in a message."""
-
-        self.checksum = checksum
         return
 
     def append_pair(self, tag, value):
@@ -135,31 +69,10 @@ class FixMessage(object):
         your program logic."""
 
         if int(tag) == 8:
-            if not self.raw:
-                v = str(value)
-
-                if len(v) < len("FIX.x.y"):
-                    raise ValueError("Bad version: %s" % v)
-                self.set_session_version(v)
-                return
-
-        if int(tag) == 9:
-            if not self.raw:
-                # Ignore body length tag, we'll calculate the correct
-                # value when generating the message string.
-                return
-
-        if int(tag) == 10:
-            if not self.raw:
-                # Ignore checksum tag, we'll calculate the correct
-                # value when generating the message string.
-                return
+            self.begin_string = str(value)
 
         if int(tag) == 35:
-            if not self.raw:
-                # Promote 35=x to attribute.
-                self.message_type = value
-                return
+            self.message_type = value
 
         self.pairs.append((str(tag), str(value)))
         return
@@ -220,34 +133,48 @@ class FixMessage(object):
 
         return None
 
-    def encode(self):
-        """Convert message to on-the-wire FIX format."""
+    def encode(self, raw=False):
+        """Convert message to on-the-wire FIX format.
 
-        # Walk pairs, creating string.
+        :param raw: If True, encode pairs exactly as provided.
+
+        Unless 'raw' is set, this function will calculate and
+        correctly set the BodyLength (9) and Checksum (10) fields, and
+        ensure that the BeginString (8), Body Length (9), Message Type
+        (35) and Checksum (10) fields are in the right positions.
+
+        It does not further validation of the message content."""
+
         s = ''
+        if raw:
+            # Walk pairs, creating string.
+            for tag, value in self.pairs:
+                s += '%s=%s' % (tag, value)
+                s += SOH
+            return s
+
+        # Cooked.
         for tag, value in self.pairs:
+            if int(tag) in (8, 9, 35, 10):
+                continue
             s += '%s=%s' % (tag, value)
             s += SOH
 
-        # Check for raw mode.
-        if self.raw:
-            return s
+        # Prepend the message type.
+        if not self.message_type:
+            raise ValueError("No message type set")
 
-        # Set message type.
         s = "35=%s" % self.message_type + SOH + s
 
-        # Calculate and pre-pend body length.
+        # Calculate body length.
         #
         # From first byte after body length field, to the delimiter
         # before the checksum (which shouldn't be there yet).
-        if self.body_length:
-            body_length = self.body_length
-        else:
-            body_length = len(s)
+        body_length = len(s)
 
-        # Prepare begin-string.
+        # Prepend begin-string and body-length.
         if not self.begin_string:
-            self.begin_string = "FIX.4.2"
+            raise ValueError("No begin string set")
 
         s = "8=%s" % self.begin_string + SOH + \
             "9=%u" % body_length + SOH + \
@@ -268,14 +195,6 @@ class FixMessage(object):
 
         Compares the tag=value pairs, message_type and FIX version
         of this message against the `other`."""
-
-        # Compare message versions.
-        if self.major != other.major or self.minor != other.minor:
-            return False
-
-        # Compare message types.
-        if self.message_type != other.message_type:
-            return False
 
         # Check pairs list lengths.
         if len(self.pairs) != len(other.pairs):

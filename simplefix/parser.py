@@ -29,13 +29,38 @@ from .message import FixMessage, SOH
 class FixParser(object):
 
     def __init__(self):
+        self.reset()
+        return
+
+    def reset(self):
+        """Reset the internal parser state.
+
+        This will discard any appended buffer content, and any fields
+        parsed so far."""
+
+        # Internal buffer used to accumulate message data.
         self.buf = ''
+
+        # Parsed "tag=value" pairs, removed from the buffer, but not
+        # yet returned as a message.
         self.pairs = []
         return
 
     def append_buffer(self, buf):
+        """Append a character string to the parser buffer.
+
+        :param buf: string to append.
+
+        The parser maintains an internal buffer of bytes to be parsed.
+        As raw data is read, it can be appended to this buffer.  Each
+        call to get_message() will try to remove the bytes of a
+        complete messages from the head of the buffer."""
         self.buf += buf
         return
+
+    def get_buffer(self):
+        """Return a copy of the internal buffer."""
+        return self.buf
 
     def get_message(self):
         # Break buffer into tag=value pairs.
@@ -69,7 +94,7 @@ class FixParser(object):
         # Found checksum, so we have a complete message.
         m = FixMessage()
         m.append_strings(self.pairs[:index + 1])
-        self.pairs = self.pairs[index:]
+        self.pairs = self.pairs[index + 1:]
 
         return m
 
