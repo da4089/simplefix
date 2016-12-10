@@ -80,7 +80,7 @@ class FixTests(unittest.TestCase):
     def test_empty_message(self):
         try:
             pkt = FixMessage()
-        except Exception, e:
+        except Exception as e:
             self.assertEqual(type(ValueError), type(e))
         return
 
