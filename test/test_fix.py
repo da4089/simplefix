@@ -11,6 +11,26 @@ class FixTests(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def test_string_with_equals(self):
+        msg = FixMessage()
+        msg.append_string("8=FIX.4.2")
+        self.assertEqual("FIX.4.2", msg.get(8))
+        return
+
+    def test_string_without_equals(self):
+        msg = FixMessage()
+        try:
+            msg.append_string("FIX.4.2")
+        except ValueError:
+            pass
+
+    def test_string_with_bad_tag(self):
+        msg = FixMessage()
+        try:
+            msg.append_string("foo=bar")
+        except ValueError:
+            pass
+
     def test_basic_fix_message(self):
         pkt = FixMessage()
         pkt.append_pair(8, "FIX.4.2")
@@ -104,6 +124,74 @@ class FixTests(unittest.TestCase):
         self.assertEqual("0", msg.get(35))
         self.assertEqual("161", msg.get(10))
         return
+
+    def test_encode_no_35(self):
+        msg = FixMessage()
+        msg.append_pair(8, "FIX.4.2")
+        try:
+            buf = msg.encode()
+        except ValueError:
+            pass
+
+    def test_encode_no_8(self):
+        msg = FixMessage()
+        msg.append_pair(35, "D")
+        try:
+            buf = msg.encode()
+        except ValueError:
+            pass
+
+    def test_compare_equal(self):
+        a = FixMessage()
+        a.append_pair(8, "FIX.4.2")
+        a.append_pair(35, "0")
+
+        b = FixMessage()
+        b.append_pair(8, "FIX.4.2")
+        b.append_pair(35, "0")
+
+        self.assertTrue(a == b)
+        return
+
+    def test_compare_not_equal_extra_field(self):
+        a = FixMessage()
+        a.append_pair(8, "FIX.4.2")
+        a.append_pair(35, "0")
+
+        b = FixMessage()
+        b.append_pair(8, "FIX.4.2")
+        b.append_pair(35, "0")
+        b.append_pair(42000, "something")
+
+        self.assertFalse(a == b)
+        return
+
+    def test_compare_not_equal_different_tags(self):
+        a = FixMessage()
+        a.append_pair(8, "FIX.4.2")
+        a.append_pair(35, "0")
+        a.append_pair(42000, "something")
+
+        b = FixMessage()
+        b.append_pair(8, "FIX.4.2")
+        b.append_pair(35, "1")
+        b.append_pair(24000, "something")
+
+        self.assertFalse(a == b)
+        return
+
+    def test_compare_not_equal_different_values(self):
+        a = FixMessage()
+        a.append_pair(8, "FIX.4.2")
+        a.append_pair(35, "0")
+
+        b = FixMessage()
+        b.append_pair(8, "FIX.4.2")
+        b.append_pair(35, "1")
+
+        self.assertFalse(a == b)
+        return
+
 
 
 
