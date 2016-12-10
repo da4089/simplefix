@@ -115,7 +115,20 @@ class MessageTests(unittest.TestCase):
         self.assertTrue(a == b)
         return
 
-    def test_compare_not_equal_extra_field(self):
+    def test_compare_not_equal_extra_field_in_a(self):
+        a = FixMessage()
+        a.append_pair(8, "FIX.4.2")
+        a.append_pair(35, "0")
+        a.append_pair(42000, "something")
+
+        b = FixMessage()
+        b.append_pair(8, "FIX.4.2")
+        b.append_pair(35, "0")
+
+        self.assertFalse(a == b)
+        return
+
+    def test_compare_not_equal_extra_field_in_b(self):
         a = FixMessage()
         a.append_pair(8, "FIX.4.2")
         a.append_pair(35, "0")
