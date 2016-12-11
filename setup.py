@@ -25,9 +25,13 @@
 
 from distutils.core import setup
 
+with open("README.rst") as readme:
+    long_description = readme.read()
+
 setup(name="simplefix",
-      version="1.0.2",
+      version="1.0.3",
       description="Simple FIX Protocol implementation for Python",
+      long_description=long_description,
       url="https://github.com/da4089/simplefix",
       author="David Arnold",
       author_email="d+simplefix@0x1.org",
