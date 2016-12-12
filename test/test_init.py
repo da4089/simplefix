@@ -23,15 +23,24 @@
 #
 ########################################################################
 
-"""A simple FIX protocol implementation for Python."""
-
-from .message import FixMessage, SOH
-from .parser import FixParser
+import unittest
+import simplefix
 
 
-def pretty_print(s):
-    cooked = s.replace(SOH, '|')
-    return cooked
+class InitTests(unittest.TestCase):
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_pretty_print(self):
+        input = "1=2\x013=foo\x01"
+        output = simplefix.pretty_print(input)
+        self.assertEqual("1=2|3=foo|", output)
+        return
 
 
-########################################################################
+if __name__ == "__main__":
+    unittest.main()
