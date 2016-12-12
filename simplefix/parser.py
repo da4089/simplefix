@@ -63,6 +63,20 @@ class FixParser(object):
         return self.buf
 
     def get_message(self):
+        """Process the accumulated buffer and return the first message.
+
+        If the buffer starts with FIX fields other than BeginString
+        (8), these are discarded until the start of a message is
+        found.
+
+        If no BeginString (8) field is found, this function returns
+        None.  Similarly, if (after a BeginString) no Checksum (10)
+        field is found, the function returns None.
+
+        Otherwise, it returns a simplefix.FixMessage instance
+        initialised with the firsts from the first complete message
+        found in the buffer."""
+
         # Break buffer into tag=value pairs.
         pairs = self.buf.split(SOH)
         if len(pairs) > 0:
