@@ -106,7 +106,8 @@ class MessageTests(unittest.TestCase):
 
     def test_empty_message(self):
         try:
-            pkt = FixMessage()
+            msg = FixMessage()
+            buf = msg.encode()
         except Exception as e:
             self.assertEqual(type(ValueError), type(e))
         return
