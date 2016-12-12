@@ -25,6 +25,7 @@
 
 
 import unittest
+from test_init import InitTests
 from test_message import MessageTests
 from test_parser import ParserTests
 
