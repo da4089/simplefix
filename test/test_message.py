@@ -190,6 +190,7 @@ class MessageTests(unittest.TestCase):
         b.append_pair(35, "1")
 
         self.assertFalse(a == b)
+        self.assertFalse(b == a)
         return
 
     def test_count(self):
