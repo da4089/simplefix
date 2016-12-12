@@ -109,7 +109,7 @@ class MessageTests(unittest.TestCase):
             msg = FixMessage()
             buf = msg.encode()
         except Exception as e:
-            self.assertEqual(type(ValueError), type(e))
+            self.assertEqual(ValueError, type(e))
         return
 
     def test_encode_no_35(self):
