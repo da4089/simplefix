@@ -50,17 +50,17 @@ suggestions, and bugs.
 
 
 .. |Build Status| image:: https://travis-ci.org/da4089/simplefix.svg?branch=master
-                  :target: https://travis-ci.org/da4089/simplefix
-                  :alt: Build status
+    :target: https://travis-ci.org/da4089/simplefix
+    :alt: Build status
 .. |Code Health| image:: https://landscape.io/github/da4089/simplefix/master/landscape.svg?style=flat
-                 :target: https://landscape.io/github/da4089/simplefix/master
-                 :alt: Code Health
+    :target: https://landscape.io/github/da4089/simplefix/master
+    :alt: Code Health
 .. |Coverage| image:: https://coveralls.io/repos/github/da4089/simplefix/badge.svg?branch=master
-              :target: https://coveralls.io/github/da4089/simplefix?branch=master
-              :alt: Coverage
+    :target: https://coveralls.io/github/da4089/simplefix?branch=master
+    :alt: Coverage
 .. |PyPI| image:: https://img.shields.io/pypi/v/simplefix.svg
-          :target: https://pypi.python.org/pypi/simplefix
-          :alt: PyPI
+    :target: https://pypi.python.org/pypi/simplefix
+    :alt: PyPI
 .. |Python| image:: https://img.shields.io/pypi/pyversions/simplefix.svg
-            :target: https://pypi.python.org/pypi/simplefix
-            :alt: Python
+    :target: https://pypi.python.org/pypi/simplefix
+    :alt: Python
