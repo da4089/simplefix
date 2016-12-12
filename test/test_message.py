@@ -192,6 +192,23 @@ class MessageTests(unittest.TestCase):
         self.assertFalse(a == b)
         return
 
+    def test_sequence_access(self):
+        msg = FixMessage()
+        msg.append_pair(8, "FIX.4.2")
+        msg.append_pair(35, "A")
+        msg.append_pair(108, 30)
+        msg.append_pair(141, "N")
+        msg.append_pair(383, 16384)
+
+        self.assertEqual(35, msg[1][0])
+        self.assertEqual(141, msg[3][0])
+
+        l = []
+        for tag, _ in msg:
+            l.append(int(tag))
+
+        self.assertEqual([8, 35, 108, 141, 383], l)
+        return
 
 if __name__ == "__main__":
     unittest.main()

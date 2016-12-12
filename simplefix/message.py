@@ -58,6 +58,10 @@ class FixMessage(object):
         self.pairs = []
         return
 
+    def count(self):
+        """Return the number of pairs in this message."""
+        return len(self.pairs)
+
     def append_pair(self, tag, value):
         """Append a tag=value pair to this message.
 
@@ -215,6 +219,22 @@ class FixMessage(object):
             return False
 
         return True
+
+
+    def __getitem__(self, item_index):
+        """Enable messages to be iterated over, and treated as a sequence.
+
+        :param item_index: Numeric index in range 0 to length - 1
+
+        Supports both 'for tag, value in message' usage, and
+        'message[n]' access."""
+
+        if item_index >= len(self.pairs):
+            raise IndexError
+
+        tag, value = self.pairs[item_index]
+        return (int(tag), value)
+
 
 
 ########################################################################
