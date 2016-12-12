@@ -192,6 +192,18 @@ class MessageTests(unittest.TestCase):
         self.assertFalse(a == b)
         return
 
+    def test_count(self):
+        msg = FixMessage()
+        msg.append_pair(8, "FIX.4.2")
+        msg.append_pair(35, "A")
+        msg.append_pair(108, 30)
+        self.assertEqual(3, msg.count())
+
+        msg.append_pair(141, "N")
+        msg.append_pair(383, 16384)
+        self.assertEqual(5, msg.count())
+        return
+
     def test_sequence_access(self):
         msg = FixMessage()
         msg.append_pair(8, "FIX.4.2")
