@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 ########################################################################
 # SimpleFIX
-# Copyright (C) 2016, David Arnold.
+# Copyright (C) 2016-2017, David Arnold.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,21 @@ from .message import FixMessage, SOH
 
 
 class FixParser(object):
+    """FIX protocol message parser.
+
+    This class translates FIX application messages in raw (wire)
+    format into instance of the FixMessage class.
+
+    It does not perform any validation of the fields, their presence
+    or absence in a particular message, the data types of fields, or
+    the values of enumerations.
+
+    It is suitable for streaming processing, accumulating byte data
+    from a network connection, and returning complete messages as they
+    are delivered, potentially in multiple fragments."""
 
     def __init__(self):
+        """Constructor."""
         self.reset()
         return
 
@@ -49,7 +62,7 @@ class FixParser(object):
     def append_buffer(self, buf):
         """Append a character string to the parser buffer.
 
-        :param buf: string to append.
+        :param buf: byte string to append.
 
         The parser maintains an internal buffer of bytes to be parsed.
         As raw data is read, it can be appended to this buffer.  Each
@@ -74,7 +87,7 @@ class FixParser(object):
         field is found, the function returns None.
 
         Otherwise, it returns a simplefix.FixMessage instance
-        initialised with the firsts from the first complete message
+        initialised with the fields from the first complete message
         found in the buffer."""
 
         # Break buffer into tag=value pairs.
