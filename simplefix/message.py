@@ -34,6 +34,8 @@
 # added in the correct location, and with correct values.  You can
 # supply these tags in the wrong order for testing error handling.
 
+import datetime
+
 
 # FIX field delimiter character.
 SOH = '\001'
@@ -80,6 +82,40 @@ class FixMessage(object):
 
         self.pairs.append((str(tag), str(value)))
         return
+
+    def append_time(self, tag, timestamp = None, precision = 3, utc = True):
+        """Append a time field to this message.
+
+        :param tag: Integer or string FIX tag number.
+        :param timestamp: Time value to append, or None for now.
+        :param precision: Number of decimal digits, defaults to milliseconds.
+        :param utc: Use UTC if True, local time if False.
+
+        Append a timestamp in FIX format from a Python time.time or
+        datetime.datetime value.
+
+        Note that prior to FIX 5.0, precision must be 3 to be
+        compliant with the standard."""
+
+        if not timestamp:
+            t = datetime.datetime.utcnow()
+
+        elif type(timestamp) is float:
+            if utc:
+                t = datetime.datetime.utcfromtimestamp(timestamp)
+            else:
+                t = datetime.datetime.fromtimestamp(timestamp)
+
+        else:
+            t = timestamp
+
+        s = t.isoformat('-')
+        if precision == 3:
+            s = s[:-3]
+        elif precision != 6:
+            raise ValueError("Precision should be either 3 or 6 digits")
+
+        return self.append_pair(tag, s)
 
     def append_string(self, field):
         """Append a tag=value pair in string format.

@@ -23,6 +23,8 @@
 #
 ########################################################################
 
+import datetime
+import time
 import unittest
 from simplefix import FixMessage
 
@@ -222,6 +224,60 @@ class MessageTests(unittest.TestCase):
 
         self.assertEqual([8, 35, 108, 141, 383], l)
         return
+
+    def test_time_defaults(self):
+        msg = FixMessage()
+        msg.append_time(52)
+        return
+
+    def test_time_explicit_none(self):
+        msg = FixMessage()
+        msg.append_time(52, None)
+        return
+
+    def test_time_float(self):
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_time(52, t)
+
+        self.assertEqual("2017-01-16-15:51:12.933", msg.get(52))
+        return
+
+    def test_time_datetime(self):
+        msg = FixMessage()
+        t = 1484581872.933458
+        dt = datetime.datetime.utcfromtimestamp(t)
+        msg.append_time(52, dt)
+
+        self.assertEqual("2017-01-16-15:51:12.933", msg.get(52))
+        return
+
+    def test_time_microseconds(self):
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_time(52, t, 6)
+
+        self.assertEqual("2017-01-16-15:51:12.933458", msg.get(52))
+        return
+
+    def test_time_bad_precision(self):
+        msg = FixMessage()
+        t = 1484581872.933458
+
+        with self.assertRaises(ValueError):
+           msg.append_time(52, t, 9)
+        return
+
+    def test_time_localtime(self):
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_time(52, t, utc=False)
+
+        test = time.localtime(t)
+        s = "%04u-%02u-%02u-%02u:%02u:%02u.%03u" % (test.tm_year, test.tm_mon, test.tm_mday, test.tm_hour, test.tm_min, test.tm_sec, int((t - int(t)) * 1000))
+        self.assertEqual(s, msg.get(52))
+        return
+
 
 if __name__ == "__main__":
     unittest.main()
