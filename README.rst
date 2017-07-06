@@ -17,11 +17,11 @@ Typically, a FIX implementation exists as a FIX Engine: a standalone
 service that acts as a gateway for other applications (matching
 engines, trading algos, etc) and implements the FIX protocol.  The
 most popular Open Source FIX engine is probably one of the versions of
-QuickFIX.
+`QuickFIX <http://www.quickfixengine.org`_.
 
 This package provides a *simple* implementation of the FIX
 application-layer protocol.  It does no socket handling, and does not
-implement FIX recovery or any message persistence.  It support the
+implement FIX recovery or any message persistence.  It supports the
 creation, encoding, and decoding of FIX messages.
 
 Licence
