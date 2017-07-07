@@ -152,6 +152,21 @@ class FixMessage(object):
             self.append_string(s)
         return
 
+    def append_data(self, len_tag, val_tag, data):
+        """Append raw data, possibly including a embedded SOH.
+
+        :param len_tag: Tag number for length field.
+        :param val_tag: Tag number for value field.
+        :param data: Raw data byte string.
+
+        Appends two pairs: a length pair, followed by a data pair,
+        containing the raw data supplied.  Example fields that should
+        use this method include: 95/96, 212/213, 354/355, etc."""
+
+        self.append_pair(len_tag, len(data))
+        self.append_pair(val_tag, data)
+        return
+
     def get(self, tag, nth=1):
         """Return n-th value for tag.
 
