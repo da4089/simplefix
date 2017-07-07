@@ -143,7 +143,7 @@ class FixParser(object):
                 point += 1
 
                 tag = int(tag_string)
-                if tag in RAW_DATA_TAGS:
+                if tag in self.raw_data_tags:
                     if raw_len > len(self.buf) - point:
                         break
 
@@ -165,7 +165,7 @@ class FixParser(object):
                 start = point
                 in_tag = True
 
-                if tag in RAW_LEN_TAGS:
+                if tag in self.raw_len_tags:
                     raw_len = int(value)
 
             point += 1

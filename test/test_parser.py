@@ -154,7 +154,7 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(len(raw), int(msg.get(5001)))
         self.assertEqual(raw, msg.get(5002))
 
-        parser = FixParser()
+        parser.reset()
         parser.remove_raw(5001, 5002)
         parser.append_buffer(buf)
         msg = parser.get_message()
