@@ -25,6 +25,8 @@
 
 # Raw data fields, as defined in FIX.5.0sp2 ep228.
 RAW_DATA = (
+    (90, 91),       # SecureData
+    (93, 89),       # Signature
     (95, 96),       # RawData
     (212, 213),     # XmlData
     (348, 349),     # EncodedIssuer
@@ -41,7 +43,10 @@ RAW_DATA = (
     (621, 622),     # EncodedLegSecurityDesc
     (1277, 1278),   # DerivativeEncodedIssuer
     (1280, 1281),   # DerivativeEncodedSecurityDesc
+    (1282, 1283),   # DerivativeSecurityXML
     (1397, 1398),   # EncodedMktSegmDesc
+    (1401, 1402),   # EncryptedPassword
+    (1403, 1404),   # EncryptedNewPassword
     (1468, 1469),   # EncodedSecurityListDesc
     (1525, 1527),   # EncodedDocumentationText
     (1578, 1579),   # EncodedEventText
