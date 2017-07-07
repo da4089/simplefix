@@ -29,7 +29,7 @@ with open("README.rst") as readme:
     long_description = readme.read()
 
 setup(name="simplefix",
-      version="1.0.4",
+      version="1.0.5",
       description="Simple FIX Protocol implementation for Python",
       long_description=long_description,
       url="https://github.com/da4089/simplefix",
@@ -38,7 +38,7 @@ setup(name="simplefix",
       license="MIT",
       packages=["simplefix"],
       classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: System :: Networking',
         'Intended Audience :: Developers',
@@ -49,6 +49,7 @@ setup(name="simplefix",
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         ],
       )
 
