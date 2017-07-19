@@ -172,8 +172,8 @@ class FixMessage(object):
     def get(self, tag, nth=1):
         """Return n-th value for tag.
 
-        :param tag: FIX field tag number
-        :param nth: Index of tag if repeating
+        :param tag: FIX field tag number.
+        :param nth: Index of tag if repeating, first is 1.
         :return: None if nothing found, otherwise value matching tag.
 
         Defaults to returning the first matching value of 'tag', but if
