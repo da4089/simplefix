@@ -83,11 +83,11 @@ class FixMessage(object):
         self.pairs.append((str(tag), str(value)))
         return
 
-    def append_time(self, tag, timestamp = None, precision = 3, utc = True):
+    def append_time(self, tag, timestamp=None, precision=3, utc=True):
         """Append a time field to this message.
 
         :param tag: Integer or string FIX tag number.
-        :param timestamp: Time value to append, or None for now.
+        :param timestamp: Time (see below) value to append, or None for now.
         :param precision: Number of decimal digits, defaults to milliseconds.
         :param utc: Use UTC if True, local time if False.
 
@@ -109,10 +109,12 @@ class FixMessage(object):
         else:
             t = timestamp
 
-        s = t.isoformat('-')
+        s = t.strftime("%Y%m%d-%H:%M:%S.")
         if precision == 3:
-            s = s[:-3]
-        elif precision != 6:
+            s += "%03d" % (t.microsecond / 1000)
+        elif precision == 6:
+            s += "%06d" % t.microsecond
+        else:
             raise ValueError("Precision should be either 3 or 6 digits")
 
         return self.append_pair(tag, s)

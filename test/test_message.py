@@ -240,7 +240,7 @@ class MessageTests(unittest.TestCase):
         t = 1484581872.933458
         msg.append_time(52, t)
 
-        self.assertEqual("2017-01-16-15:51:12.933", msg.get(52))
+        self.assertEqual("20170116-15:51:12.933", msg.get(52))
         return
 
     def test_time_datetime(self):
@@ -249,7 +249,7 @@ class MessageTests(unittest.TestCase):
         dt = datetime.datetime.utcfromtimestamp(t)
         msg.append_time(52, dt)
 
-        self.assertEqual("2017-01-16-15:51:12.933", msg.get(52))
+        self.assertEqual("20170116-15:51:12.933", msg.get(52))
         return
 
     def test_time_microseconds(self):
@@ -257,7 +257,7 @@ class MessageTests(unittest.TestCase):
         t = 1484581872.933458
         msg.append_time(52, t, 6)
 
-        self.assertEqual("2017-01-16-15:51:12.933458", msg.get(52))
+        self.assertEqual("20170116-15:51:12.933458", msg.get(52))
         return
 
     def test_time_bad_precision(self):
@@ -274,7 +274,7 @@ class MessageTests(unittest.TestCase):
         msg.append_time(52, t, utc=False)
 
         test = time.localtime(t)
-        s = "%04u-%02u-%02u-%02u:%02u:%02u.%03u" % (test.tm_year, test.tm_mon, test.tm_mday, test.tm_hour, test.tm_min, test.tm_sec, int((t - int(t)) * 1000))
+        s = "%04u%02u%02u-%02u:%02u:%02u.%03u" % (test.tm_year, test.tm_mon, test.tm_mday, test.tm_hour, test.tm_min, test.tm_sec, int((t - int(t)) * 1000))
         self.assertEqual(s, msg.get(52))
         return
 
