@@ -38,12 +38,14 @@ class MessageTests(unittest.TestCase):
         pass
 
     def test_string_with_equals(self):
+        """Test field set with tag=value string"""
         msg = FixMessage()
         msg.append_string("8=FIX.4.2")
         self.assertEqual("FIX.4.2", msg.get(8))
         return
 
     def test_string_without_equals(self):
+        """Test field set with string not containing equals sign"""
         msg = FixMessage()
         try:
             msg.append_string("FIX.4.2")
@@ -51,6 +53,7 @@ class MessageTests(unittest.TestCase):
             pass
 
     def test_string_with_bad_tag(self):
+        """Test field set with bad tag in tag=value string"""
         msg = FixMessage()
         try:
             msg.append_string("foo=bar")
@@ -58,17 +61,20 @@ class MessageTests(unittest.TestCase):
             pass
 
     def test_raw_empty_message(self):
+        """Test raw encoding of empty message"""
         pkt = FixMessage()
         self.assertEqual("", pkt.encode(True))
         return
 
     def test_raw_begin_string(self):
+        """Test raw encoding of BeginString(8)"""
         pkt = FixMessage()
         pkt.append_pair(8, "FIX.4.4")
         self.assertEqual("8=FIX.4.4\x01", pkt.encode(True))
         return
 
     def test_set_session_version(self):
+        """Test minimal message"""
         pkt = FixMessage()
         pkt.append_pair(8, "FIX.4.4")
         pkt.append_pair(35, "0")
@@ -76,6 +82,7 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_get_repeating(self):
+        """Test retrieval of repeating field's value"""
         pkt = FixMessage()
         pkt.append_pair(42, "a")
         pkt.append_pair(42, "b")
@@ -89,24 +96,28 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_raw_body_length(self):
+        """Test encoding of BodyLength(9) in raw mode"""
         pkt = FixMessage()
         pkt.append_pair(9, 42)
         self.assertEqual("9=42\x01", pkt.encode(True))
         return
 
     def test_raw_checksum(self):
+        """Test encoding of CheckSum(10) in raw mode"""
         pkt = FixMessage()
         pkt.append_pair(10, 42)
         self.assertEqual("10=42\x01", pkt.encode(True))
         return
 
     def test_raw_msg_type(self):
+        """Test encoding of MessageType(35) in raw mode"""
         pkt = FixMessage()
         pkt.append_pair(35, "D")
         self.assertEqual("35=D\x01", pkt.encode(True))
         return
 
     def test_empty_message(self):
+        """Test encoding of empty message"""
         try:
             msg = FixMessage()
             buf = msg.encode()
@@ -115,6 +126,7 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_encode_no_35(self):
+        """Test encoding without MessageType(35) field"""
         msg = FixMessage()
         msg.append_pair(8, "FIX.4.2")
         try:
@@ -123,6 +135,7 @@ class MessageTests(unittest.TestCase):
             pass
 
     def test_encode_no_8(self):
+        """Test encoding without BeginString(8) field"""
         msg = FixMessage()
         msg.append_pair(35, "D")
         try:
@@ -131,6 +144,7 @@ class MessageTests(unittest.TestCase):
             pass
 
     def test_compare_equal(self):
+        """Test comparison of equal messages"""
         a = FixMessage()
         a.append_pair(8, "FIX.4.2")
         a.append_pair(35, "0")
@@ -143,6 +157,7 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_compare_not_equal_extra_field_in_a(self):
+        """Test comparison of extra field in this message"""
         a = FixMessage()
         a.append_pair(8, "FIX.4.2")
         a.append_pair(35, "0")
@@ -156,6 +171,7 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_compare_not_equal_extra_field_in_b(self):
+        """Test comparison of other message with extra field"""
         a = FixMessage()
         a.append_pair(8, "FIX.4.2")
         a.append_pair(35, "0")
@@ -169,6 +185,7 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_compare_not_equal_different_tags(self):
+        """Test comparison of different tagged fields"""
         a = FixMessage()
         a.append_pair(8, "FIX.4.2")
         a.append_pair(35, "0")
@@ -183,6 +200,7 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_compare_not_equal_different_values(self):
+        """Test comparison of unequal message field values"""
         a = FixMessage()
         a.append_pair(8, "FIX.4.2")
         a.append_pair(35, "0")
@@ -196,6 +214,7 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_count(self):
+        """Test count of message fields"""
         msg = FixMessage()
         msg.append_pair(8, "FIX.4.2")
         msg.append_pair(35, "A")
@@ -208,6 +227,7 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_sequence_access(self):
+        """Test sequence access to message fields"""
         msg = FixMessage()
         msg.append_pair(8, "FIX.4.2")
         msg.append_pair(35, "A")
@@ -226,16 +246,19 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_time_defaults(self):
+        """Test no supplied timestamp value"""
         msg = FixMessage()
         msg.append_time(52)
         return
 
     def test_time_explicit_none(self):
+        """Test explicit None as timestamp value"""
         msg = FixMessage()
         msg.append_time(52, None)
         return
 
     def test_time_float(self):
+        """Test floating point timestamp values"""
         msg = FixMessage()
         t = 1484581872.933458
         msg.append_time(52, t)
@@ -244,6 +267,7 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_time_datetime(self):
+        """Test use of built-in datetime timestamp values"""
         msg = FixMessage()
         t = 1484581872.933458
         dt = datetime.datetime.utcfromtimestamp(t)
@@ -253,6 +277,7 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_time_microseconds(self):
+        """Test formatting of time values with microseconds"""
         msg = FixMessage()
         t = 1484581872.933458
         msg.append_time(52, t, 6)
@@ -261,6 +286,7 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_time_bad_precision(self):
+        """Test bad time precision values"""
         msg = FixMessage()
         t = 1484581872.933458
 
@@ -269,6 +295,7 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_time_localtime(self):
+        """Test non-UTC supplied time values"""
         msg = FixMessage()
         t = 1484581872.933458
         msg.append_time(52, t, utc=False)
@@ -276,6 +303,17 @@ class MessageTests(unittest.TestCase):
         test = time.localtime(t)
         s = "%04u%02u%02u-%02u:%02u:%02u.%03u" % (test.tm_year, test.tm_mon, test.tm_mday, test.tm_hour, test.tm_min, test.tm_sec, int((t - int(t)) * 1000))
         self.assertEqual(s, msg.get(52))
+        return
+
+    def test_header_field(self):
+        """Test use of header flag"""
+
+        msg = FixMessage()
+        msg.append_pair(20000, "third")
+        msg.append_pair(20001, "first", header=True)
+        msg.append_pair(20002, "second", header=True)
+        self.assertEqual("20001=first\x0120002=second\x0120000=third\x01",
+                         msg.encode(True))
         return
 
 

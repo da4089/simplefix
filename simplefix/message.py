@@ -58,17 +58,19 @@ class FixMessage(object):
         self.begin_string = None
         self.message_type = None
         self.pairs = []
+        self.header_index = 0
         return
 
     def count(self):
         """Return the number of pairs in this message."""
         return len(self.pairs)
 
-    def append_pair(self, tag, value):
+    def append_pair(self, tag, value, header=False):
         """Append a tag=value pair to this message.
 
         :param tag: Integer or string FIX tag number.
         :param value: FIX tag value.
+        :param: header: Append to header if True; default to body.
 
         Both parameters are explicitly converted to strings before
         storage, so it's ok to pass integers if that's easier for
@@ -80,16 +82,21 @@ class FixMessage(object):
         if int(tag) == 35:
             self.message_type = value
 
-        self.pairs.append((str(tag), str(value)))
+        if header:
+            self.pairs.insert(self.header_index, (str(tag), str(value)))
+            self.header_index += 1
+        else:
+            self.pairs.append((str(tag), str(value)))
         return
 
-    def append_time(self, tag, timestamp=None, precision=3, utc=True):
+    def append_time(self, tag, timestamp=None, precision=3, utc=True, header=False):
         """Append a time field to this message.
 
         :param tag: Integer or string FIX tag number.
         :param timestamp: Time (see below) value to append, or None for now.
         :param precision: Number of decimal digits, defaults to milliseconds.
         :param utc: Use UTC if True, local time if False.
+        :param header: Append to header if True; default to body.
 
         Append a timestamp in FIX format from a Python time.time or
         datetime.datetime value.
@@ -117,12 +124,13 @@ class FixMessage(object):
         else:
             raise ValueError("Precision should be either 3 or 6 digits")
 
-        return self.append_pair(tag, s)
+        return self.append_pair(tag, s, header=header)
 
-    def append_string(self, field):
+    def append_string(self, field, header=False):
         """Append a tag=value pair in string format.
 
         :param field: String "tag=value" to be appended to this message.
+        :param header: Append to header if True; default to body.
 
         The string is split at the first '=' character, and the resulting
         tag and value strings are appended to the message."""
@@ -139,34 +147,36 @@ class FixMessage(object):
             raise ValueError("Tag value must be an integer")
 
         # Save.
-        self.append_pair(tag_int, l[1])
+        self.append_pair(tag_int, l[1], header=header)
         return
 
-    def append_strings(self, string_list):
+    def append_strings(self, string_list, header=False):
         """Append tag=pairs for each supplied string.
 
         :param string_list: List of "tag=value" strings.
+        :param header: Append to header if True; default to body.
 
         Each string is split, and the resulting tag and value strings
         are appended to the message."""
 
         for s in string_list:
-            self.append_string(s)
+            self.append_string(s, header=header)
         return
 
-    def append_data(self, len_tag, val_tag, data):
+    def append_data(self, len_tag, val_tag, data, header=False):
         """Append raw data, possibly including a embedded SOH.
 
         :param len_tag: Tag number for length field.
         :param val_tag: Tag number for value field.
         :param data: Raw data byte string.
+        :param header: Append to header if True; default to body.
 
         Appends two pairs: a length pair, followed by a data pair,
         containing the raw data supplied.  Example fields that should
         use this method include: 95/96, 212/213, 354/355, etc."""
 
-        self.append_pair(len_tag, len(data))
-        self.append_pair(val_tag, data)
+        self.append_pair(len_tag, len(data), header=header)
+        self.append_pair(val_tag, data, header=header)
         return
 
     def get(self, tag, nth=1):
@@ -200,25 +210,24 @@ class FixMessage(object):
         ensure that the BeginString (8), Body Length (9), Message Type
         (35) and Checksum (10) fields are in the right positions.
 
-        It does not further validation of the message content."""
+        This function does no further validation of the message content."""
 
         s = ''
         if raw:
             # Walk pairs, creating string.
             for tag, value in self.pairs:
-                s += '%s=%s' % (tag, value)
-                s += SOH
+                s += '%s=%s%s' % (tag, value, SOH)
+
             return s
 
         # Cooked.
         for tag, value in self.pairs:
             if int(tag) in (8, 9, 35, 10):
                 continue
-            s += '%s=%s' % (tag, value)
-            s += SOH
+            s += '%s=%s%s' % (tag, value, SOH)
 
         # Prepend the message type.
-        if not self.message_type:
+        if self.message_type is None:
             raise ValueError("No message type set")
 
         s = "35=%s" % self.message_type + SOH + s
