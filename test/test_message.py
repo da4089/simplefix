@@ -316,6 +316,14 @@ class MessageTests(unittest.TestCase):
                          msg.encode(True))
         return
 
+    def test_strings(self):
+        """Test adding fields from a sequence of tag=value strings"""
+
+        msg = FixMessage()
+        msg.append_strings(["8=FIX.4.4", "35=0"])
+        self.assertEqual("8=FIX.4.4\x019=5\x0135=0\x0110=163\x01", msg.encode())
+        return
+
 
 if __name__ == "__main__":
     unittest.main()
