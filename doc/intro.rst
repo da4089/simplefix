@@ -31,7 +31,8 @@ Creating Messages
 To create a FIX message, first create an instance of the FixMessage class.
 
 .. code-block:: python
-msg = simplefix.FixMessage()
+
+   msg = simplefix.FixMessage()
 
 You can then add fields to the message as required.  You should add the
 standard header tags 8, 34, 35, 49, 52, and 56 to all messages.  For most
