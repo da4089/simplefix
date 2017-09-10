@@ -10,7 +10,8 @@ Welcome to SimpleFIX's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-
+   intro
+   getting
 
 Indices and tables
 ==================

@@ -1,0 +1,51 @@
+.. _getting:
+
+Installation
+============
+
+simplefix has a few dependencies.  Firstly, it is known to run on
+Python_ 2.7, 3.3, 3.4, 3.5, and 3.6.  It will not run on Python 2.6 or
+earlier.
+
+You can install it using pip_::
+
+    $ pip install simplefix
+
+or using easy_install_::
+
+    $ easy_install simplefix
+
+It's usually a good idea to install simplefix into a virtualenv, to avoid
+issues with incompatible versions and system packaging schemes.
+
+Getting the code
+----------------
+
+You can also get the code from PyPI_ or GitHub_. You can either clone the
+public repository::
+
+    $ git clone git://github.com/da4089/simplefix.git
+
+Download the tarball::
+
+    $ curl -OL https://github.com/da4089/simplefix/tarball/master
+
+Or, download the zipball::
+
+    $ curl -OL https://github.com/da4089/simplefix/zipball/master
+
+Once you have a copy of the source you can install it into your site-packages
+easily::
+
+    $ python setup.py install
+
+
+
+.. _easy_install: http://pypi.python.org/pypi/setuptools
+.. _GitHub: https://github.com/hgrecco/pint
+.. _Python: http://www.python.org/
+.. _PyPI: https://pypi.python.org/pypi/Pint/
+.. _pip: http://www.pip-installer.org/
+
+
+
