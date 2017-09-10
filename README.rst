@@ -2,7 +2,7 @@
 simplefix
 =========
 
-|  |Build Status|  |Code Health|  |Coverage|  |PyPI|  |Python|  |Docs|
+|  |Build Status|  |Docs|  |Code Health|  |Coverage|  |PyPI|  |Python|
 
 Introduction
 ============
@@ -101,6 +101,9 @@ suggestions, and bugs.
 .. |Build Status| image:: https://travis-ci.org/da4089/simplefix.svg?branch=master
     :target: https://travis-ci.org/da4089/simplefix
     :alt: Build status
+.. |Docs| image:: https://readthedocs.org/projects/simplefix/badge/?version=latest
+    :target: http://simplefix.readthedocs.io/en/latest/
+    :alt: Docs
 .. |Code Health| image:: https://landscape.io/github/da4089/simplefix/master/landscape.svg?style=flat
     :target: https://landscape.io/github/da4089/simplefix/master
     :alt: Code Health
@@ -113,6 +116,3 @@ suggestions, and bugs.
 .. |Python| image:: https://img.shields.io/pypi/pyversions/simplefix.svg
     :target: https://pypi.python.org/pypi/simplefix
     :alt: Python
-.. |Docs| image:: https://readthedocs.org/projects/simplefix/badge/?version=latest
-    :target: http://simplefix.readthedocs.io/en/latest/
-    :alt: Docs
