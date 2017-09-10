@@ -113,6 +113,6 @@ suggestions, and bugs.
 .. |Python| image:: https://img.shields.io/pypi/pyversions/simplefix.svg
     :target: https://pypi.python.org/pypi/simplefix
     :alt: Python
-.. |Docs| image:: http://simplefix.readthedocs.io/en/latest/?badge=latest
+.. |Docs| image:: https://readthedocs.org/projects/simplefix/badge/?version=latest
     :target: http://simplefix.readthedocs.io/en/latest/
     :alt: Docs
