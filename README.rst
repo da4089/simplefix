@@ -2,7 +2,7 @@
 simplefix
 =========
 
-|  |Build Status|  |Code Health|  |Coverage|  |PyPI|  |Python|
+|  |Build Status|  |Code Health|  |Coverage|  |PyPI|  |Python|  |Docs|
 
 Introduction
 ============
@@ -113,3 +113,6 @@ suggestions, and bugs.
 .. |Python| image:: https://img.shields.io/pypi/pyversions/simplefix.svg
     :target: https://pypi.python.org/pypi/simplefix
     :alt: Python
+.. |Docs| image:: http://simplefix.readthedocs.io/en/latest/?badge=latest
+    :target: http://simplefix.readthedocs.io/en/latest/
+    :alt: Docs
