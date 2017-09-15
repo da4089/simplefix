@@ -212,7 +212,7 @@ class FixMessage(object):
 
         This function does no further validation of the message content."""
 
-        s = ''
+        s = ''  #FIXME: should be bytes type?
         if raw:
             # Walk pairs, creating string.
             for tag, value in self.pairs:
