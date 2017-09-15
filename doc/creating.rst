@@ -4,8 +4,8 @@ Creating Messages
 
 To create a FIX message, first create an instance of the FixMessage class.
 
+
 .. code-block:: python
-    :linesnos:
 
     msg = simplefix.FixMessage()
 
@@ -121,37 +121,25 @@ itself.
 Repeating Groups
 ................
 
+There is no specific support for creating repeating groups in Messages.
+The count field must be appended first, followed by the group's member's
+fields.
+
+Consequently, it's not an error to append two fields with the same tag.
+
 Data Fields
 ...........
 
+There are numerous defined fields in the FIX protocol that use the *data*
+type.  These fields consist of two parts: a length, which must come first,
+immediately followed by the value field, whose value may include the ASCII
+SOH character, the ASCII NUL character, and in fact any 8-bit byte value.
 
-Encoding
---------
-Once all fields are set, calling ``encode()`` will return a byte buffer
-containing the correctly formatted FIX message, with fields in the required
-order, and automatically added and set values for the BodyLength (9) and
-Checksum (10) fields.
+To append a data field to a message, the ``append_data()`` method can be
+used.  It will correctly add both the length field and the value field.
 
-Note that if you want to manually control the ordering of all fields, the
-value of the BodyLength or Checksum fields, there's a 'raw' flag to the
-``encode()`` method that disables this functionality.  This is useful for
-creating known-bad messages for testing purposes.
+.. code-block:: python
+    :linenos:
 
-Parsing Messages
-----------------
+    message.append_data(95, 96, "RAW DATA \x00\x01 VALUE")
 
-To extract FIX messages from a byte buffer, such as that received from a
-socket, you should first create an instance of the ``FixParser`` class.  For
-each byte string received, append it to the internal reassembly buffer using
-``append_buffer()`` .  At any time, you can call ``get_message()`` : if there's
-no complete message in the parser's internal buffer, it'll return None,
-otherwise, it'll return a ``FixMessage`` instance.
-
-Once you've received a ``FixMessage`` from ``get_message()`` , you can: check
-the number of fields with ``count()`` , retrieve the value of a field using
-``get()`` or the built-in "[ ]" syntax, or iterate over all the fields using
-"for ... in ...".
-
-Members of repeating groups can be accessed using ``get(tag, nth)``, where the
-"nth" value is an integer indicating the number of the group to use (note
-that the first group is number one, not zero).

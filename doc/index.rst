@@ -11,6 +11,8 @@ SimpleFIX
     getting
     import
     creating
+    encoding
+    parsing
 
 Indices and tables
 ==================
