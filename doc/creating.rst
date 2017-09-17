@@ -139,7 +139,12 @@ To append a data field to a message, the ``append_data()`` method can be
 used.  It will correctly add both the length field and the value field.
 
 .. code-block:: python
-    :linenos:
 
     message.append_data(95, 96, "RAW DATA \x00\x01 VALUE")
+
+which will result in the FIX message content:
+
+.. epigraph::
+
+    95=17\x0196=RAW DATA \x00\x01 VALUE\x01
 
