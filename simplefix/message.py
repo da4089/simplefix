@@ -70,7 +70,7 @@ class FixMessage(object):
 
         :param tag: Integer or string FIX tag number.
         :param value: FIX tag value.
-        :param: header: Append to header if True; default to body.
+        :param header: Append to header if True; default to body.
 
         Both parameters are explicitly converted to strings before
         storage, so it's ok to pass integers if that's easier for
@@ -129,6 +129,75 @@ class FixMessage(object):
 
         return self.append_pair(tag, s, header=header)
 
+    def append_tz_time_only_bits(self, tag, h, m, s=None, ms=None, us=None,
+                                 offset=0, header=False):
+        """Append a field with a TZTimeOnly value from components.
+
+        :param tag: Integer or string FIX tag number.
+        :param h: Hours, in range 0 to 23.
+        :param m: Minutes, in range 0 to 59.
+        :param s: Optional seconds, in range 0 to 59 (60 for leap second).
+        :param ms: Optional milliseconds, in range 0 to 999.
+        :param us: Optional microseconds, in range 0 to 999.
+        :param offset: Minutes east of UTC, in range -1439 to +1439.
+        :param header: Append to FIX header if True; default to body.
+
+        Formats the TZTimeOnly value from its components.
+
+        If `s`, `ms` or `us` are None, the precision is truncated at
+        that point."""
+
+        ih = int(h)
+        if ih < 0 or ih > 23:
+            raise ValueError("Hour value `h` (%u) out of range "
+                             "0 to 23" % ih)
+
+        im = int(m)
+        if im < 0 or im > 59:
+            raise ValueError("Minute value `m` (%u) out of range "
+                             "0 to 59" % im)
+
+        v = "%02u:%02u" % (ih, im)
+
+        if s is not None:
+            isec = int(s)
+            if isec < 0 or isec > 60:
+                raise ValueError("Seconds value `s` (%u) out of range "
+                                 "0 to 60" % isec)
+            v += ":%02u" % isec
+
+            if ms is not None:
+                ims = int(ms)
+                if ims < 0 or ims > 999:
+                    raise ValueError("Milliseconds value `ms` (%u) "
+                                     "out of range 0 to 999" % ims)
+                v += ".%03u" % ims
+
+                if us is not None:
+                    ius = int(us)
+                    if ius < 0 or ius > 999:
+                        raise ValueError("Microseconds value `us` (%u) "
+                                         "out of range 0 to 999" % ius)
+                    v += "%03u" % ius
+
+        io = int(offset)
+        if io == 0:
+            v += "Z"
+        else:
+            if -1440 < io < 1440:
+                ho = abs(io) / 60
+                mo = abs(io) % 60
+
+                v += "%c%02u" % ("+" if io > 0 else "-", ho)
+                if mo != 0:
+                    v += ":%02u" % mo
+
+            else:
+                raise ValueError("Timezone `offset` (%u) out of range "
+                                 "-1439 to +1439 minutes" % io)
+
+        return self.append_pair(tag, v, header=header)
+
     def append_string(self, field, header=False):
         """Append a tag=value pair in string format.
 
@@ -139,18 +208,18 @@ class FixMessage(object):
         tag and value strings are appended to the message."""
 
         # Split into tag and value.
-        l = field.split('=', 1)
-        if len(l) != 2:
+        bits = field.split('=', 1)
+        if len(bits) != 2:
             raise ValueError("Field missing '=' separator.")
 
         # Check tag is an integer.
         try:
-            tag_int = int(l[0])
+            tag_int = int(bits[0])
         except ValueError:
             raise ValueError("Tag value must be an integer")
 
         # Save.
-        self.append_pair(tag_int, l[1], header=header)
+        self.append_pair(tag_int, bits[1], header=header)
         return
 
     def append_strings(self, string_list, header=False):
@@ -215,7 +284,7 @@ class FixMessage(object):
 
         This function does no further validation of the message content."""
 
-        s = ''  #FIXME: should be bytes type?
+        s = ''  # FIXME: should be bytes type?
         if raw:
             # Walk pairs, creating string.
             for tag, value in self.pairs:
@@ -285,7 +354,6 @@ class FixMessage(object):
 
         return True
 
-
     def __getitem__(self, item_index):
         """Enable messages to be iterated over, and treated as a sequence.
 
@@ -298,8 +366,7 @@ class FixMessage(object):
             raise IndexError
 
         tag, value = self.pairs[item_index]
-        return (int(tag), value)
-
+        return int(tag), value
 
 
 ########################################################################

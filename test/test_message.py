@@ -314,9 +314,50 @@ class MessageTests(unittest.TestCase):
         self.assertEqual(s, msg.get(52))
         return
 
+    def test_tzto_bits_15_51_240(self):
+        """Test TZTimeOnly with hour and minute components, full hour offset"""
+        msg = FixMessage()
+        msg.append_tz_time_only_bits(1, 15, 51, offset=-240)
+        self.assertEqual("15:51-04", msg.get(1))
+        return
+
+    def test_tzto_bits_15_51_270(self):
+        """Test TZTimeOnly with hour, minute and second components, full hour offset"""
+        msg = FixMessage()
+        msg.append_tz_time_only_bits(1, 15, 51, offset=-270)
+        self.assertEqual("15:51-04:30", msg.get(1))
+        return
+
+    def test_tzto_bits_15_51_12_270(self):
+        """Test TZTimeOnly with hour, minute and second components, partial hour offset."""
+        msg = FixMessage()
+        msg.append_tz_time_only_bits(1, 15, 51, 12, offset=-270)
+        self.assertEqual("15:51:12-04:30", msg.get(1))
+        return
+
+    def test_tzto_bits_15_51_12_933_270(self):
+        """Test TZTimeOnly with h, m, s and ms components, partial hour offset."""
+        msg = FixMessage()
+        msg.append_tz_time_only_bits(1, 15, 51, 12, 933, offset=-270)
+        self.assertEqual("15:51:12.933-04:30", msg.get(1))
+        return
+
+    def test_tzto_bits_15_51_12_933_458_270(self):
+        """Test TZTimeOnly with h, m, s, ms, and us components, partial hour offset."""
+        msg = FixMessage()
+        msg.append_tz_time_only_bits(1, 15, 51, 12, 933, 458, offset=-270)
+        self.assertEqual("15:51:12.933458-04:30", msg.get(1))
+        return
+
+    def test_tzto_bits_15_51_12_933_458_150(self):
+        """Test TZTimeOnly with h, m, s, ms, and us components, partial hour offset."""
+        msg = FixMessage()
+        msg.append_tz_time_only_bits(1, 15, 51, 12, 933, 458, offset=150)
+        self.assertEqual("15:51:12.933458+02:30", msg.get(1))
+        return
+
     def test_header_field(self):
         """Test use of header flag"""
-
         msg = FixMessage()
         msg.append_pair(20000, "third")
         msg.append_pair(20001, "first", header=True)
@@ -327,7 +368,6 @@ class MessageTests(unittest.TestCase):
 
     def test_strings(self):
         """Test adding fields from a sequence of tag=value strings"""
-
         msg = FixMessage()
         msg.append_strings(["8=FIX.4.4", "35=0"])
         self.assertEqual("8=FIX.4.4\x019=5\x0135=0\x0110=163\x01", msg.encode())
