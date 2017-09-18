@@ -94,14 +94,15 @@ class FixMessage(object):
 
         :param tag: Integer or string FIX tag number.
         :param timestamp: Time (see below) value to append, or None for now.
-        :param precision: Number of decimal digits, defaults to milliseconds.
+        :param precision: Number of decimal digits.  Zero for seconds only,
+        three for milliseconds, 6 for microseconds.  Defaults to milliseconds.
         :param utc: Use UTC if True, local time if False.
         :param header: Append to header if True; default to body.
 
         Append a timestamp in FIX format from a Python time.time or
         datetime.datetime value.
 
-        Note that prior to FIX 5.0, precision must be 3 to be
+        Note that prior to FIX 5.0, precision must be zero or three to be
         compliant with the standard."""
 
         if not timestamp:
@@ -116,13 +117,15 @@ class FixMessage(object):
         else:
             t = timestamp
 
-        s = t.strftime("%Y%m%d-%H:%M:%S.")
+        s = t.strftime("%Y%m%d-%H:%M:%S")
         if precision == 3:
-            s += "%03d" % (t.microsecond / 1000)
+            s += ".%03d" % (t.microsecond / 1000)
         elif precision == 6:
-            s += "%06d" % t.microsecond
+            s += ".%06d" % t.microsecond
+        elif precision == 0:
+            pass
         else:
-            raise ValueError("Precision should be either 3 or 6 digits")
+            raise ValueError("Precision should be one of 0, 3 or 6 digits")
 
         return self.append_pair(tag, s, header=header)
 

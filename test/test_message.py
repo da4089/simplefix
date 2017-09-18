@@ -285,6 +285,15 @@ class MessageTests(unittest.TestCase):
         self.assertEqual("20170116-15:51:12.933458", msg.get(52))
         return
 
+    def test_time_seconds_only(self):
+        """Test formatting of time values with no decimal component"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_time(52, t, 0)
+
+        self.assertEqual("20170116-15:51:12", msg.get(52))
+        return
+
     def test_time_bad_precision(self):
         """Test bad time precision values"""
         msg = FixMessage()
