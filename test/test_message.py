@@ -314,6 +314,74 @@ class MessageTests(unittest.TestCase):
         self.assertEqual(s, msg.get(52))
         return
 
+    def test_utcto_bits_15_51_12(self):
+        msg = FixMessage()
+        msg.append_utc_time_only_bits(1, 15, 51, 12)
+        self.assertEqual("15:51:12", msg.get(1))
+        return
+
+    def test_utcto_bits_15_51_12_933(self):
+        msg = FixMessage()
+        msg.append_utc_time_only_bits(1, 15, 51, 12, 933)
+        self.assertEqual("15:51:12.933", msg.get(1))
+        return
+
+    def test_utcto_bits_15_51_12_933_458(self):
+        msg = FixMessage()
+        msg.append_utc_time_only_bits(1, 15, 51, 12, 933, 458)
+        self.assertEqual("15:51:12.933458", msg.get(1))
+        return
+
+    def test_utcto_bits_bad_hour(self):
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_bits(1, 24, 0, 0)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_bits(1, -1, 0, 0)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_bits(1, "a", 0, 0)
+        return
+
+    def test_utcto_bits_bad_minute(self):
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_bits(1, 15, 60, 0)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_bits(1, 15, -1, 0)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_bits(1, 0, "b", 0)
+        return
+
+    def test_utcto_bits_bad_seconds(self):
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_bits(1, 15, 51, 61)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_bits(1, 15, 51, -1)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_bits(1, 0, 0, "c")
+        return
+
+    def test_utcto_bits_bad_ms(self):
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_bits(1, 15, 51, 12, 1000)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_bits(1, 15, 51, 12, -1)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_bits(1, 0, 0, 0, "d")
+        return
+
+    def test_utcto_bits_bad_us(self):
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_bits(1, 15, 51, 12, 0, 1000)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_bits(1, 15, 51, 12, 0, -1)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_bits(1, 0, 0, 0, 0, "e")
+        return
+
     def test_tzto_bits_15_51_240(self):
         """Test TZTimeOnly with hour and minute components, full hour offset"""
         msg = FixMessage()

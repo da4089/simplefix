@@ -129,6 +129,54 @@ class FixMessage(object):
 
         return self.append_pair(tag, s, header=header)
 
+    def append_utc_time_only_bits(self, tag, h, m, s, ms=None, us=None,
+                                  header=False):
+        """Append a field with a UTCTimeOnly value from components.
+
+        :param tag: Integer or string FIX tag number.
+        :param h: Hours, in range 0 to 23.
+        :param m: Minutes, in range 0 to 59.
+        :param s: Seconds, in range 0 to 59 (60 for leap second).
+        :param ms: Optional milliseconds, in range 0 to 999.
+        :param us: Optional microseconds, in range 0 to 999.
+        :param header: Append to FIX header if True; default to body.
+
+        Formats the UTCTimeOnly value from its components.
+
+        If `ms` or `us` are None, the precision is truncated at
+        that point.  Note that seconds are not optional, unlike in
+        TZTimeOnly."""
+
+        ih = int(h)
+        if ih < 0 or ih > 23:
+            raise ValueError("Hour value `h` (%u) out of range "
+                             "0 to 23" % ih)
+        im = int(m)
+        if im < 0 or im > 59:
+            raise ValueError("Minute value `m` (%u) out of range "
+                             "0 to 59" % im)
+        isec = int(s)
+        if isec < 0 or isec > 60:
+            raise ValueError("Seconds value `s` (%u) out of range "
+                             "0 to 60" % isec)
+        v = "%02u:%02u:%02u" % (ih, im, isec)
+
+        if ms is not None:
+            ims = int(ms)
+            if ims < 0 or ims > 999:
+                raise ValueError("Milliseconds value `ms` (%u) "
+                                 "out of range 0 to 999" % ims)
+            v += ".%03u" % ims
+
+            if us is not None:
+                ius = int(us)
+                if ius < 0 or ius > 999:
+                    raise ValueError("Microseconds value `us` (%u) "
+                                     "out of range 0 to 999" % ius)
+                v += "%03u" % ius
+
+        return self.append_pair(tag, v, header=header)
+
     def append_tz_time_only_bits(self, tag, h, m, s=None, ms=None, us=None,
                                  offset=0, header=False):
         """Append a field with a TZTimeOnly value from components.
