@@ -125,7 +125,8 @@ There is no specific support for creating repeating groups in Messages.
 The count field must be appended first, followed by the group's member's
 fields.
 
-Consequently, it's not an error to append two fields with the same tag.
+Consequently, it's not an error to append two fields with the same tag,
+but note that the count fields are not added automatically.
 
 Data Fields
 ...........
@@ -142,9 +143,9 @@ used.  It will correctly add both the length field and the value field.
 
     message.append_data(95, 96, "RAW DATA \x00\x01 VALUE")
 
-which will result in the FIX message content:
+which will result in the FIX message content (where ◆ represents the SOH):
 
 .. epigraph::
 
-    95=17\x0196=RAW DATA \x00\x01 VALUE\x01
+    95=17◆96=RAW DATA \\x00\\x01 VALUE◆
 
