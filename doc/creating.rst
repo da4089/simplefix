@@ -119,8 +119,8 @@ timestamp values from their components:
 
 .. code-block:: python
 
-    message.append_utc_time_only_bits(1495, 7, 0, 0, 0, 0)
-    message.append_tz_time_only_bits(1079, 20, 0, 0, offset=-300)
+    message.append_utc_time_only_parts(1495, 7, 0, 0, 0, 0)
+    message.append_tz_time_only_parts(1079, 20, 0, 0, offset=-300)
 
 As usual, the first parameter to these functions is the field's tag number.
 The next three parameters are the hour, minute, and seconds of the time value,

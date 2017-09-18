@@ -129,8 +129,14 @@ class FixMessage(object):
 
         return self.append_pair(tag, s, header=header)
 
-    def append_utc_time_only_bits(self, tag, h, m, s, ms=None, us=None,
-                                  header=False):
+    def append_utc_timestamp(self, tag, timestamp=None, precision=3, header=False):
+        return
+
+    def append_utc_time_only(self, tag, timestamp=None, precision=3, header=False):
+        return
+
+    def append_utc_time_only_parts(self, tag, h, m, s, ms=None, us=None,
+                                   header=False):
         """Append a field with a UTCTimeOnly value from components.
 
         :param tag: Integer or string FIX tag number.
@@ -177,8 +183,8 @@ class FixMessage(object):
 
         return self.append_pair(tag, v, header=header)
 
-    def append_tz_time_only_bits(self, tag, h, m, s=None, ms=None, us=None,
-                                 offset=0, header=False):
+    def append_tz_time_only_parts(self, tag, h, m, s=None, ms=None, us=None,
+                                  offset=0, header=False):
         """Append a field with a TZTimeOnly value from components.
 
         :param tag: Integer or string FIX tag number.
