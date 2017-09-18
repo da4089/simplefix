@@ -114,9 +114,25 @@ seconds, 3 for milliseconds or 6 for microseconds; ``utc`` which is
 ``True`` by default but can be set ``False`` for TZTimestamp and TZTimeOnly;
 and ``header`` to insert this field in the header rather than the body.
 
-Time fields can also be set using a string value if the application already
-has the value in the correct format or prefers to manage the formatting
-itself.
+In addition, there are a set of methods for creating correctly formatted
+timestamp values from their components:
+
+.. code-block:: python
+
+    message.append_utc_time_only_bits(1495, 7, 0, 0, 0, 0)
+    message.append_tz_time_only_bits(1079, 20, 0, 0, offset=-300)
+
+As usual, the first parameter to these functions is the field's tag number.
+The next three parameters are the hour, minute, and seconds of the time value,
+followed by optional milliseconds and microseconds values.
+
+The timezone for the TZTimeOnly field is set using an offset value, the
+number of minutes east of UTC.  Thus CET will be offset 60 minutes, and
+New York offset -240 minutes (four hours west).
+
+Finally, remember that time fields can always be set using a string value
+if the application already has the value in the correct format or prefers
+to manage the formatting itself.
 
 Repeating Groups
 ................
