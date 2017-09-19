@@ -35,6 +35,8 @@
 # supply these tags in the wrong order for testing error handling.
 
 import datetime
+import time
+import warnings
 
 
 # FIX field delimiter character.
@@ -99,12 +101,18 @@ class FixMessage(object):
         :param utc: Use UTC if True, local time if False.
         :param header: Append to header if True; default to body.
 
+        THIS METHOD IS DEPRECATED!
+        USE append_utc_timestamp() OR append_tz_timestamp() INSTEAD.
+
         Append a timestamp in FIX format from a Python time.time or
         datetime.datetime value.
 
         Note that prior to FIX 5.0, precision must be zero or three to be
         compliant with the standard."""
 
+        warnings.warn("simplefix.FixMessage.append_time() is deprecated. "
+                      "Use append_utc_timestamp() or append_tz_timestamp() "
+                      "instead.", DeprecationWarning)
         if not timestamp:
             t = datetime.datetime.utcnow()
 
@@ -122,18 +130,80 @@ class FixMessage(object):
             s += ".%03d" % (t.microsecond / 1000)
         elif precision == 6:
             s += ".%06d" % t.microsecond
-        elif precision == 0:
-            pass
-        else:
+        elif precision != 0:
             raise ValueError("Precision should be one of 0, 3 or 6 digits")
 
         return self.append_pair(tag, s, header=header)
 
     def append_utc_timestamp(self, tag, timestamp=None, precision=3, header=False):
-        return
+        """Append a field with a UTCTimestamp value.
+
+        :param tag: Integer or string FIX tag number.
+        :param timestamp: Time value, see below.
+        :param precision: Number of decimal places: 0, 3 (ms) or 6 (us).
+        :param header: Append to FIX header if True; default to body.
+
+        The `timestamp` value should be a datetime, such as created by
+        datetime.datetime.utcnow(); a float, being the number of seconds
+        since midnight 1 Jan 1970 UTC, such as returned by time.time();
+        or, None, in which case datetime.datetime.utcnow() is used to
+        get the current UTC time.
+
+        Precision values other than zero (seconds), 3 (milliseconds),
+        or 6 (microseconds) will raise an exception.  Note that prior
+        to FIX 5.0, only values of 0 or 3 comply with the standard."""
+
+        if timestamp is None:
+            t = datetime.datetime.utcnow()
+        elif type(timestamp) is float:
+            t = datetime.datetime.utcfromtimestamp(timestamp)
+        else:
+            t = timestamp
+
+        s = t.strftime("%Y%m%d-%H:%M:%S")
+        if precision == 3:
+            s += ".%03d" % (t.microsecond / 1000)
+        elif precision == 6:
+            s += ".%06d" % t.microsecond
+        elif precision != 0:
+            raise ValueError("Precision should be one of 0, 3 or 6 digits")
+
+        return self.append_pair(tag, s, header=header)
 
     def append_utc_time_only(self, tag, timestamp=None, precision=3, header=False):
-        return
+        """Append a field with a UTCTimeOnly value.
+
+        :param tag: Integer or string FIX tag number.
+        :param timestamp: Time value, see below.
+        :param precision: Number of decimal places: 0, 3 (ms) or 6 (us).
+        :param header: Append to FIX header if True; default to body.
+
+        The `timestamp` value should be a datetime, such as created by
+        datetime.datetime.utcnow(); a float, being the number of seconds
+        since midnight 1 Jan 1970 UTC, such as returned by time.time();
+        or, None, in which case datetime.datetime.utcnow() is used to
+        get the current UTC time.
+
+        Precision values other than zero (seconds), 3 (milliseconds),
+        or 6 (microseconds) will raise an exception.  Note that prior
+        to FIX 5.0, only values of 0 or 3 comply with the standard."""
+
+        if timestamp is None:
+            t = datetime.datetime.utcnow()
+        elif type(timestamp) is float:
+            t = datetime.datetime.utcfromtimestamp(timestamp)
+        else:
+            t = timestamp
+
+        s = t.strftime("%H:%M:%S")
+        if precision == 3:
+            s += ".%03u" % (t.microsecond / 1000)
+        elif precision == 6:
+            s += ".%06u" % t.microsecond
+        elif precision != 0:
+            raise ValueError("Precision should be one of 0, 3 or 6 digits")
+
+        return self.append_pair(tag, s, header=header)
 
     def append_utc_time_only_parts(self, tag, h, m, s, ms=None, us=None,
                                    header=False):
@@ -182,6 +252,94 @@ class FixMessage(object):
                 v += "%03u" % ius
 
         return self.append_pair(tag, v, header=header)
+
+    def append_tz_timestamp(self, tag, timestamp=None, precision=3, header=False):
+        """Append a field with a TZTimestamp value, derived from local time.
+
+        :param tag: Integer or string FIX tag number.
+        :param timestamp: Time value, see below.
+        :param precision: Number of decimal places: 0, 3 (ms) or 6 (us).
+        :param header: Append to FIX header if True; default to body.
+
+        The `timestamp` value should be a local datetime, such as created
+        by datetime.datetime.now(); a float, being the number of seconds
+        since midnight 1 Jan 1970 UTC, such as returned by time.time();
+        or, None, in which case datetime.datetime.now() is used to get
+        the current local time.
+
+        Precision values other than zero (seconds), 3 (milliseconds),
+        or 6 (microseconds) will raise an exception.  Note that prior
+        to FIX 5.0, only values of 0 or 3 comply with the standard."""
+
+        # Get float offset from Unix epoch.
+        if timestamp is None:
+            now = time.time()
+        elif type(timestamp) is float:
+            now = timestamp
+        else:
+            now = time.mktime(timestamp.timetuple()) + \
+                  (timestamp.microsecond * 1e-6)
+
+        # Get offset of local timezone east of UTC.
+        utc = datetime.datetime.utcfromtimestamp(now)
+        local = datetime.datetime.fromtimestamp(now)
+        offset = int((local - utc).total_seconds() / 60)
+
+        s = local.strftime("%Y%m%d-%H:%M:%S")
+        if precision == 3:
+            s += ".%03u" % (local.microsecond / 1000)
+        elif precision == 6:
+            s += ".%06u" % local.microsecond
+        elif precision != 0:
+            raise ValueError("Precision (%u) should be one of "
+                             "0, 3 or 6 digits" % precision)
+
+        s += self._tz_offset_string(offset)
+        return self.append_pair(tag, s, header=header)
+
+    def append_tz_time_only(self, tag, timestamp=None, precision=3,
+                            header=False):
+        """Append a field with a TZTimeOnly value.
+
+        :param tag: Integer or string FIX tag number.
+        :param timestamp: Time value, see below.
+        :param precision: Number of decimal places: 0, 3 (ms) or 6 (us).
+        :param header: Append to FIX header if True; default to body.
+
+        The `timestamp` value should be a local datetime, such as created
+        by datetime.datetime.now(); a float, being the number of seconds
+        since midnight 1 Jan 1970 UTC, such as returned by time.time();
+        or, None, in which case datetime.datetime.now() is used to
+        get the current UTC time.
+
+        Precision values other than None (minutes), zero (seconds),
+        3 (milliseconds), or 6 (microseconds) will raise an exception.
+        Note that prior to FIX 5.0, only values of 0 or 3 comply with the
+        standard."""
+
+        if timestamp is None:
+            t = datetime.datetime.now()
+        elif type(timestamp) is float:
+            t = datetime.datetime.fromtimestamp(timestamp)
+        else:
+            t = timestamp
+
+        now = time.mktime(t.timetuple()) + (t.microsecond * 1e-6)
+        utc = datetime.datetime.utcfromtimestamp(now)
+        offset = int((t - utc).total_seconds() / 60)
+
+        s = t.strftime("%H:%M")
+        if precision == 0:
+            s += t.strftime(":%S")
+        elif precision == 3:
+            s += ".%03u" % (t.microsecond / 1000)
+        elif precision == 6:
+            s += ".%06u" % t.microsecond
+        elif precision is not None:
+            raise ValueError("Precision should be one of None, 0, 3 or 6 digits")
+
+        s += self._tz_offset_string(offset)
+        return self.append_pair(tag, s, header=header)
 
     def append_tz_time_only_parts(self, tag, h, m, s=None, ms=None, us=None,
                                   offset=0, header=False):
@@ -234,22 +392,7 @@ class FixMessage(object):
                                          "out of range 0 to 999" % ius)
                     v += "%03u" % ius
 
-        io = int(offset)
-        if io == 0:
-            v += "Z"
-        else:
-            if -1440 < io < 1440:
-                ho = abs(io) / 60
-                mo = abs(io) % 60
-
-                v += "%c%02u" % ("+" if io > 0 else "-", ho)
-                if mo != 0:
-                    v += ":%02u" % mo
-
-            else:
-                raise ValueError("Timezone `offset` (%u) out of range "
-                                 "-1439 to +1439 minutes" % io)
-
+        v += self._tz_offset_string(offset)
         return self.append_pair(tag, v, header=header)
 
     def append_string(self, field, header=False):
@@ -421,6 +564,28 @@ class FixMessage(object):
 
         tag, value = self.pairs[item_index]
         return int(tag), value
+
+    @staticmethod
+    def _tz_offset_string(offset):
+        """(Internal) Convert TZ offset in minutes east to string."""
+
+        s = ""
+        io = int(offset)
+        if io == 0:
+            s += "Z"
+        else:
+            if -1440 < io < 1440:
+                ho = abs(io) / 60
+                mo = abs(io) % 60
+
+                s += "%c%02u" % ("+" if io > 0 else "-", ho)
+                if mo != 0:
+                    s += ":%02u" % mo
+
+            else:
+                raise ValueError("Timezone `offset` (%u) out of range "
+                                 "-1439 to +1439 minutes" % io)
+        return s
 
 
 ########################################################################

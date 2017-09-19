@@ -314,25 +314,85 @@ class MessageTests(unittest.TestCase):
         self.assertEqual(s, msg.get(52))
         return
 
-    def test_utcto_bits_15_51_12(self):
+    def test_utcts_default(self):
+        """Test UTCTimestamp with no supplied timestamp value"""
+        msg = FixMessage()
+        msg.append_utc_timestamp(52)
+        return
+
+    def test_utcts_explicit_none(self):
+        """Test UTCTimestamp with explicit None timestamp value"""
+        msg = FixMessage()
+        msg.append_utc_timestamp(52, None)
+        return
+
+    def test_utcts_float(self):
+        """Test UTCTimestamp with floating point value"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_utc_timestamp(52, t)
+
+        self.assertEqual("20170116-15:51:12.933", msg.get(52))
+        return
+
+    def test_utcts_datetime(self):
+        """Test UTCTimestamp with datetime timestamp values"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        dt = datetime.datetime.utcfromtimestamp(t)
+        msg.append_utc_timestamp(52, dt)
+
+        self.assertEqual("20170116-15:51:12.933", msg.get(52))
+        return
+
+    def test_utcts_microseconds(self):
+        """Test UTCTimestamp formatting of microseconds"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_utc_timestamp(52, t, 6)
+
+        self.assertEqual("20170116-15:51:12.933458", msg.get(52))
+        return
+
+    def test_utcts_seconds_only(self):
+        """Test UTCTimestamp formatting of seconds only"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_utc_timestamp(52, t, 0)
+
+        self.assertEqual("20170116-15:51:12", msg.get(52))
+        return
+
+    def test_utcts_bad_precision(self):
+        """Test UTCTimestamp bad time precision values"""
+        msg = FixMessage()
+        t = 1484581872.933458
+
+        with self.assertRaises(ValueError):
+           msg.append_utc_timestamp(52, t, 9)
+        return
+
+    # FIXME: utcto tests
+
+    def test_utcto_parts_15_51_12(self):
         msg = FixMessage()
         msg.append_utc_time_only_parts(1, 15, 51, 12)
         self.assertEqual("15:51:12", msg.get(1))
         return
 
-    def test_utcto_bits_15_51_12_933(self):
+    def test_utcto_parts_15_51_12_933(self):
         msg = FixMessage()
         msg.append_utc_time_only_parts(1, 15, 51, 12, 933)
         self.assertEqual("15:51:12.933", msg.get(1))
         return
 
-    def test_utcto_bits_15_51_12_933_458(self):
+    def test_utcto_parts_15_51_12_933_458(self):
         msg = FixMessage()
         msg.append_utc_time_only_parts(1, 15, 51, 12, 933, 458)
         self.assertEqual("15:51:12.933458", msg.get(1))
         return
 
-    def test_utcto_bits_bad_hour(self):
+    def test_utcto_parts_bad_hour(self):
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.append_utc_time_only_parts(1, 24, 0, 0)
@@ -342,7 +402,7 @@ class MessageTests(unittest.TestCase):
             msg.append_utc_time_only_parts(1, "a", 0, 0)
         return
 
-    def test_utcto_bits_bad_minute(self):
+    def test_utcto_parts_bad_minute(self):
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.append_utc_time_only_parts(1, 15, 60, 0)
@@ -352,7 +412,7 @@ class MessageTests(unittest.TestCase):
             msg.append_utc_time_only_parts(1, 0, "b", 0)
         return
 
-    def test_utcto_bits_bad_seconds(self):
+    def test_utcto_parts_bad_seconds(self):
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.append_utc_time_only_parts(1, 15, 51, 61)
@@ -362,7 +422,7 @@ class MessageTests(unittest.TestCase):
             msg.append_utc_time_only_parts(1, 0, 0, "c")
         return
 
-    def test_utcto_bits_bad_ms(self):
+    def test_utcto_parts_bad_ms(self):
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.append_utc_time_only_parts(1, 15, 51, 12, 1000)
@@ -372,7 +432,7 @@ class MessageTests(unittest.TestCase):
             msg.append_utc_time_only_parts(1, 0, 0, 0, "d")
         return
 
-    def test_utcto_bits_bad_us(self):
+    def test_utcto_parts_bad_us(self):
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.append_utc_time_only_parts(1, 15, 51, 12, 0, 1000)
@@ -382,42 +442,153 @@ class MessageTests(unittest.TestCase):
             msg.append_utc_time_only_parts(1, 0, 0, 0, 0, "e")
         return
 
-    def test_tzto_bits_15_51_240(self):
+    def test_offset_range(self):
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg._tz_offset_string(1500)
+        with self.assertRaises(ValueError):
+            msg._tz_offset_string(1440)
+
+        msg._tz_offset_string(1439)
+        msg._tz_offset_string(0)
+        msg._tz_offset_string(-1439)
+
+        with self.assertRaises(ValueError):
+            msg._tz_offset_string(-1440)
+        with self.assertRaises(ValueError):
+            msg._tz_offset_string(-1500)
+        return
+
+    def test_offset_hours(self):
+        msg = FixMessage()
+        self.assertEqual("Z", msg._tz_offset_string(0))
+        self.assertEqual("+01", msg._tz_offset_string(60))
+        self.assertEqual("+10", msg._tz_offset_string(600))
+        self.assertEqual("-01", msg._tz_offset_string(-60))
+        self.assertEqual("-10", msg._tz_offset_string(-600))
+        return
+
+    def test_offset_minutes(self):
+        msg = FixMessage()
+        self.assertEqual("+01:30", msg._tz_offset_string(90))
+        self.assertEqual("-01:30", msg._tz_offset_string(-90))
+        self.assertEqual("+23:59", msg._tz_offset_string(1439))
+        self.assertEqual("-23:59", msg._tz_offset_string(-1439))
+        return
+
+    def test_append_tzts_float(self):
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_tz_timestamp(1132, t)
+
+        test = time.localtime(t)
+        s = "%04u%02u%02u-%02u:%02u:%02u.%03u" % \
+            (test.tm_year, test.tm_mon, test.tm_mday,
+             test.tm_hour, test.tm_min, test.tm_sec,
+             int((t - int(t)) * 1000))
+        offset = int((datetime.datetime.fromtimestamp(t) -
+                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
+                     / 60)
+        if offset == 0:
+            s += "Z"
+        else:
+            offset_hours = abs(offset) / 60
+            offset_mins = abs(offset) % 60
+
+            s += "%c%02u" % ("+" if offset > 0 else "-", offset_hours)
+            if offset_mins > 0:
+                s += ":%02u" % offset_mins
+
+        self.assertEqual(s, msg.get(1132))
+        return
+
+    def test_append_tzts_datetime(self):
+        msg = FixMessage()
+        t = 1484581872.933458
+        local = datetime.datetime.fromtimestamp(t)
+        msg.append_tz_timestamp(1132, local)
+
+        test = time.localtime(t)
+        s = "%04u%02u%02u-%02u:%02u:%02u.%03u" % \
+            (test.tm_year, test.tm_mon, test.tm_mday,
+             test.tm_hour, test.tm_min, test.tm_sec,
+             int((t - int(t)) * 1000))
+        offset = int((datetime.datetime.fromtimestamp(t) -
+                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
+                     / 60)
+        if offset == 0:
+            s += "Z"
+        else:
+            offset_hours = abs(offset) / 60
+            offset_mins = abs(offset) % 60
+
+            s += "%c%02u" % ("+" if offset > 0 else "-", offset_hours)
+            if offset_mins > 0:
+                s += ":%02u" % offset_mins
+
+        self.assertEqual(s, msg.get(1132))
+        return
+
+    def test_tzto_minutes(self):
+        """Test TZTimeOnly formatting without seconds"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_tz_time_only(1079, t, precision=None)
+
+        test = time.localtime(t)
+        s = "%02u:%02u" % (test.tm_hour, test.tm_min)
+        offset = int((datetime.datetime.fromtimestamp(t) -
+                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
+                     / 60)
+        if offset == 0:
+            s += "Z"
+        else:
+            offset_hours = abs(offset) / 60
+            offset_mins = abs(offset) % 60
+
+            s += "%c%02u" % ("+" if offset > 0 else "-", offset_hours)
+            if offset_mins > 0:
+                s += ":%02u" % offset_mins
+
+        self.assertEqual(s, msg.get(1079))
+        return
+
+    def test_tzto_parts_15_51_240(self):
         """Test TZTimeOnly with hour and minute components, full hour offset"""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, offset=-240)
         self.assertEqual("15:51-04", msg.get(1))
         return
 
-    def test_tzto_bits_15_51_270(self):
+    def test_tzto_parts_15_51_270(self):
         """Test TZTimeOnly with hour, minute and second components, full hour offset"""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, offset=-270)
         self.assertEqual("15:51-04:30", msg.get(1))
         return
 
-    def test_tzto_bits_15_51_12_270(self):
+    def test_tzto_parts_15_51_12_270(self):
         """Test TZTimeOnly with hour, minute and second components, partial hour offset."""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, 12, offset=-270)
         self.assertEqual("15:51:12-04:30", msg.get(1))
         return
 
-    def test_tzto_bits_15_51_12_933_270(self):
+    def test_tzto_parts_15_51_12_933_270(self):
         """Test TZTimeOnly with h, m, s and ms components, partial hour offset."""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, 12, 933, offset=-270)
         self.assertEqual("15:51:12.933-04:30", msg.get(1))
         return
 
-    def test_tzto_bits_15_51_12_933_458_270(self):
+    def test_tzto_parts_15_51_12_933_458_270(self):
         """Test TZTimeOnly with h, m, s, ms, and us components, partial hour offset."""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, 12, 933, 458, offset=-270)
         self.assertEqual("15:51:12.933458-04:30", msg.get(1))
         return
 
-    def test_tzto_bits_15_51_12_933_458_150(self):
+    def test_tzto_parts_15_51_12_933_458_150(self):
         """Test TZTimeOnly with h, m, s, ms, and us components, partial hour offset."""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, 12, 933, 458, offset=150)

@@ -99,23 +99,22 @@ time values in the application code.
 
 .. code-block:: python
 
-    message.append_timestamp(52, precision=6, header=True)  # UTCTimestamp
-    message.append_timestamp(1132, utc=False)  # TZTimestamp
-    message.append_time_only(1495, start_time)  # UTCTimeOnly
-    message.append_time_only(1079, maturity_time, utc=False)  # TZTimeOnly
+    message.append_utc_timestamp(52, precision=6, header=True)
+    message.append_tz_timestamp(1132, my_datetime)
+    message.append_utc_time_only(1495, start_time)
+    message.append_tz_time_only(1079, maturity_time)
 
 The first parameter to these functions is the field's tag number.  The
 second parameter is optional: if None or not supplied, it defaults to the
 current time, otherwise it must be a Unix epoch time (like from
 ``time.time()``), or a ``datetime`` instance.
 
-There are three keyword parameters: ``precision`` which can be 0 for just
-seconds, 3 for milliseconds or 6 for microseconds; ``utc`` which is
-``True`` by default but can be set ``False`` for TZTimestamp and TZTimeOnly;
-and ``header`` to insert this field in the header rather than the body.
+There are two keyword parameters: ``precision`` which can be 0 for just
+seconds, 3 for milliseconds, or 6 for microseconds; and ``header`` to
+insert this field in the header rather than the body.
 
 In addition, there are a set of methods for creating correctly formatted
-timestamp values from their components:
+time only values from their components:
 
 .. code-block:: python
 
