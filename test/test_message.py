@@ -310,7 +310,10 @@ class MessageTests(unittest.TestCase):
         msg.append_time(52, t, utc=False)
 
         test = time.localtime(t)
-        s = "%04u%02u%02u-%02u:%02u:%02u.%03u" % (test.tm_year, test.tm_mon, test.tm_mday, test.tm_hour, test.tm_min, test.tm_sec, int((t - int(t)) * 1000))
+        s = "%04u%02u%02u-%02u:%02u:%02u.%03u" % \
+            (test.tm_year, test.tm_mon, test.tm_mday,
+             test.tm_hour, test.tm_min, test.tm_sec,
+             int((t - int(t)) * 1000))
         self.assertEqual(s, msg.get(52))
         return
 
@@ -554,42 +557,48 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_tzto_parts_15_51_240(self):
-        """Test TZTimeOnly with hour and minute components, full hour offset"""
+        """Test TZTimeOnly with hour and minute components,
+         full hour offset"""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, offset=-240)
         self.assertEqual("15:51-04", msg.get(1))
         return
 
     def test_tzto_parts_15_51_270(self):
-        """Test TZTimeOnly with hour, minute and second components, full hour offset"""
+        """Test TZTimeOnly with hour, minute and second components,
+         full hour offset"""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, offset=-270)
         self.assertEqual("15:51-04:30", msg.get(1))
         return
 
     def test_tzto_parts_15_51_12_270(self):
-        """Test TZTimeOnly with hour, minute and second components, partial hour offset."""
+        """Test TZTimeOnly with hour, minute and second components,
+         partial hour offset."""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, 12, offset=-270)
         self.assertEqual("15:51:12-04:30", msg.get(1))
         return
 
     def test_tzto_parts_15_51_12_933_270(self):
-        """Test TZTimeOnly with h, m, s and ms components, partial hour offset."""
+        """Test TZTimeOnly with h, m, s and ms components,
+         partial hour offset."""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, 12, 933, offset=-270)
         self.assertEqual("15:51:12.933-04:30", msg.get(1))
         return
 
     def test_tzto_parts_15_51_12_933_458_270(self):
-        """Test TZTimeOnly with h, m, s, ms, and us components, partial hour offset."""
+        """Test TZTimeOnly with h, m, s, ms, and us components,
+         partial hour offset."""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, 12, 933, 458, offset=-270)
         self.assertEqual("15:51:12.933458-04:30", msg.get(1))
         return
 
     def test_tzto_parts_15_51_12_933_458_150(self):
-        """Test TZTimeOnly with h, m, s, ms, and us components, partial hour offset."""
+        """Test TZTimeOnly with h, m, s, ms, and us components,
+         partial hour offset."""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, 12, 933, 458, offset=150)
         self.assertEqual("15:51:12.933458+02:30", msg.get(1))
