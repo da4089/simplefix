@@ -33,8 +33,8 @@ While this is not legal advice, in short this means you're free to do
 whatever you like with this code, with the exception of claiming you
 wrote it.
 
-Usage
-=====
+Basic Usage
+===========
 
 Creating Messages
 -----------------
@@ -42,13 +42,14 @@ Creating Messages
 To create a FIX message, first create an instance of the FixMessage class.
 
 .. code-block:: python
+
 msg = simplefix.FixMessage()
 
 You can then add fields to the message as required.  You should add the
 standard header tags 8, 34, 35, 49, 52, and 56 to all messages.  For most
 tags, using ``append_pair()`` is the easiest way to add a field to the message.
-When adding at *UTCTimestamp*  value (ie, for tag 52) using ``append_time()``
-will take care of the formatting for you.
+When adding a *UTCTimestamp*  value (ie, for tag 52) using
+``append_utc_timestamp()`` will take care of the formatting for you.
 
 ``append_string()`` will decompose a "tag=value" string and add it as a proper
 field; ``append_strings()`` will do the same for a sequence of "tag=value"
@@ -82,8 +83,8 @@ the number of fields with ``count()`` , retrieve the value of a field using
 "for ... in ...".
 
 Members of repeating groups can be accessed using ``get(tag, nth)``, where the
-"nth" value is an integer indicating the number of the group to use (note
-that the first group is number one, not zero).
+"nth" value is an integer indicating which occurrence of the tag to return
+(note that the first occurrence is number one, not zero).
 
 
 Contributing
