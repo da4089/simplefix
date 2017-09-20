@@ -116,30 +116,26 @@ class MessageTests(unittest.TestCase):
 
     def test_empty_message(self):
         """Test encoding of empty message"""
-        try:
-            msg = FixMessage()
-            buf = msg.encode()
-        except Exception as e:
-            self.assertEqual(ValueError, type(e))
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg.encode()
         return
 
     def test_encode_no_35(self):
         """Test encoding without MessageType(35) field"""
         msg = FixMessage()
         msg.append_pair(8, "FIX.4.2")
-        try:
-            buf = msg.encode()
-        except ValueError:
-            pass
+        with self.assertRaises(ValueError):
+            msg.encode()
+        return
 
     def test_encode_no_8(self):
         """Test encoding without BeginString(8) field"""
         msg = FixMessage()
         msg.append_pair(35, "D")
-        try:
-            buf = msg.encode()
-        except ValueError:
-            pass
+        with self.assertRaises(ValueError):
+            msg.encode()
+        return
 
     def test_compare_equal(self):
         """Test comparison of equal messages"""
@@ -236,11 +232,11 @@ class MessageTests(unittest.TestCase):
         self.assertEqual(35, msg[1][0])
         self.assertEqual(141, msg[3][0])
 
-        l = []
+        fields = []
         for tag, _ in msg:
-            l.append(int(tag))
+            fields.append(int(tag))
 
-        self.assertEqual([8, 35, 108, 141, 383], l)
+        self.assertEqual([8, 35, 108, 141, 383], fields)
         return
 
     def test_time_defaults(self):
@@ -298,7 +294,7 @@ class MessageTests(unittest.TestCase):
         t = 1484581872.933458
 
         with self.assertRaises(ValueError):
-           msg.append_time(52, t, 9)
+            msg.append_time(52, t, 9)
         return
 
     def test_time_localtime(self):
@@ -370,7 +366,7 @@ class MessageTests(unittest.TestCase):
         t = 1484581872.933458
 
         with self.assertRaises(ValueError):
-           msg.append_utc_timestamp(52, t, 9)
+            msg.append_utc_timestamp(52, t, 9)
         return
 
     # FIXME: utcto tests
