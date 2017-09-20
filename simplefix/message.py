@@ -253,7 +253,8 @@ class FixMessage(object):
 
         return self.append_pair(tag, v, header=header)
 
-    def append_tz_timestamp(self, tag, timestamp=None, precision=3, header=False):
+    def append_tz_timestamp(self, tag, timestamp=None, precision=3,
+                            header=False):
         """Append a field with a TZTimestamp value, derived from local time.
 
         :param tag: Integer or string FIX tag number.
