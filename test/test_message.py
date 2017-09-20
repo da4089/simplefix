@@ -47,18 +47,16 @@ class MessageTests(unittest.TestCase):
     def test_string_without_equals(self):
         """Test field set with string not containing equals sign"""
         msg = FixMessage()
-        try:
+        with self.assertRaises(ValueError):
             msg.append_string("FIX.4.2")
-        except ValueError:
-            pass
+        return
 
     def test_string_with_bad_tag(self):
         """Test field set with bad tag in tag=value string"""
         msg = FixMessage()
-        try:
+        with self.assertRaises(ValueError):
             msg.append_string("foo=bar")
-        except ValueError:
-            pass
+        return
 
     def test_raw_empty_message(self):
         """Test raw encoding of empty message"""
