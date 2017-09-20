@@ -30,7 +30,7 @@
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = []
+extensions = ['sphinx.ext.autodoc']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -46,7 +46,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'SimpleFIX'
-copyright = u'2017, David Arnold'
+copyright = u'2016-2017, David Arnold'
 author = u'David Arnold'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -88,7 +88,14 @@ html_theme = 'alabaster'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'github_user': 'da4089',
+    'github_repo': 'simplefix',
+    'github_type': 'star',
+    'github_button': 'true',
+    'github_count': 'true',
+    'travis_button': 'true'
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -166,6 +173,3 @@ texinfo_documents = [
      author, 'SimpleFIX', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-
