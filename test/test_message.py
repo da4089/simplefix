@@ -47,18 +47,16 @@ class MessageTests(unittest.TestCase):
     def test_string_without_equals(self):
         """Test field set with string not containing equals sign"""
         msg = FixMessage()
-        try:
+        with self.assertRaises(ValueError):
             msg.append_string("FIX.4.2")
-        except ValueError:
-            pass
+        return
 
     def test_string_with_bad_tag(self):
         """Test field set with bad tag in tag=value string"""
         msg = FixMessage()
-        try:
+        with self.assertRaises(ValueError):
             msg.append_string("foo=bar")
-        except ValueError:
-            pass
+        return
 
     def test_raw_empty_message(self):
         """Test raw encoding of empty message"""
@@ -118,30 +116,26 @@ class MessageTests(unittest.TestCase):
 
     def test_empty_message(self):
         """Test encoding of empty message"""
-        try:
-            msg = FixMessage()
-            buf = msg.encode()
-        except Exception as e:
-            self.assertEqual(ValueError, type(e))
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg.encode()
         return
 
     def test_encode_no_35(self):
         """Test encoding without MessageType(35) field"""
         msg = FixMessage()
         msg.append_pair(8, "FIX.4.2")
-        try:
-            buf = msg.encode()
-        except ValueError:
-            pass
+        with self.assertRaises(ValueError):
+            msg.encode()
+        return
 
     def test_encode_no_8(self):
         """Test encoding without BeginString(8) field"""
         msg = FixMessage()
         msg.append_pair(35, "D")
-        try:
-            buf = msg.encode()
-        except ValueError:
-            pass
+        with self.assertRaises(ValueError):
+            msg.encode()
+        return
 
     def test_compare_equal(self):
         """Test comparison of equal messages"""
@@ -238,11 +232,11 @@ class MessageTests(unittest.TestCase):
         self.assertEqual(35, msg[1][0])
         self.assertEqual(141, msg[3][0])
 
-        l = []
+        fields = []
         for tag, _ in msg:
-            l.append(int(tag))
+            fields.append(int(tag))
 
-        self.assertEqual([8, 35, 108, 141, 383], l)
+        self.assertEqual([8, 35, 108, 141, 383], fields)
         return
 
     def test_time_defaults(self):
@@ -285,13 +279,22 @@ class MessageTests(unittest.TestCase):
         self.assertEqual("20170116-15:51:12.933458", msg.get(52))
         return
 
+    def test_time_seconds_only(self):
+        """Test formatting of time values with no decimal component"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_time(52, t, 0)
+
+        self.assertEqual("20170116-15:51:12", msg.get(52))
+        return
+
     def test_time_bad_precision(self):
         """Test bad time precision values"""
         msg = FixMessage()
         t = 1484581872.933458
 
         with self.assertRaises(ValueError):
-           msg.append_time(52, t, 9)
+            msg.append_time(52, t, 9)
         return
 
     def test_time_localtime(self):
@@ -301,13 +304,302 @@ class MessageTests(unittest.TestCase):
         msg.append_time(52, t, utc=False)
 
         test = time.localtime(t)
-        s = "%04u%02u%02u-%02u:%02u:%02u.%03u" % (test.tm_year, test.tm_mon, test.tm_mday, test.tm_hour, test.tm_min, test.tm_sec, int((t - int(t)) * 1000))
+        s = "%04u%02u%02u-%02u:%02u:%02u.%03u" % \
+            (test.tm_year, test.tm_mon, test.tm_mday,
+             test.tm_hour, test.tm_min, test.tm_sec,
+             int((t - int(t)) * 1000))
         self.assertEqual(s, msg.get(52))
+        return
+
+    def test_utcts_default(self):
+        """Test UTCTimestamp with no supplied timestamp value"""
+        msg = FixMessage()
+        msg.append_utc_timestamp(52)
+        return
+
+    def test_utcts_explicit_none(self):
+        """Test UTCTimestamp with explicit None timestamp value"""
+        msg = FixMessage()
+        msg.append_utc_timestamp(52, None)
+        return
+
+    def test_utcts_float(self):
+        """Test UTCTimestamp with floating point value"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_utc_timestamp(52, t)
+
+        self.assertEqual("20170116-15:51:12.933", msg.get(52))
+        return
+
+    def test_utcts_datetime(self):
+        """Test UTCTimestamp with datetime timestamp values"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        dt = datetime.datetime.utcfromtimestamp(t)
+        msg.append_utc_timestamp(52, dt)
+
+        self.assertEqual("20170116-15:51:12.933", msg.get(52))
+        return
+
+    def test_utcts_microseconds(self):
+        """Test UTCTimestamp formatting of microseconds"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_utc_timestamp(52, t, 6)
+
+        self.assertEqual("20170116-15:51:12.933458", msg.get(52))
+        return
+
+    def test_utcts_seconds_only(self):
+        """Test UTCTimestamp formatting of seconds only"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_utc_timestamp(52, t, 0)
+
+        self.assertEqual("20170116-15:51:12", msg.get(52))
+        return
+
+    def test_utcts_bad_precision(self):
+        """Test UTCTimestamp bad time precision values"""
+        msg = FixMessage()
+        t = 1484581872.933458
+
+        with self.assertRaises(ValueError):
+            msg.append_utc_timestamp(52, t, 9)
+        return
+
+    # FIXME: utcto tests
+
+    def test_utcto_parts_15_51_12(self):
+        msg = FixMessage()
+        msg.append_utc_time_only_parts(1, 15, 51, 12)
+        self.assertEqual("15:51:12", msg.get(1))
+        return
+
+    def test_utcto_parts_15_51_12_933(self):
+        msg = FixMessage()
+        msg.append_utc_time_only_parts(1, 15, 51, 12, 933)
+        self.assertEqual("15:51:12.933", msg.get(1))
+        return
+
+    def test_utcto_parts_15_51_12_933_458(self):
+        msg = FixMessage()
+        msg.append_utc_time_only_parts(1, 15, 51, 12, 933, 458)
+        self.assertEqual("15:51:12.933458", msg.get(1))
+        return
+
+    def test_utcto_parts_bad_hour(self):
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_parts(1, 24, 0, 0)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_parts(1, -1, 0, 0)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_parts(1, "a", 0, 0)
+        return
+
+    def test_utcto_parts_bad_minute(self):
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_parts(1, 15, 60, 0)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_parts(1, 15, -1, 0)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_parts(1, 0, "b", 0)
+        return
+
+    def test_utcto_parts_bad_seconds(self):
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_parts(1, 15, 51, 61)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_parts(1, 15, 51, -1)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_parts(1, 0, 0, "c")
+        return
+
+    def test_utcto_parts_bad_ms(self):
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_parts(1, 15, 51, 12, 1000)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_parts(1, 15, 51, 12, -1)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_parts(1, 0, 0, 0, "d")
+        return
+
+    def test_utcto_parts_bad_us(self):
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_parts(1, 15, 51, 12, 0, 1000)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_parts(1, 15, 51, 12, 0, -1)
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only_parts(1, 0, 0, 0, 0, "e")
+        return
+
+    def test_offset_range(self):
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg._tz_offset_string(1500)
+        with self.assertRaises(ValueError):
+            msg._tz_offset_string(1440)
+
+        msg._tz_offset_string(1439)
+        msg._tz_offset_string(0)
+        msg._tz_offset_string(-1439)
+
+        with self.assertRaises(ValueError):
+            msg._tz_offset_string(-1440)
+        with self.assertRaises(ValueError):
+            msg._tz_offset_string(-1500)
+        return
+
+    def test_offset_hours(self):
+        msg = FixMessage()
+        self.assertEqual("Z", msg._tz_offset_string(0))
+        self.assertEqual("+01", msg._tz_offset_string(60))
+        self.assertEqual("+10", msg._tz_offset_string(600))
+        self.assertEqual("-01", msg._tz_offset_string(-60))
+        self.assertEqual("-10", msg._tz_offset_string(-600))
+        return
+
+    def test_offset_minutes(self):
+        msg = FixMessage()
+        self.assertEqual("+01:30", msg._tz_offset_string(90))
+        self.assertEqual("-01:30", msg._tz_offset_string(-90))
+        self.assertEqual("+23:59", msg._tz_offset_string(1439))
+        self.assertEqual("-23:59", msg._tz_offset_string(-1439))
+        return
+
+    def test_append_tzts_float(self):
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_tz_timestamp(1132, t)
+
+        test = time.localtime(t)
+        s = "%04u%02u%02u-%02u:%02u:%02u.%03u" % \
+            (test.tm_year, test.tm_mon, test.tm_mday,
+             test.tm_hour, test.tm_min, test.tm_sec,
+             int((t - int(t)) * 1000))
+        offset = int((datetime.datetime.fromtimestamp(t) -
+                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
+                     / 60)
+        if offset == 0:
+            s += "Z"
+        else:
+            offset_hours = abs(offset) / 60
+            offset_mins = abs(offset) % 60
+
+            s += "%c%02u" % ("+" if offset > 0 else "-", offset_hours)
+            if offset_mins > 0:
+                s += ":%02u" % offset_mins
+
+        self.assertEqual(s, msg.get(1132))
+        return
+
+    def test_append_tzts_datetime(self):
+        msg = FixMessage()
+        t = 1484581872.933458
+        local = datetime.datetime.fromtimestamp(t)
+        msg.append_tz_timestamp(1132, local)
+
+        test = time.localtime(t)
+        s = "%04u%02u%02u-%02u:%02u:%02u.%03u" % \
+            (test.tm_year, test.tm_mon, test.tm_mday,
+             test.tm_hour, test.tm_min, test.tm_sec,
+             int((t - int(t)) * 1000))
+        offset = int((datetime.datetime.fromtimestamp(t) -
+                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
+                     / 60)
+        if offset == 0:
+            s += "Z"
+        else:
+            offset_hours = abs(offset) / 60
+            offset_mins = abs(offset) % 60
+
+            s += "%c%02u" % ("+" if offset > 0 else "-", offset_hours)
+            if offset_mins > 0:
+                s += ":%02u" % offset_mins
+
+        self.assertEqual(s, msg.get(1132))
+        return
+
+    def test_tzto_minutes(self):
+        """Test TZTimeOnly formatting without seconds"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_tz_time_only(1079, t, precision=None)
+
+        test = time.localtime(t)
+        s = "%02u:%02u" % (test.tm_hour, test.tm_min)
+        offset = int((datetime.datetime.fromtimestamp(t) -
+                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
+                     / 60)
+        if offset == 0:
+            s += "Z"
+        else:
+            offset_hours = abs(offset) / 60
+            offset_mins = abs(offset) % 60
+
+            s += "%c%02u" % ("+" if offset > 0 else "-", offset_hours)
+            if offset_mins > 0:
+                s += ":%02u" % offset_mins
+
+        self.assertEqual(s, msg.get(1079))
+        return
+
+    def test_tzto_parts_15_51_240(self):
+        """Test TZTimeOnly with hour and minute components,
+         full hour offset"""
+        msg = FixMessage()
+        msg.append_tz_time_only_parts(1, 15, 51, offset=-240)
+        self.assertEqual("15:51-04", msg.get(1))
+        return
+
+    def test_tzto_parts_15_51_270(self):
+        """Test TZTimeOnly with hour, minute and second components,
+         full hour offset"""
+        msg = FixMessage()
+        msg.append_tz_time_only_parts(1, 15, 51, offset=-270)
+        self.assertEqual("15:51-04:30", msg.get(1))
+        return
+
+    def test_tzto_parts_15_51_12_270(self):
+        """Test TZTimeOnly with hour, minute and second components,
+         partial hour offset."""
+        msg = FixMessage()
+        msg.append_tz_time_only_parts(1, 15, 51, 12, offset=-270)
+        self.assertEqual("15:51:12-04:30", msg.get(1))
+        return
+
+    def test_tzto_parts_15_51_12_933_270(self):
+        """Test TZTimeOnly with h, m, s and ms components,
+         partial hour offset."""
+        msg = FixMessage()
+        msg.append_tz_time_only_parts(1, 15, 51, 12, 933, offset=-270)
+        self.assertEqual("15:51:12.933-04:30", msg.get(1))
+        return
+
+    def test_tzto_parts_15_51_12_933_458_270(self):
+        """Test TZTimeOnly with h, m, s, ms, and us components,
+         partial hour offset."""
+        msg = FixMessage()
+        msg.append_tz_time_only_parts(1, 15, 51, 12, 933, 458, offset=-270)
+        self.assertEqual("15:51:12.933458-04:30", msg.get(1))
+        return
+
+    def test_tzto_parts_15_51_12_933_458_150(self):
+        """Test TZTimeOnly with h, m, s, ms, and us components,
+         partial hour offset."""
+        msg = FixMessage()
+        msg.append_tz_time_only_parts(1, 15, 51, 12, 933, 458, offset=150)
+        self.assertEqual("15:51:12.933458+02:30", msg.get(1))
         return
 
     def test_header_field(self):
         """Test use of header flag"""
-
         msg = FixMessage()
         msg.append_pair(20000, "third")
         msg.append_pair(20001, "first", header=True)
@@ -318,7 +610,6 @@ class MessageTests(unittest.TestCase):
 
     def test_strings(self):
         """Test adding fields from a sequence of tag=value strings"""
-
         msg = FixMessage()
         msg.append_strings(["8=FIX.4.4", "35=0"])
         self.assertEqual("8=FIX.4.4\x019=5\x0135=0\x0110=163\x01", msg.encode())

@@ -1,0 +1,19 @@
+
+* Introduction
+* Installation
+* Usage
+  * Import
+  * Creating Messages
+    * Simple Fields
+    * Header Fields
+    * Pre-composed Pairs
+    * Timestamps
+    * Repeating Groups
+    * Data Fields
+  * Encoding Messages
+    * Raw Mode
+  * Decoding Messages
+    * Accumulating bytes
+    * Extracting a message
+    * Accessing Fields
+    * Repeating Groups
