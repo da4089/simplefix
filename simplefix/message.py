@@ -35,12 +35,31 @@
 # supply these tags in the wrong order for testing error handling.
 
 import datetime
+import sys
 import time
 import warnings
 
+from .constants import SOH_BYTE
 
-# FIX field delimiter character.
-SOH = '\001'
+
+def make_value(value):
+    """Make a FIX value from a string, bytes, or number."""
+    if sys.version_info.major == 2:
+        return bytes(value)
+    elif type(value) == str:
+        return bytes(value, 'UTF-8')
+    elif type(value) in (int, float):
+        return bytes(str(value), 'ASCII')
+    else:
+        return bytes(value)
+
+
+def make_tag(value):
+    """Make a FIX tag value from string, bytes, or integer."""
+    if sys.version_info.major == 2:
+        return bytes(value)
+    else:
+        return bytes(str(value), 'ASCII')
 
 
 class FixMessage(object):
@@ -79,19 +98,22 @@ class FixMessage(object):
         your program logic."""
 
         if int(tag) == 8:
-            self.begin_string = str(value)
+            self.begin_string = make_value(value)
 
         if int(tag) == 35:
-            self.message_type = value
+            self.message_type = make_value(value)
 
         if header:
-            self.pairs.insert(self.header_index, (str(tag), str(value)))
+            self.pairs.insert(self.header_index,
+                              (make_tag(tag),
+                               make_value(value)))
             self.header_index += 1
         else:
-            self.pairs.append((str(tag), str(value)))
+            self.pairs.append((make_tag(tag), make_value(value)))
         return
 
-    def append_time(self, tag, timestamp=None, precision=3, utc=True, header=False):
+    def append_time(self, tag, timestamp=None, precision=3, utc=True,
+                    header=False):
         """Append a time field to this message.
 
         :param tag: Integer or string FIX tag number.
@@ -135,7 +157,8 @@ class FixMessage(object):
 
         return self.append_pair(tag, s, header=header)
 
-    def append_utc_timestamp(self, tag, timestamp=None, precision=3, header=False):
+    def append_utc_timestamp(self, tag, timestamp=None, precision=3,
+                             header=False):
         """Append a field with a UTCTimestamp value.
 
         :param tag: Integer or string FIX tag number.
@@ -170,7 +193,8 @@ class FixMessage(object):
 
         return self.append_pair(tag, s, header=header)
 
-    def append_utc_time_only(self, tag, timestamp=None, precision=3, header=False):
+    def append_utc_time_only(self, tag, timestamp=None, precision=3,
+                             header=False):
         """Append a field with a UTCTimeOnly value.
 
         :param tag: Integer or string FIX tag number.
@@ -337,7 +361,8 @@ class FixMessage(object):
         elif precision == 6:
             s += ".%06u" % t.microsecond
         elif precision is not None:
-            raise ValueError("Precision should be one of None, 0, 3 or 6 digits")
+            raise ValueError("Precision should be one of "
+                             "None, 0, 3 or 6 digits")
 
         s += self._tz_offset_string(offset)
         return self.append_pair(tag, s, header=header)
@@ -482,47 +507,47 @@ class FixMessage(object):
 
         This function does no further validation of the message content."""
 
-        s = ''  # FIXME: should be bytes type?
+        buf = b""
         if raw:
             # Walk pairs, creating string.
             for tag, value in self.pairs:
-                s += '%s=%s%s' % (tag, value, SOH)
+                buf += b"%s=%s%s" % (tag, value, SOH_BYTE)
 
-            return s
+            return buf
 
         # Cooked.
         for tag, value in self.pairs:
             if int(tag) in (8, 9, 35, 10):
                 continue
-            s += '%s=%s%s' % (tag, value, SOH)
+            buf += b"%s=%s%s" % (tag, value, SOH_BYTE)
 
         # Prepend the message type.
         if self.message_type is None:
             raise ValueError("No message type set")
 
-        s = "35=%s" % self.message_type + SOH + s
+        buf = b"35=%s" % self.message_type + SOH_BYTE + buf
 
         # Calculate body length.
         #
         # From first byte after body length field, to the delimiter
         # before the checksum (which shouldn't be there yet).
-        body_length = len(s)
+        body_length = len(buf)
 
         # Prepend begin-string and body-length.
         if not self.begin_string:
             raise ValueError("No begin string set")
 
-        s = "8=%s" % self.begin_string + SOH + \
-            "9=%u" % body_length + SOH + \
-            s
+        buf = b"8=%s" % self.begin_string + SOH_BYTE + \
+            b"9=%u" % body_length + SOH_BYTE + \
+            buf
 
         # Calculate and append the checksum.
         checksum = 0
-        for c in s:
-            checksum += ord(c)
-        s += "10=%03u" % (checksum % 256,) + SOH
+        for c in buf:
+            checksum += ord(c) if sys.version_info.major == 2 else c
+        buf += b"10=%03u" % (checksum % 256,) + SOH_BYTE
 
-        return s
+        return buf
 
     def __eq__(self, other):
         """Compare with another FixMessage.

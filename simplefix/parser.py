@@ -23,7 +23,8 @@
 #
 ########################################################################
 
-from .message import FixMessage, SOH
+from .constants import EQUALS_BYTE, SOH_BYTE
+from .message import FixMessage
 from .data import RAW_DATA_TAGS, RAW_LEN_TAGS
 
 
@@ -45,7 +46,7 @@ class FixParser(object):
         """Constructor."""
 
         # Internal buffer used to accumulate message data.
-        self.buf = ''
+        self.buf = b""
 
         # Parsed "tag=value" pairs, removed from the buffer, but not
         # yet returned as a message.
@@ -95,7 +96,7 @@ class FixParser(object):
         This will discard any appended buffer content, and any fields
         parsed so far."""
 
-        self.buf = ''
+        self.buf = b""
         self.pairs = []
         return
 
@@ -138,7 +139,7 @@ class FixParser(object):
         tag = 0
 
         while point < len(self.buf):
-            if in_tag and self.buf[point] == "=":
+            if in_tag and self.buf[point] == EQUALS_BYTE:
                 tag_string = self.buf[start:point]
                 point += 1
 
@@ -157,7 +158,7 @@ class FixParser(object):
                     in_tag = False
                     start = point
 
-            elif self.buf[point] == SOH:
+            elif self.buf[point] == SOH_BYTE:
                 value = self.buf[start:point]
                 self.pairs.append((tag, value))
                 self.buf = self.buf[point + 1:]

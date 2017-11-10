@@ -25,13 +25,13 @@
 
 """A simple FIX protocol implementation for Python."""
 
-from .message import FixMessage, SOH
+from .message import FixMessage
 from .parser import FixParser
 from .constants import *
 
 
-def pretty_print(s):
-    cooked = s.replace(SOH, '|')
+def pretty_print(buf):
+    cooked = buf.replace(SOH_BYTE, '|')
     return cooked
 
 
