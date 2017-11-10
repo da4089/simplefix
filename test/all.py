@@ -25,9 +25,11 @@
 
 
 import unittest
+from test_constants import ConstantsTests
 from test_init import InitTests
 from test_message import MessageTests
 from test_parser import ParserTests
+
 
 if __name__ == "__main__":
     unittest.main()

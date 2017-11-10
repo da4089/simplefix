@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 ########################################################################
 # SimpleFIX
-# Copyright (C) 2016-2017, David Arnold.
+# Copyright (C) 2017, David Arnold.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,16 +23,22 @@
 #
 ########################################################################
 
-"""A simple FIX protocol implementation for Python."""
-
-from .message import FixMessage, SOH
-from .parser import FixParser
-from .constants import *
+import unittest
+import simplefix
 
 
-def pretty_print(s):
-    cooked = s.replace(SOH, '|')
-    return cooked
+class ConstantsTests(unittest.TestCase):
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_35(self):
+        self.assertEqual(b'0', simplefix.MSGTYPE_HEARTBEAT)
+        return
 
 
-########################################################################
+if __name__ == "__main__":
+    unittest.main()
