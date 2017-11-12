@@ -23,8 +23,17 @@
 #
 ########################################################################
 
+import sys
 import unittest
+
 from simplefix import FixMessage, FixParser
+
+
+def make_str(s):
+    if sys.version_info.major == 2:
+        return bytes(s)
+    else:
+        return bytes(s, 'ASCII')
 
 
 class ParserTests(unittest.TestCase):
@@ -55,9 +64,9 @@ class ParserTests(unittest.TestCase):
         m = p.get_message()
 
         self.assertIsNotNone(m)
-        self.assertEqual("FIX.4.2", m.get(8))
-        self.assertEqual("D", m.get(35))
-        self.assertEqual("A", m.get(29))
+        self.assertEqual(b"FIX.4.2", m.get(8))
+        self.assertEqual(b"D", m.get(35))
+        self.assertEqual(b"A", m.get(29))
         return
 
     def test_parse_partial_string(self):
@@ -70,10 +79,10 @@ class ParserTests(unittest.TestCase):
         parser.append_buffer("5\x0135=0\x0110=161\x01")
         msg = parser.get_message()
         self.assertIsNotNone(msg)
-        self.assertEqual("FIX.4.2", msg.get(8))
-        self.assertEqual("5", msg.get(9))
-        self.assertEqual("0", msg.get(35))
-        self.assertEqual("161", msg.get(10))
+        self.assertEqual(b"FIX.4.2", msg.get(8))
+        self.assertEqual(b"5", msg.get(9))
+        self.assertEqual(b"0", msg.get(35))
+        self.assertEqual(b"161", msg.get(10))
         return
 
     def test_get_buffer(self):
@@ -84,14 +93,14 @@ class ParserTests(unittest.TestCase):
         self.assertIsNone(msg)
 
         buf = parser.get_buffer()
-        self.assertEqual("9=", buf)
+        self.assertEqual(b"9=", buf)
 
         parser.append_buffer("5\x0135=0\x0110=161\x01")
         msg = parser.get_message()
         self.assertIsNotNone(msg)
 
         buf = parser.get_buffer()
-        self.assertEqual("", buf)
+        self.assertEqual(b"", buf)
         return
 
     def test_leading_junk_pairs(self):
@@ -114,7 +123,7 @@ class ParserTests(unittest.TestCase):
 
     def test_raw_data(self):
         """Test parsing of raw data fields."""
-        raw = "raw\x01data"
+        raw = b"raw\x01data"
 
         pkt = FixMessage()
         pkt.append_pair(8, "FIX.4.2")
@@ -127,15 +136,15 @@ class ParserTests(unittest.TestCase):
         msg = parser.get_message()
 
         self.assertIsNotNone(msg)
-        self.assertEqual("FIX.4.2", msg.get(8))
-        self.assertEqual("D", msg.get(35))
+        self.assertEqual(b"FIX.4.2", msg.get(8))
+        self.assertEqual(b"D", msg.get(35))
         self.assertEqual(len(raw), int(msg.get(95)))
         self.assertEqual(raw, msg.get(96))
         return
 
     def test_raw_data_tags(self):
         """Test functions to add and remove raw data tags."""
-        raw = "raw\x015000=1"
+        raw = b"raw\x015000=1"
 
         pkt = FixMessage()
         pkt.append_pair(8, "FIX.4.2")
@@ -149,8 +158,8 @@ class ParserTests(unittest.TestCase):
         msg = parser.get_message()
 
         self.assertIsNotNone(msg)
-        self.assertEqual("FIX.4.2", msg.get(8))
-        self.assertEqual("D", msg.get(35))
+        self.assertEqual(b"FIX.4.2", msg.get(8))
+        self.assertEqual(b"D", msg.get(35))
         self.assertEqual(len(raw), int(msg.get(5001)))
         self.assertEqual(raw, msg.get(5002))
 
@@ -160,11 +169,11 @@ class ParserTests(unittest.TestCase):
         msg = parser.get_message()
 
         self.assertIsNotNone(msg)
-        self.assertEqual("FIX.4.2", msg.get(8))
-        self.assertEqual("D", msg.get(35))
+        self.assertEqual(b"FIX.4.2", msg.get(8))
+        self.assertEqual(b"D", msg.get(35))
         self.assertEqual(len(raw), int(msg.get(5001)))
-        self.assertEqual("raw", msg.get(5002))
-        self.assertEqual("1", msg.get(5000))
+        self.assertEqual(b"raw", msg.get(5002))
+        self.assertEqual(b"1", msg.get(5000))
         return
 
 

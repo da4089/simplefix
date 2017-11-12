@@ -39,22 +39,23 @@ import sys
 import time
 import warnings
 
-from .constants import SOH_BYTE
+from .constants import SOH_STR
 
 
-def make_value(value):
+def fix_val(value):
     """Make a FIX value from a string, bytes, or number."""
+    if type(value) == bytes:
+        return value
+
     if sys.version_info.major == 2:
         return bytes(value)
     elif type(value) == str:
         return bytes(value, 'UTF-8')
-    elif type(value) in (int, float):
-        return bytes(str(value), 'ASCII')
     else:
-        return bytes(value)
+        return bytes(str(value), 'ASCII')
 
 
-def make_tag(value):
+def fix_tag(value):
     """Make a FIX tag value from string, bytes, or integer."""
     if sys.version_info.major == 2:
         return bytes(value)
@@ -98,18 +99,18 @@ class FixMessage(object):
         your program logic."""
 
         if int(tag) == 8:
-            self.begin_string = make_value(value)
+            self.begin_string = fix_val(value)
 
         if int(tag) == 35:
-            self.message_type = make_value(value)
+            self.message_type = fix_val(value)
 
         if header:
             self.pairs.insert(self.header_index,
-                              (make_tag(tag),
-                               make_value(value)))
+                              (fix_tag(tag),
+                               fix_val(value)))
             self.header_index += 1
         else:
-            self.pairs.append((make_tag(tag), make_value(value)))
+            self.pairs.append((fix_tag(tag), fix_val(value)))
         return
 
     def append_time(self, tag, timestamp=None, precision=3, utc=True,
@@ -484,11 +485,11 @@ class FixMessage(object):
         Defaults to returning the first matching value of 'tag', but if
         the 'nth' parameter is overridden, can get repeated fields."""
 
-        str_tag = str(tag)
+        tag = fix_tag(tag)
         nth = int(nth)
 
         for t, v in self.pairs:
-            if t == str_tag:
+            if t == tag:
                 nth -= 1
                 if nth == 0:
                     return v
@@ -511,7 +512,7 @@ class FixMessage(object):
         if raw:
             # Walk pairs, creating string.
             for tag, value in self.pairs:
-                buf += b"%s=%s%s" % (tag, value, SOH_BYTE)
+                buf += b"%s=%s%s" % (tag, value, SOH_STR)
 
             return buf
 
@@ -519,13 +520,13 @@ class FixMessage(object):
         for tag, value in self.pairs:
             if int(tag) in (8, 9, 35, 10):
                 continue
-            buf += b"%s=%s%s" % (tag, value, SOH_BYTE)
+            buf += b"%s=%s%s" % (tag, value, SOH_STR)
 
         # Prepend the message type.
         if self.message_type is None:
             raise ValueError("No message type set")
 
-        buf = b"35=%s" % self.message_type + SOH_BYTE + buf
+        buf = b"35=%s" % self.message_type + SOH_STR + buf
 
         # Calculate body length.
         #
@@ -537,15 +538,15 @@ class FixMessage(object):
         if not self.begin_string:
             raise ValueError("No begin string set")
 
-        buf = b"8=%s" % self.begin_string + SOH_BYTE + \
-            b"9=%u" % body_length + SOH_BYTE + \
+        buf = b"8=%s" % self.begin_string + SOH_STR + \
+            b"9=%u" % body_length + SOH_STR + \
             buf
 
         # Calculate and append the checksum.
         checksum = 0
         for c in buf:
             checksum += ord(c) if sys.version_info.major == 2 else c
-        buf += b"10=%03u" % (checksum % 256,) + SOH_BYTE
+        buf += b"10=%03u" % (checksum % 256,) + SOH_STR
 
         return buf
 

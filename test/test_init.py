@@ -36,9 +36,9 @@ class InitTests(unittest.TestCase):
         pass
 
     def test_pretty_print(self):
-        input = "1=2\x013=foo\x01"
+        input = b"1=2\x013=foo\x01"
         output = simplefix.pretty_print(input)
-        self.assertEqual("1=2|3=foo|", output)
+        self.assertEqual(b"1=2|3=foo|", output)
         return
 
 

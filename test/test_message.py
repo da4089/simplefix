@@ -24,9 +24,18 @@
 ########################################################################
 
 import datetime
+import sys
 import time
 import unittest
+
 from simplefix import FixMessage
+
+
+def fix_str(s):
+    if sys.version_info.major == 2:
+        return bytes(s)
+    else:
+        return bytes(s, 'ASCII')
 
 
 class MessageTests(unittest.TestCase):
@@ -41,7 +50,7 @@ class MessageTests(unittest.TestCase):
         """Test field set with tag=value string"""
         msg = FixMessage()
         msg.append_string("8=FIX.4.2")
-        self.assertEqual("FIX.4.2", msg.get(8))
+        self.assertEqual(fix_str("FIX.4.2"), msg.get(8))
         return
 
     def test_string_without_equals(self):
@@ -61,14 +70,14 @@ class MessageTests(unittest.TestCase):
     def test_raw_empty_message(self):
         """Test raw encoding of empty message"""
         pkt = FixMessage()
-        self.assertEqual("", pkt.encode(True))
+        self.assertEqual(fix_str(""), pkt.encode(True))
         return
 
     def test_raw_begin_string(self):
         """Test raw encoding of BeginString(8)"""
         pkt = FixMessage()
         pkt.append_pair(8, "FIX.4.4")
-        self.assertEqual("8=FIX.4.4\x01", pkt.encode(True))
+        self.assertEqual(fix_str("8=FIX.4.4\x01"), pkt.encode(True))
         return
 
     def test_set_session_version(self):
@@ -76,7 +85,11 @@ class MessageTests(unittest.TestCase):
         pkt = FixMessage()
         pkt.append_pair(8, "FIX.4.4")
         pkt.append_pair(35, "0")
-        self.assertEqual("8=FIX.4.4\x019=5\x0135=0\x0110=163\x01", pkt.encode())
+        self.assertEqual(fix_str("8=FIX.4.4\x01"
+                                  "9=5\x01"
+                                  "35=0\x01"
+                                  "10=163\x01"),
+                         pkt.encode())
         return
 
     def test_get_repeating(self):
@@ -86,10 +99,10 @@ class MessageTests(unittest.TestCase):
         pkt.append_pair(42, "b")
         pkt.append_pair(42, "c")
 
-        self.assertEqual("a", pkt.get(42))
-        self.assertEqual("b", pkt.get(42, 2))
-        self.assertEqual("c", pkt.get(42, 3))
-        self.assertEqual("a", pkt.get(42, 1))
+        self.assertEqual(fix_str("a"), pkt.get(42))
+        self.assertEqual(fix_str("b"), pkt.get(42, 2))
+        self.assertEqual(fix_str("c"), pkt.get(42, 3))
+        self.assertEqual(fix_str("a"), pkt.get(42, 1))
         self.assertIsNone(pkt.get(42, 4))
         return
 
@@ -97,21 +110,21 @@ class MessageTests(unittest.TestCase):
         """Test encoding of BodyLength(9) in raw mode"""
         pkt = FixMessage()
         pkt.append_pair(9, 42)
-        self.assertEqual("9=42\x01", pkt.encode(True))
+        self.assertEqual(fix_str("9=42\x01"), pkt.encode(True))
         return
 
     def test_raw_checksum(self):
         """Test encoding of CheckSum(10) in raw mode"""
         pkt = FixMessage()
         pkt.append_pair(10, 42)
-        self.assertEqual("10=42\x01", pkt.encode(True))
+        self.assertEqual(fix_str("10=42\x01"), pkt.encode(True))
         return
 
     def test_raw_msg_type(self):
         """Test encoding of MessageType(35) in raw mode"""
         pkt = FixMessage()
         pkt.append_pair(35, "D")
-        self.assertEqual("35=D\x01", pkt.encode(True))
+        self.assertEqual(fix_str("35=D\x01"), pkt.encode(True))
         return
 
     def test_empty_message(self):
@@ -257,7 +270,7 @@ class MessageTests(unittest.TestCase):
         t = 1484581872.933458
         msg.append_time(52, t)
 
-        self.assertEqual("20170116-15:51:12.933", msg.get(52))
+        self.assertEqual(fix_str("20170116-15:51:12.933"), msg.get(52))
         return
 
     def test_time_datetime(self):
@@ -267,7 +280,7 @@ class MessageTests(unittest.TestCase):
         dt = datetime.datetime.utcfromtimestamp(t)
         msg.append_time(52, dt)
 
-        self.assertEqual("20170116-15:51:12.933", msg.get(52))
+        self.assertEqual(fix_str("20170116-15:51:12.933"), msg.get(52))
         return
 
     def test_time_microseconds(self):
@@ -276,7 +289,7 @@ class MessageTests(unittest.TestCase):
         t = 1484581872.933458
         msg.append_time(52, t, 6)
 
-        self.assertEqual("20170116-15:51:12.933458", msg.get(52))
+        self.assertEqual(fix_str("20170116-15:51:12.933458"), msg.get(52))
         return
 
     def test_time_seconds_only(self):
@@ -285,7 +298,7 @@ class MessageTests(unittest.TestCase):
         t = 1484581872.933458
         msg.append_time(52, t, 0)
 
-        self.assertEqual("20170116-15:51:12", msg.get(52))
+        self.assertEqual(fix_str("20170116-15:51:12"), msg.get(52))
         return
 
     def test_time_bad_precision(self):
@@ -308,7 +321,7 @@ class MessageTests(unittest.TestCase):
             (test.tm_year, test.tm_mon, test.tm_mday,
              test.tm_hour, test.tm_min, test.tm_sec,
              int((t - int(t)) * 1000))
-        self.assertEqual(s, msg.get(52))
+        self.assertEqual(fix_str(s), msg.get(52))
         return
 
     def test_utcts_default(self):
@@ -329,7 +342,7 @@ class MessageTests(unittest.TestCase):
         t = 1484581872.933458
         msg.append_utc_timestamp(52, t)
 
-        self.assertEqual("20170116-15:51:12.933", msg.get(52))
+        self.assertEqual(fix_str("20170116-15:51:12.933"), msg.get(52))
         return
 
     def test_utcts_datetime(self):
@@ -339,7 +352,7 @@ class MessageTests(unittest.TestCase):
         dt = datetime.datetime.utcfromtimestamp(t)
         msg.append_utc_timestamp(52, dt)
 
-        self.assertEqual("20170116-15:51:12.933", msg.get(52))
+        self.assertEqual(fix_str("20170116-15:51:12.933"), msg.get(52))
         return
 
     def test_utcts_microseconds(self):
@@ -348,7 +361,7 @@ class MessageTests(unittest.TestCase):
         t = 1484581872.933458
         msg.append_utc_timestamp(52, t, 6)
 
-        self.assertEqual("20170116-15:51:12.933458", msg.get(52))
+        self.assertEqual(fix_str("20170116-15:51:12.933458"), msg.get(52))
         return
 
     def test_utcts_seconds_only(self):
@@ -357,7 +370,7 @@ class MessageTests(unittest.TestCase):
         t = 1484581872.933458
         msg.append_utc_timestamp(52, t, 0)
 
-        self.assertEqual("20170116-15:51:12", msg.get(52))
+        self.assertEqual(fix_str("20170116-15:51:12"), msg.get(52))
         return
 
     def test_utcts_bad_precision(self):
@@ -374,19 +387,19 @@ class MessageTests(unittest.TestCase):
     def test_utcto_parts_15_51_12(self):
         msg = FixMessage()
         msg.append_utc_time_only_parts(1, 15, 51, 12)
-        self.assertEqual("15:51:12", msg.get(1))
+        self.assertEqual(fix_str("15:51:12"), msg.get(1))
         return
 
     def test_utcto_parts_15_51_12_933(self):
         msg = FixMessage()
         msg.append_utc_time_only_parts(1, 15, 51, 12, 933)
-        self.assertEqual("15:51:12.933", msg.get(1))
+        self.assertEqual(fix_str("15:51:12.933"), msg.get(1))
         return
 
     def test_utcto_parts_15_51_12_933_458(self):
         msg = FixMessage()
         msg.append_utc_time_only_parts(1, 15, 51, 12, 933, 458)
-        self.assertEqual("15:51:12.933458", msg.get(1))
+        self.assertEqual(fix_str("15:51:12.933458"), msg.get(1))
         return
 
     def test_utcto_parts_bad_hour(self):
@@ -496,7 +509,7 @@ class MessageTests(unittest.TestCase):
             if offset_mins > 0:
                 s += ":%02u" % offset_mins
 
-        self.assertEqual(s, msg.get(1132))
+        self.assertEqual(fix_str(s), msg.get(1132))
         return
 
     def test_append_tzts_datetime(self):
@@ -523,7 +536,7 @@ class MessageTests(unittest.TestCase):
             if offset_mins > 0:
                 s += ":%02u" % offset_mins
 
-        self.assertEqual(s, msg.get(1132))
+        self.assertEqual(fix_str(s), msg.get(1132))
         return
 
     def test_tzto_minutes(self):
@@ -547,7 +560,7 @@ class MessageTests(unittest.TestCase):
             if offset_mins > 0:
                 s += ":%02u" % offset_mins
 
-        self.assertEqual(s, msg.get(1079))
+        self.assertEqual(fix_str(s), msg.get(1079))
         return
 
     def test_tzto_parts_15_51_240(self):
@@ -555,7 +568,7 @@ class MessageTests(unittest.TestCase):
          full hour offset"""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, offset=-240)
-        self.assertEqual("15:51-04", msg.get(1))
+        self.assertEqual(fix_str("15:51-04"), msg.get(1))
         return
 
     def test_tzto_parts_15_51_270(self):
@@ -563,7 +576,7 @@ class MessageTests(unittest.TestCase):
          full hour offset"""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, offset=-270)
-        self.assertEqual("15:51-04:30", msg.get(1))
+        self.assertEqual(fix_str("15:51-04:30"), msg.get(1))
         return
 
     def test_tzto_parts_15_51_12_270(self):
@@ -571,7 +584,7 @@ class MessageTests(unittest.TestCase):
          partial hour offset."""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, 12, offset=-270)
-        self.assertEqual("15:51:12-04:30", msg.get(1))
+        self.assertEqual(fix_str("15:51:12-04:30"), msg.get(1))
         return
 
     def test_tzto_parts_15_51_12_933_270(self):
@@ -579,7 +592,7 @@ class MessageTests(unittest.TestCase):
          partial hour offset."""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, 12, 933, offset=-270)
-        self.assertEqual("15:51:12.933-04:30", msg.get(1))
+        self.assertEqual(fix_str("15:51:12.933-04:30"), msg.get(1))
         return
 
     def test_tzto_parts_15_51_12_933_458_270(self):
@@ -587,7 +600,7 @@ class MessageTests(unittest.TestCase):
          partial hour offset."""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, 12, 933, 458, offset=-270)
-        self.assertEqual("15:51:12.933458-04:30", msg.get(1))
+        self.assertEqual(fix_str("15:51:12.933458-04:30"), msg.get(1))
         return
 
     def test_tzto_parts_15_51_12_933_458_150(self):
@@ -595,7 +608,7 @@ class MessageTests(unittest.TestCase):
          partial hour offset."""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, 12, 933, 458, offset=150)
-        self.assertEqual("15:51:12.933458+02:30", msg.get(1))
+        self.assertEqual(fix_str("15:51:12.933458+02:30"), msg.get(1))
         return
 
     def test_header_field(self):
@@ -604,7 +617,9 @@ class MessageTests(unittest.TestCase):
         msg.append_pair(20000, "third")
         msg.append_pair(20001, "first", header=True)
         msg.append_pair(20002, "second", header=True)
-        self.assertEqual("20001=first\x0120002=second\x0120000=third\x01",
+        self.assertEqual(fix_str("20001=first\x01"
+                                  "20002=second\x01"
+                                  "20000=third\x01"),
                          msg.encode(True))
         return
 
@@ -612,7 +627,11 @@ class MessageTests(unittest.TestCase):
         """Test adding fields from a sequence of tag=value strings"""
         msg = FixMessage()
         msg.append_strings(["8=FIX.4.4", "35=0"])
-        self.assertEqual("8=FIX.4.4\x019=5\x0135=0\x0110=163\x01", msg.encode())
+        self.assertEqual(fix_str("8=FIX.4.4\x01"
+                                  "9=5\x01"
+                                  "35=0\x01"
+                                  "10=163\x01"),
+                         msg.encode())
         return
 
 

@@ -24,7 +24,7 @@
 ########################################################################
 
 from .constants import EQUALS_BYTE, SOH_BYTE
-from .message import FixMessage
+from .message import FixMessage, fix_val
 from .data import RAW_DATA_TAGS, RAW_LEN_TAGS
 
 
@@ -109,11 +109,11 @@ class FixParser(object):
         As raw data is read, it can be appended to this buffer.  Each
         call to get_message() will try to remove the bytes of a
         complete messages from the head of the buffer."""
-        self.buf += buf
+        self.buf += fix_val(buf)
         return
 
     def get_buffer(self):
-        """Return a copy of the internal buffer."""
+        """Return a reference to the internal buffer."""
         return self.buf
 
     def get_message(self):

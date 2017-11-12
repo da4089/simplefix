@@ -31,8 +31,11 @@ from .constants import *
 
 
 def pretty_print(buf):
-    cooked = buf.replace(SOH_BYTE, '|')
-    return cooked
+    raw = bytearray(buf)
+    cooked = bytearray(len(raw))
+    for i in range(len(raw)):
+        cooked[i] = 124 if raw[i] == 1 else raw[i]
+    return bytes(cooked)
 
 
 ########################################################################

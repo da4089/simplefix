@@ -25,8 +25,18 @@
 
 """FIX protocol constants."""
 
-SOH_BYTE = b'\x01'
-EQUALS_BYTE = b'='
+import sys
+
+
+if sys.version_info.major == 2:
+    EQUALS_BYTE = b'='
+    SOH_BYTE = b'\x01'
+    SOH_STR = SOH_BYTE
+else:
+    EQUALS_BYTE = 61
+    SOH_BYTE = 1
+    SOH_STR = b'\x01'
+
 
 MSGTYPE_HEARTBEAT = b'0'
 MSGTYPE_TEST_REQUEST = b'1'
