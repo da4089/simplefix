@@ -512,7 +512,7 @@ class FixMessage(object):
         if raw:
             # Walk pairs, creating string.
             for tag, value in self.pairs:
-                buf += b"%s=%s%s" % (tag, value, SOH_STR)
+                buf += tag + b'=' + value + SOH_STR
 
             return buf
 
@@ -520,13 +520,13 @@ class FixMessage(object):
         for tag, value in self.pairs:
             if int(tag) in (8, 9, 35, 10):
                 continue
-            buf += b"%s=%s%s" % (tag, value, SOH_STR)
+            buf += tag + b'=' + value + SOH_STR
 
         # Prepend the message type.
         if self.message_type is None:
             raise ValueError("No message type set")
 
-        buf = b"35=%s" % self.message_type + SOH_STR + buf
+        buf = b"35=" + self.message_type + SOH_STR + buf
 
         # Calculate body length.
         #
@@ -538,15 +538,15 @@ class FixMessage(object):
         if not self.begin_string:
             raise ValueError("No begin string set")
 
-        buf = b"8=%s" % self.begin_string + SOH_STR + \
-            b"9=%u" % body_length + SOH_STR + \
-            buf
+        buf = b"8=" + self.begin_string + SOH_STR + \
+              b"9=" + fix_val("%u" % body_length) + SOH_STR + \
+              buf
 
         # Calculate and append the checksum.
         checksum = 0
         for c in buf:
             checksum += ord(c) if sys.version_info.major == 2 else c
-        buf += b"10=%03u" % (checksum % 256,) + SOH_STR
+        buf += b"10=" + fix_val("%03u" % (checksum % 256,)) + SOH_STR
 
         return buf
 
