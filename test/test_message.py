@@ -634,6 +634,16 @@ class MessageTests(unittest.TestCase):
                          msg.encode())
         return
 
+    def test_contains(self):
+        """Test use of 'in' and 'not in' operators"""
+        msg = FixMessage()
+        msg.append_strings(["8=FIX.4.4", "35=0"])
+        self.assertIn(8, msg)
+        self.assertIn(35, msg)
+        self.assertNotIn(9, msg)
+        self.assertNotIn(10, msg)
+        return
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -592,6 +592,19 @@ class FixMessage(object):
         tag, value = self.pairs[item_index]
         return int(tag), value
 
+    def __contains__(self, item):
+        """Directly support 'in' and 'not in' operators.
+
+        :param item: Tag value to check."""
+
+        needle = fix_tag(item)
+        for tag, value in self.pairs:
+            if tag == needle:
+                return True
+
+        return False
+
+
     @staticmethod
     def _tz_offset_string(offset):
         """(Internal) Convert TZ offset in minutes east to string."""
