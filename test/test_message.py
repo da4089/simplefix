@@ -604,6 +604,60 @@ class MessageTests(unittest.TestCase):
         self.assertEqual(fix_str(s), msg.get(1132))
         return
 
+    def test_tzts_microseconds(self):
+        """Test formatting of TZTimestamp values with microseconds"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_tz_timestamp(1253, t, 6)
+
+        test = time.localtime(t)
+        s = "%04u%02u%02u-%02u:%02u:%02u.%06u" % \
+            (test.tm_year, test.tm_mon, test.tm_mday,
+             test.tm_hour, test.tm_min, test.tm_sec,
+             int((t % 1) * 1e6))
+        offset = int((datetime.datetime.fromtimestamp(t) -
+                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
+                     / 60)
+        if offset == 0:
+            s += "Z"
+        else:
+            offset_hours = abs(offset) / 60
+            offset_mins = abs(offset) % 60
+
+            s += "%c%02u" % ("+" if offset > 0 else "-", offset_hours)
+            if offset_mins > 0:
+                s += ":%02u" % offset_mins
+
+        self.assertEqual(fix_str(s), msg.get(1253))
+        return
+
+    def test_tzts_seconds_only(self):
+        """Test formatting of TZTimestamp values with seconds only"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_tz_timestamp(1253, t, 0)
+
+        test = time.localtime(t)
+        s = "%04u%02u%02u-%02u:%02u:%02u" % \
+            (test.tm_year, test.tm_mon, test.tm_mday,
+             test.tm_hour, test.tm_min, test.tm_sec)
+        offset = int((datetime.datetime.fromtimestamp(t) -
+                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
+                     / 60)
+        if offset == 0:
+            s += "Z"
+        else:
+            offset_hours = abs(offset) / 60
+            offset_mins = abs(offset) % 60
+
+            s += "%c%02u" % ("+" if offset > 0 else "-", offset_hours)
+            if offset_mins > 0:
+                s += ":%02u" % offset_mins
+
+        self.assertEqual(fix_str(s), msg.get(1253))
+        return
+
+
     def test_tzto_minutes(self):
         """Test TZTimeOnly formatting without seconds"""
         msg = FixMessage()
@@ -707,6 +761,21 @@ class MessageTests(unittest.TestCase):
         self.assertIn(35, msg)
         self.assertNotIn(9, msg)
         self.assertNotIn(10, msg)
+        return
+
+    def test_none_value(self):
+        """Test encoding of None value"""
+        msg = FixMessage()
+        msg.append_pair(8, b"FIX.4.2")
+        msg.append_pair(35, b"U1")
+        msg.append_pair(99999, None)
+        buf = msg.encode()
+        # FIXME
+        #self.assertEqual(b"8=FIX.4.2\x01" +
+        #                 b"9=1\x01" +
+        #                 b"35=U1\x01" +
+        #                 b"10=xxx",
+        #                 buf)
         return
 
 
