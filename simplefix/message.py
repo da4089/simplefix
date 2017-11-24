@@ -358,8 +358,10 @@ class FixMessage(object):
         if precision == 0:
             s += t.strftime(":%S")
         elif precision == 3:
+            s += t.strftime(":%S")
             s += ".%03u" % (t.microsecond / 1000)
         elif precision == 6:
+            s += t.strftime(":%S")
             s += ".%06u" % t.microsecond
         elif precision is not None:
             raise ValueError("Precision should be one of "
@@ -605,7 +607,6 @@ class FixMessage(object):
                 return True
 
         return False
-
 
     @staticmethod
     def _tz_offset_string(offset):

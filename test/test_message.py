@@ -86,9 +86,9 @@ class MessageTests(unittest.TestCase):
         pkt.append_pair(8, "FIX.4.4")
         pkt.append_pair(35, "0")
         self.assertEqual(fix_str("8=FIX.4.4\x01"
-                                  "9=5\x01"
-                                  "35=0\x01"
-                                  "10=163\x01"),
+                                 "9=5\x01"
+                                 "35=0\x01"
+                                 "10=163\x01"),
                          pkt.encode())
         return
 
@@ -540,14 +540,12 @@ class MessageTests(unittest.TestCase):
     def test_append_tzts_default(self):
         """Test TZTimeOnly with no supplied timestamp value"""
         msg = FixMessage()
-        t = 1484581872.933458
         msg.append_tz_time_only(1253)
         return
 
     def test_append_tzts_none(self):
         """Test TimezoneTimeOnly with explicit None"""
         msg = FixMessage()
-        t = 1484581872.933458
         msg.append_tz_timestamp(1253, None)
         return
 
@@ -688,6 +686,63 @@ class MessageTests(unittest.TestCase):
         self.assertEqual(fix_str(s), msg.get(1079))
         return
 
+    def test_tzto_microseconds(self):
+        """Test formatting of TZTimeOnly values with microseconds"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_tz_time_only(1079, t, 6)
+
+        test = time.localtime(t)
+        s = "%02u:%02u:%02u.%06u" % \
+            (test.tm_hour, test.tm_min, test.tm_sec, int((t % 1) * 1e6))
+        offset = int((datetime.datetime.fromtimestamp(t) -
+                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
+                     / 60)
+        if offset == 0:
+            s += "Z"
+        else:
+            offset_hours = abs(offset) / 60
+            offset_mins = abs(offset) % 60
+
+            s += "%c%02u" % ("+" if offset > 0 else "-", offset_hours)
+            if offset_mins > 0:
+                s += ":%02u" % offset_mins
+
+        self.assertEqual(fix_str(s), msg.get(1079))
+        return
+
+    def test_tzto_seconds_only(self):
+        """Test formatting of TZTimeOnly values with seconds only"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_tz_time_only(1079, t, 0)
+
+        test = time.localtime(t)
+        s = "%02u:%02u:%02u" % \
+            (test.tm_hour, test.tm_min, test.tm_sec)
+        offset = int((datetime.datetime.fromtimestamp(t) -
+                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
+                     / 60)
+        if offset == 0:
+            s += "Z"
+        else:
+            offset_hours = abs(offset) / 60
+            offset_mins = abs(offset) % 60
+
+            s += "%c%02u" % ("+" if offset > 0 else "-", offset_hours)
+            if offset_mins > 0:
+                s += ":%02u" % offset_mins
+
+        self.assertEqual(fix_str(s), msg.get(1079))
+        return
+
+    def test_tzto_bad_precision(self):
+        """Test bad TZTimeOnly precision value"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        with self.assertRaises(ValueError):
+            msg.append_tz_time_only(1079, t, 9)
+
     def test_tzto_parts_15_51_240(self):
         """Test TZTimeOnly with hour and minute components,
          full hour offset"""
@@ -736,6 +791,61 @@ class MessageTests(unittest.TestCase):
         self.assertEqual(fix_str("15:51:12.933458+02:30"), msg.get(1))
         return
 
+    def test_tzto_parts_bad_hour(self):
+        """Test TZTimeOnly with out-of-range hour components"""
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg.append_tz_time_only_parts(1, 24, 0, 0)
+        with self.assertRaises(ValueError):
+            msg.append_tz_time_only_parts(1, -1, 0, 0)
+        with self.assertRaises(ValueError):
+            msg.append_tz_time_only_parts(1, "a", 0, 0)
+        return
+
+    def test_tzto_parts_bad_minute(self):
+        """Test TZTimeOnly with out-of-range minute components"""
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg.append_tz_time_only_parts(1, 15, 60, 0)
+        with self.assertRaises(ValueError):
+            msg.append_tz_time_only_parts(1, 15, -1, 0)
+        with self.assertRaises(ValueError):
+            msg.append_tz_time_only_parts(1, 0, "b", 0)
+        return
+
+    def test_tzto_parts_bad_seconds(self):
+        """Test TZTimeOnly with out-of-range seconds components"""
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg.append_tz_time_only_parts(1, 15, 51, 61)
+        with self.assertRaises(ValueError):
+            msg.append_tz_time_only_parts(1, 15, 51, -1)
+        with self.assertRaises(ValueError):
+            msg.append_tz_time_only_parts(1, 0, 0, "c")
+        return
+
+    def test_tzto_parts_bad_ms(self):
+        """Test TZTimeOnly with out-of-range milliseconds components"""
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg.append_tz_time_only_parts(1, 15, 51, 12, 1000)
+        with self.assertRaises(ValueError):
+            msg.append_tz_time_only_parts(1, 15, 51, 12, -1)
+        with self.assertRaises(ValueError):
+            msg.append_tz_time_only_parts(1, 0, 0, 0, "d")
+        return
+
+    def test_tzto_parts_bad_us(self):
+        """Test TZTimeOnly with out-of-range microseconds components"""
+        msg = FixMessage()
+        with self.assertRaises(ValueError):
+            msg.append_tz_time_only_parts(1, 15, 51, 12, 0, 1000)
+        with self.assertRaises(ValueError):
+            msg.append_tz_time_only_parts(1, 15, 51, 12, 0, -1)
+        with self.assertRaises(ValueError):
+            msg.append_tz_time_only_parts(1, 0, 0, 0, 0, "e")
+        return
+
     def test_header_field(self):
         """Test use of header flag"""
         msg = FixMessage()
@@ -743,8 +853,8 @@ class MessageTests(unittest.TestCase):
         msg.append_pair(20001, "first", header=True)
         msg.append_pair(20002, "second", header=True)
         self.assertEqual(fix_str("20001=first\x01"
-                                  "20002=second\x01"
-                                  "20000=third\x01"),
+                                 "20002=second\x01"
+                                 "20000=third\x01"),
                          msg.encode(True))
         return
 
@@ -753,9 +863,9 @@ class MessageTests(unittest.TestCase):
         msg = FixMessage()
         msg.append_strings(["8=FIX.4.4", "35=0"])
         self.assertEqual(fix_str("8=FIX.4.4\x01"
-                                  "9=5\x01"
-                                  "35=0\x01"
-                                  "10=163\x01"),
+                                 "9=5\x01"
+                                 "35=0\x01"
+                                 "10=163\x01"),
                          msg.encode())
         return
 
