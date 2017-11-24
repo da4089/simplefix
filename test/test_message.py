@@ -382,7 +382,58 @@ class MessageTests(unittest.TestCase):
             msg.append_utc_timestamp(52, t, 9)
         return
 
-    # FIXME: utcto tests
+    def test_utcto_default(self):
+        """Test UTCTimeOnly with no supplied timestamp value"""
+        msg = FixMessage()
+        msg.append_utc_time_only(273)
+        return
+
+    def test_utcto_explicit_none(self):
+        """Test UTCTimeOnly with explicit None time value"""
+        msg = FixMessage()
+        msg.append_utc_time_only(273, None)
+        return
+
+    def test_utcto_float(self):
+        """Test UTCTimeOnly with floating point value"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_utc_time_only(273, t)
+        self.assertEqual(fix_str("15:51:12.933"), msg.get(273))
+        return
+
+    def test_utcto_datetime(self):
+        """Test UTCTimeOnly with datetime timestamp values"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        dt = datetime.datetime.utcfromtimestamp(t)
+        msg.append_utc_time_only(273, dt)
+        self.assertEqual(fix_str("15:51:12.933"), msg.get(273))
+        return
+
+    def test_utcto_microseconds(self):
+        """Test UTCTimeOnly formatting of microseconds"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_utc_time_only(273, t, 6)
+        self.assertEqual(fix_str("15:51:12.933458"), msg.get(273))
+        return
+
+    def test_utcto_seconds_only(self):
+        """Test UTCTimeOnly formatting of seconds only"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_utc_time_only(273, t, 0)
+        self.assertEqual(fix_str("15:51:12"), msg.get(273))
+        return
+
+    def test_utcto_bad_precision(self):
+        """Test UTCTimeOnly bad time precision values"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        with self.assertRaises(ValueError):
+            msg.append_utc_time_only(273, t, 9)
+        return
 
     def test_utcto_parts_15_51_12(self):
         msg = FixMessage()
