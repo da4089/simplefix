@@ -657,6 +657,12 @@ class MessageTests(unittest.TestCase):
         self.assertEqual(fix_str(s), msg.get(1253))
         return
 
+    def test_tzts_bad_precision(self):
+        """Test bad TZTimestamp precision value"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        with self.assertRaises(ValueError):
+            msg.append_tz_timestamp(1253, t, 9)
 
     def test_tzto_minutes(self):
         """Test TZTimeOnly formatting without seconds"""
