@@ -520,6 +520,7 @@ class FixMessage(object):
         for tag, value in self.pairs:
             if int(tag) in (8, 9, 35, 10):
                 continue
+            if value is None: continue
             buf += tag + b'=' + value + SOH_STR
 
         # Prepend the message type.
