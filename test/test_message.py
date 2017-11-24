@@ -907,16 +907,8 @@ class MessageTests(unittest.TestCase):
     def test_none_value(self):
         """Test encoding of None value"""
         msg = FixMessage()
-        msg.append_pair(8, b"FIX.4.2")
-        msg.append_pair(35, b"U1")
         msg.append_pair(99999, None)
-        buf = msg.encode()
-        # FIXME
-        #self.assertEqual(b"8=FIX.4.2\x01" +
-        #                 b"9=1\x01" +
-        #                 b"35=U1\x01" +
-        #                 b"10=xxx",
-        #                 buf)
+        self.assertNotIn(b'99999', msg)
         return
 
 

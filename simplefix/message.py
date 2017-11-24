@@ -96,7 +96,13 @@ class FixMessage(object):
 
         Both parameters are explicitly converted to strings before
         storage, so it's ok to pass integers if that's easier for
-        your program logic."""
+        your program logic.
+
+        Note: a Python 'None' value will be silently ignored, and
+        no field is appended."""
+
+        if tag is None or value is None:
+            return
 
         if int(tag) == 8:
             self.begin_string = fix_val(value)
@@ -521,8 +527,6 @@ class FixMessage(object):
         # Cooked.
         for tag, value in self.pairs:
             if int(tag) in (8, 9, 35, 10):
-                continue
-            if value is None:
                 continue
             buf += tag + b'=' + value + SOH_STR
 
