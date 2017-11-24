@@ -537,6 +537,20 @@ class MessageTests(unittest.TestCase):
         self.assertEqual("-23:59", msg._tz_offset_string(-1439))
         return
 
+    def test_append_tzts_default(self):
+        """Test TZTimeOnly with no supplied timestamp value"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_tz_time_only(1253)
+        return
+
+    def test_append_tzts_none(self):
+        """Test TimezoneTimeOnly with explicit None"""
+        msg = FixMessage()
+        t = 1484581872.933458
+        msg.append_tz_timestamp(1253, None)
+        return
+
     def test_append_tzts_float(self):
         msg = FixMessage()
         t = 1484581872.933458
