@@ -662,6 +662,31 @@ class MessageTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             msg.append_tz_timestamp(1253, t, 9)
 
+    def test_tzto_datetime(self):
+        msg = FixMessage()
+        t = 1484581872.933458
+        local = datetime.datetime.fromtimestamp(t)
+        msg.append_tz_time_only(1079, local)
+
+        test = time.localtime(t)
+        s = "%02u:%02u:%02u.%03u" % \
+            (test.tm_hour, test.tm_min, test.tm_sec, int((t % 1) * 1e3))
+        offset = int((datetime.datetime.fromtimestamp(t) -
+                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
+                     / 60)
+        if offset == 0:
+            s += "Z"
+        else:
+            offset_hours = abs(offset) / 60
+            offset_mins = abs(offset) % 60
+
+            s += "%c%02u" % ("+" if offset > 0 else "-", offset_hours)
+            if offset_mins > 0:
+                s += ":%02u" % offset_mins
+
+        self.assertEqual(fix_str(s), msg.get(1079))
+        return
+
     def test_tzto_minutes(self):
         """Test TZTimeOnly formatting without seconds"""
         msg = FixMessage()
