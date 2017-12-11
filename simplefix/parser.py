@@ -144,6 +144,7 @@ class FixParser(object):
                 point += 1
 
                 tag = int(tag_string)
+                in_tag = False
                 if tag in self.raw_data_tags:
                     if raw_len > len(self.buf) - point:
                         break
@@ -155,7 +156,6 @@ class FixParser(object):
                     start = point
 
                 else:
-                    in_tag = False
                     start = point
 
             elif self.buf[point] == SOH_BYTE:
