@@ -129,6 +129,7 @@ class ParserTests(unittest.TestCase):
         pkt.append_pair(8, "FIX.4.2")
         pkt.append_pair(35, "D")
         pkt.append_data(95, 96, raw)
+        pkt.append_pair(20000, "private tag")
         buf = pkt.encode()
 
         parser = FixParser()
@@ -140,6 +141,7 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(b"D", msg.get(35))
         self.assertEqual(len(raw), int(msg.get(95)))
         self.assertEqual(raw, msg.get(96))
+        self.assertEqual(b"private tag", msg.get(20000))
         return
 
     def test_raw_data_tags(self):
@@ -150,6 +152,7 @@ class ParserTests(unittest.TestCase):
         pkt.append_pair(8, "FIX.4.2")
         pkt.append_pair(35, "D")
         pkt.append_data(5001, 5002, raw)
+        pkt.append_pair(20000, "private tag")
         buf = pkt.encode()
 
         parser = FixParser()
@@ -162,6 +165,7 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(b"D", msg.get(35))
         self.assertEqual(len(raw), int(msg.get(5001)))
         self.assertEqual(raw, msg.get(5002))
+        self.assertEqual(b"private tag", msg.get(20000))
 
         parser.reset()
         parser.remove_raw(5001, 5002)
@@ -174,6 +178,7 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(len(raw), int(msg.get(5001)))
         self.assertEqual(b"raw", msg.get(5002))
         self.assertEqual(b"1", msg.get(5000))
+        self.assertEqual(b"private tag", msg.get(20000))
         return
 
 
