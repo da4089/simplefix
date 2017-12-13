@@ -26,7 +26,7 @@
 import sys
 import unittest
 
-from simplefix import FixMessage, FixParser
+from simplefix import FixMessage, FixParser, SOH_STR
 
 
 def make_str(s):
@@ -179,6 +179,30 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(b"raw", msg.get(5002))
         self.assertEqual(b"1", msg.get(5000))
         self.assertEqual(b"private tag", msg.get(20000))
+        return
+
+    def test_embedded_equals_96_no_95(self):
+        """Test a Logon with 96 but no 95, and an embedded equals."""
+
+        raw = b"8=FIX.4.2" + SOH_STR + \
+              b"9=169" + SOH_STR + \
+              b"35=A" + SOH_STR + \
+              b"52=20171213-01:41:08.063" + SOH_STR + \
+              b"49=HelloWorld" + SOH_STR + \
+              b"56=1234" + SOH_STR + \
+              b"34=1" + SOH_STR + \
+              b"96=ABC=DE" + SOH_STR + \
+              b"98=0" + SOH_STR + \
+              b"108=30" + SOH_STR + \
+              b"554=HelloWorld" + SOH_STR + \
+              b"8013=Y" + SOH_STR + \
+              b"10=166" + SOH_STR
+
+        parser = FixParser()
+        parser.append_buffer(raw)
+        msg = parser.get_message()
+
+        self.assertIsNotNone(msg)
         return
 
 
