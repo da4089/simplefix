@@ -28,7 +28,7 @@
 import sys
 
 
-if sys.version_info.major == 2:
+if sys.version_info[0] == 2:
     EQUALS_BYTE = b'='
     SOH_BYTE = b'\x01'
     SOH_STR = SOH_BYTE

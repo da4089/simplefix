@@ -36,10 +36,25 @@ def make_str(s):
         return bytes(s, 'ASCII')
 
 
+# Python 2.6's unittest.TestCase doesn't have assertIsNone()
+def test_none(self, other):
+    return True if other is None else False
+
+
+# Python 2.6's unittest.TestCase doesn't have assertIsNotNone()
+def test_not_none(self, other):
+    return False if other is None else True
+
+
 class ParserTests(unittest.TestCase):
 
+
     def setUp(self):
-        pass
+        if not hasattr(self, "assertIsNotNone"):
+            ParserTests.assertIsNotNone = test_not_none
+        if not hasattr(self, "assertIsNone"):
+            ParserTests.assertIsNone = test_none
+        return
 
     def tearDown(self):
         pass

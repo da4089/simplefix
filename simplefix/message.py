@@ -47,7 +47,7 @@ def fix_val(value):
     if type(value) == bytes:
         return value
 
-    if sys.version_info.major == 2:
+    if sys.version_info[0] == 2:
         return bytes(value)
     elif type(value) == str:
         return bytes(value, 'UTF-8')
@@ -57,7 +57,7 @@ def fix_val(value):
 
 def fix_tag(value):
     """Make a FIX tag value from string, bytes, or integer."""
-    if sys.version_info.major == 2:
+    if sys.version_info[0] == 2:
         return bytes(value)
     else:
         return bytes(str(value), 'ASCII')
@@ -553,7 +553,7 @@ class FixMessage(object):
         # Calculate and append the checksum.
         checksum = 0
         for c in buf:
-            checksum += ord(c) if sys.version_info.major == 2 else c
+            checksum += ord(c) if sys.version_info[0] == 2 else c
         buf += b"10=" + fix_val("%03u" % (checksum % 256,)) + SOH_STR
 
         return buf
@@ -565,6 +565,9 @@ class FixMessage(object):
 
         Compares the tag=value pairs, message_type and FIX version
         of this message against the `other`."""
+
+        if not hasattr(other, "pairs"):
+            return False
 
         # Check pairs list lengths.
         if len(self.pairs) != len(other.pairs):
