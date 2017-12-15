@@ -315,7 +315,8 @@ class FixMessage(object):
         # Get offset of local timezone east of UTC.
         utc = datetime.datetime.utcfromtimestamp(now)
         local = datetime.datetime.fromtimestamp(now)
-        offset = int((local - utc).total_seconds() / 60)
+        td = local - utc
+        offset = int(((td.days * 86400) + td.seconds) / 60)
 
         s = local.strftime("%Y%m%d-%H:%M:%S")
         if precision == 3:
@@ -358,7 +359,8 @@ class FixMessage(object):
 
         now = time.mktime(t.timetuple()) + (t.microsecond * 1e-6)
         utc = datetime.datetime.utcfromtimestamp(now)
-        offset = int((t - utc).total_seconds() / 60)
+        td = t - utc
+        offset = int(((td.days * 86400) + td.seconds) / 60)
 
         s = t.strftime("%H:%M")
         if precision == 0:

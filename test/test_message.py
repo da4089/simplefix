@@ -31,6 +31,16 @@ import unittest
 from simplefix import FixMessage
 
 
+# NOTE: RHEL6 ships with Python 2.6, which is increasingly difficult to
+# support as both 2.7 and 3.x have added numerous features that seem like
+# they've been around forever, but actually aren't in 2.6.
+#
+# While in a few cases, I try to monkey-patch stuff up to 2.7-equivalent,
+# in a lot of the test code, I just skip the tests if they're run on
+# a 2.6 interpreter -- or I would but unittest in 2.6 doesn't understand
+# skipping, so they just pass without testing anything.
+#
+# This constant is used to check the version and alter behaviour to suit.
 VERSION = (sys.version_info[0] * 10) + sys.version_info[1]
 
 
@@ -58,7 +68,8 @@ class MessageTests(unittest.TestCase):
 
     def test_string_without_equals(self):
         """Test field set with string not containing equals sign"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         with self.assertRaises(ValueError):
@@ -67,7 +78,8 @@ class MessageTests(unittest.TestCase):
 
     def test_string_with_bad_tag(self):
         """Test field set with bad tag in tag=value string"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         with self.assertRaises(ValueError):
@@ -101,7 +113,8 @@ class MessageTests(unittest.TestCase):
 
     def test_get_repeating(self):
         """Test retrieval of repeating field's value"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         pkt = FixMessage()
         pkt.append_pair(42, "a")
@@ -138,7 +151,8 @@ class MessageTests(unittest.TestCase):
 
     def test_empty_message(self):
         """Test encoding of empty message"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         with self.assertRaises(ValueError):
@@ -147,7 +161,8 @@ class MessageTests(unittest.TestCase):
 
     def test_encode_no_35(self):
         """Test encoding without MessageType(35) field"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         msg.append_pair(8, "FIX.4.2")
@@ -157,7 +172,8 @@ class MessageTests(unittest.TestCase):
 
     def test_encode_no_8(self):
         """Test encoding without BeginString(8) field"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         msg.append_pair(35, "D")
@@ -318,7 +334,8 @@ class MessageTests(unittest.TestCase):
 
     def test_time_bad_precision(self):
         """Test bad time precision values"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         t = 1484581872.933458
@@ -392,7 +409,8 @@ class MessageTests(unittest.TestCase):
 
     def test_utcts_bad_precision(self):
         """Test UTCTimestamp bad time precision values"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         t = 1484581872.933458
@@ -448,7 +466,8 @@ class MessageTests(unittest.TestCase):
 
     def test_utcto_bad_precision(self):
         """Test UTCTimeOnly bad time precision values"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         t = 1484581872.933458
@@ -475,7 +494,8 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_utcto_parts_bad_hour(self):
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         with self.assertRaises(ValueError):
@@ -487,7 +507,8 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_utcto_parts_bad_minute(self):
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         with self.assertRaises(ValueError):
@@ -499,7 +520,8 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_utcto_parts_bad_seconds(self):
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         with self.assertRaises(ValueError):
@@ -511,7 +533,8 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_utcto_parts_bad_ms(self):
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         with self.assertRaises(ValueError):
@@ -523,7 +546,8 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_utcto_parts_bad_us(self):
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         with self.assertRaises(ValueError):
@@ -535,7 +559,8 @@ class MessageTests(unittest.TestCase):
         return
 
     def test_offset_range(self):
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         with self.assertRaises(ValueError):
@@ -582,6 +607,14 @@ class MessageTests(unittest.TestCase):
         msg.append_tz_timestamp(1253, None)
         return
 
+    @staticmethod
+    def calculate_tz_offset(t):
+        local = datetime.datetime.fromtimestamp(t)
+        utc = datetime.datetime.utcfromtimestamp(t)
+        td = local - utc
+        offset = int(((td.days * 86400) + td.seconds) / 60)
+        return offset
+
     def test_append_tzts_float(self):
         msg = FixMessage()
         t = 1484581872.933458
@@ -592,9 +625,7 @@ class MessageTests(unittest.TestCase):
             (test.tm_year, test.tm_mon, test.tm_mday,
              test.tm_hour, test.tm_min, test.tm_sec,
              int((t - int(t)) * 1000))
-        offset = int((datetime.datetime.fromtimestamp(t) -
-                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
-                     / 60)
+        offset = self.calculate_tz_offset(t)
         if offset == 0:
             s += "Z"
         else:
@@ -619,9 +650,7 @@ class MessageTests(unittest.TestCase):
             (test.tm_year, test.tm_mon, test.tm_mday,
              test.tm_hour, test.tm_min, test.tm_sec,
              int((t - int(t)) * 1000))
-        offset = int((datetime.datetime.fromtimestamp(t) -
-                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
-                     / 60)
+        offset = self.calculate_tz_offset(t)
         if offset == 0:
             s += "Z"
         else:
@@ -646,9 +675,7 @@ class MessageTests(unittest.TestCase):
             (test.tm_year, test.tm_mon, test.tm_mday,
              test.tm_hour, test.tm_min, test.tm_sec,
              int((t % 1) * 1e6))
-        offset = int((datetime.datetime.fromtimestamp(t) -
-                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
-                     / 60)
+        offset = self.calculate_tz_offset(t)
         if offset == 0:
             s += "Z"
         else:
@@ -672,9 +699,7 @@ class MessageTests(unittest.TestCase):
         s = "%04u%02u%02u-%02u:%02u:%02u" % \
             (test.tm_year, test.tm_mon, test.tm_mday,
              test.tm_hour, test.tm_min, test.tm_sec)
-        offset = int((datetime.datetime.fromtimestamp(t) -
-                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
-                     / 60)
+        offset = self.calculate_tz_offset(t)
         if offset == 0:
             s += "Z"
         else:
@@ -690,7 +715,8 @@ class MessageTests(unittest.TestCase):
 
     def test_tzts_bad_precision(self):
         """Test bad TZTimestamp precision value"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         t = 1484581872.933458
@@ -706,9 +732,7 @@ class MessageTests(unittest.TestCase):
         test = time.localtime(t)
         s = "%02u:%02u:%02u.%03u" % \
             (test.tm_hour, test.tm_min, test.tm_sec, int((t % 1) * 1e3))
-        offset = int((datetime.datetime.fromtimestamp(t) -
-                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
-                     / 60)
+        offset = self.calculate_tz_offset(t)
         if offset == 0:
             s += "Z"
         else:
@@ -730,9 +754,7 @@ class MessageTests(unittest.TestCase):
 
         test = time.localtime(t)
         s = "%02u:%02u" % (test.tm_hour, test.tm_min)
-        offset = int((datetime.datetime.fromtimestamp(t) -
-                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
-                     / 60)
+        offset = self.calculate_tz_offset(t)
         if offset == 0:
             s += "Z"
         else:
@@ -755,9 +777,7 @@ class MessageTests(unittest.TestCase):
         test = time.localtime(t)
         s = "%02u:%02u:%02u.%06u" % \
             (test.tm_hour, test.tm_min, test.tm_sec, int((t % 1) * 1e6))
-        offset = int((datetime.datetime.fromtimestamp(t) -
-                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
-                     / 60)
+        offset = self.calculate_tz_offset(t)
         if offset == 0:
             s += "Z"
         else:
@@ -780,9 +800,7 @@ class MessageTests(unittest.TestCase):
         test = time.localtime(t)
         s = "%02u:%02u:%02u" % \
             (test.tm_hour, test.tm_min, test.tm_sec)
-        offset = int((datetime.datetime.fromtimestamp(t) -
-                      datetime.datetime.utcfromtimestamp(t)).total_seconds()
-                     / 60)
+        offset = self.calculate_tz_offset(t)
         if offset == 0:
             s += "Z"
         else:
@@ -798,7 +816,8 @@ class MessageTests(unittest.TestCase):
 
     def test_tzto_bad_precision(self):
         """Test bad TZTimeOnly precision value"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         t = 1484581872.933458
@@ -855,7 +874,8 @@ class MessageTests(unittest.TestCase):
 
     def test_tzto_parts_bad_hour(self):
         """Test TZTimeOnly with out-of-range hour components"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         with self.assertRaises(ValueError):
@@ -868,7 +888,8 @@ class MessageTests(unittest.TestCase):
 
     def test_tzto_parts_bad_minute(self):
         """Test TZTimeOnly with out-of-range minute components"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         with self.assertRaises(ValueError):
@@ -881,7 +902,8 @@ class MessageTests(unittest.TestCase):
 
     def test_tzto_parts_bad_seconds(self):
         """Test TZTimeOnly with out-of-range seconds components"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         with self.assertRaises(ValueError):
@@ -894,7 +916,8 @@ class MessageTests(unittest.TestCase):
 
     def test_tzto_parts_bad_ms(self):
         """Test TZTimeOnly with out-of-range milliseconds components"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         with self.assertRaises(ValueError):
@@ -907,7 +930,8 @@ class MessageTests(unittest.TestCase):
 
     def test_tzto_parts_bad_us(self):
         """Test TZTimeOnly with out-of-range microseconds components"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         with self.assertRaises(ValueError):
@@ -943,7 +967,8 @@ class MessageTests(unittest.TestCase):
 
     def test_contains(self):
         """Test use of 'in' and 'not in' operators"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         msg.append_strings(["8=FIX.4.4", "35=0"])
@@ -955,7 +980,8 @@ class MessageTests(unittest.TestCase):
 
     def test_none_value(self):
         """Test encoding of None value"""
-        if VERSION == 26: return
+        if VERSION == 26:
+            return
 
         msg = FixMessage()
         msg.append_pair(99999, None)
