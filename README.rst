@@ -37,6 +37,9 @@ wrote it.
 Basic Usage
 ===========
 
+See the `Programmer's Guide <https://simplefix.readthedocs.io>_` for
+more information.
+
 Creating Messages
 -----------------
 
