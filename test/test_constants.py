@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 ########################################################################
 # SimpleFIX
-# Copyright (C) 2017, David Arnold.
+# Copyright (C) 2017-2018, David Arnold.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
