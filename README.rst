@@ -98,6 +98,8 @@ source code, and please open an `issue
 <https://github.com/da4089/simplefix/issues>`_ for comments,
 suggestions, and bugs.
 
+See the CONTRIBUTING.rst file for more detailed instructions.
+
 
 
 .. |Build Status| image:: https://travis-ci.org/da4089/simplefix.svg?branch=master
