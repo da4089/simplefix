@@ -111,11 +111,11 @@ See the CONTRIBUTING.rst file for more detailed instructions.
 .. |Docs| image:: https://readthedocs.org/projects/simplefix/badge/?version=latest
     :target: http://simplefix.readthedocs.io/en/latest/
     :alt: Docs
-.. |Code Health| image:: https://landscape.io/github/da4089/simplefix/master/landscape.svg?style=flat
-    :target: https://landscape.io/github/da4089/simplefix/master
+.. |Code Health| image:: https://api.codacy.com/project/badge/Grade/abd5c37cfe834d5ca5edb74853223986    :target: https://www.codacy.com/app/da4089/fixtool?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=da4089/fixtool&amp;utm_campaign=Badge_Grade
+    :target: https://app.codacy.com/app/da4089/fixtool/dashboard
     :alt: Code Health
-.. |Coverage| image:: https://coveralls.io/repos/github/da4089/simplefix/badge.svg?branch=master
-    :target: https://coveralls.io/github/da4089/simplefix?branch=master
+.. |Coverage| image:: https://api.codacy.com/project/badge/Coverage/abd5c37cfe834d5ca5edb74853223986    :target: https://www.codacy.com/app/da4089/fixtool?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=da4089/fixtool&amp;utm_campaign=Badge_Coverage
+    :target: https://app.codacy.com/app/da4089/fixtool/dashboard
     :alt: Coverage
 .. |PyPI| image:: https://img.shields.io/pypi/v/simplefix.svg
     :target: https://pypi.python.org/pypi/simplefix
@@ -123,3 +123,11 @@ See the CONTRIBUTING.rst file for more detailed instructions.
 .. |Python| image:: https://img.shields.io/pypi/pyversions/simplefix.svg
     :target: https://pypi.python.org/pypi/simplefix
     :alt: Python
+.. |Landscape| image:: https://landscape.io/github/da4089/simplefix/master/landscape.svg?style=flat
+    :target: https://landscape.io/github/da4089/simplefix/master
+    :alt: Code Health
+.. |Coveralls| image:: https://coveralls.io/repos/github/da4089/simplefix/badge.svg?branch=master
+    :target: https://coveralls.io/github/da4089/simplefix?branch=master
+    :alt: Coverage
+
+
