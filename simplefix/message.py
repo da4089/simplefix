@@ -506,6 +506,27 @@ class FixMessage(object):
 
         return None
 
+    def remove(self, tag, nth=1):
+        """Remove the n-th occurrence of tag in this message.
+
+        :param tag: FIX field tag number to be removed.
+        :param nth: Index of tag if repeating, first is 1.
+        :returns: Value of the field if removed, None otherwise."""
+
+        tag = fix_tag(tag)
+        nth = int(nth)
+
+        for i in range(len(self.pairs)):
+            t, v = self.pairs[i]
+            if t == tag:
+                nth -= 1
+                if nth == 0:
+                    self.pairs.pop(i)
+                    return v
+
+        return None
+
+
     def encode(self, raw=False):
         """Convert message to on-the-wire FIX format.
 
@@ -559,6 +580,15 @@ class FixMessage(object):
         buf += b"10=" + fix_val("%03u" % (checksum % 256,)) + SOH_STR
 
         return buf
+
+    def __str__(self):
+        """Return string form of message contents."""
+        s = ""
+        for tag, value in self.pairs:
+            if s:
+                s += "|"
+            s += tag.decode("ascii") + "=" + value.decode("ascii")
+        return s
 
     def __eq__(self, other):
         """Compare with another FixMessage.

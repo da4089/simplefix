@@ -988,6 +988,44 @@ class MessageTests(unittest.TestCase):
         self.assertNotIn(b'99999', msg)
         return
 
+    def test_remove_simple(self):
+        """Test removal of single, existent field."""
+
+        msg = FixMessage()
+        msg.append_pair(8, b'FIX.4.2')
+        self.assertEqual(1, msg.count())
+        result = msg.remove(8)
+        self.assertEqual(b'FIX.4.2', result)
+        self.assertEqual(0, msg.count())
+        return
+
+    def test_remove_not_found(self):
+        """Test removal of non-existent field."""
+        msg = FixMessage()
+        msg.append_pair(8, b'FIX.4.2')
+        msg.append_pair(35, b'D')
+        msg.append_utc_timestamp(52)
+        self.assertEqual(3, msg.count())
+        result = msg.remove(9)
+        self.assertIsNone(result)
+        self.assertEqual(3, msg.count())
+        return
+
+    def test_remove_nth(self):
+        """Test removal of nth field."""
+        msg = FixMessage()
+        msg.append_pair(99999, 1)
+        msg.append_pair(99999, 99999)
+        msg.append_pair(99999, 2)
+        self.assertEqual(3, msg.count())
+        result = msg.remove(99999, 2)
+        self.assertEqual(b'99999', result)
+        self.assertEqual(2, msg.count())
+        self.assertEqual(b'1', msg.get(99999, 1))
+        self.assertEqual(b'2', msg.get(99999, 2))
+        return
+
+
 
 if __name__ == "__main__":
     unittest.main()
