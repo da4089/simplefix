@@ -29,6 +29,7 @@ import time
 import unittest
 
 from simplefix import FixMessage
+from simplefix.message import fix_tag, fix_val
 
 
 # NOTE: RHEL6 ships with Python 2.6, which is increasingly difficult to
@@ -192,6 +193,13 @@ class MessageTests(unittest.TestCase):
         b.append_pair(35, "0")
 
         self.assertTrue(a == b)
+        return
+
+    def test_compare_not_message(self):
+        """Test comparison fails against not-FixMessage."""
+        msg = FixMessage()
+        msg.append_pair(1, 1)
+        self.assertFalse(msg == self)
         return
 
     def test_compare_not_equal_extra_field_in_a(self):
@@ -1025,7 +1033,48 @@ class MessageTests(unittest.TestCase):
         self.assertEqual(b'2', msg.get(99999, 2))
         return
 
+    def test_str(self):
+        """Test conversion to string."""
+        msg = FixMessage()
+        msg.append_pair(1, 1)
+        msg.append_pair(2, "foo")
+        msg.append_pair(3, b"bar")
+        msg.append_pair(4, 3.1415679)
 
+        buffer = msg.encode(True)
+        self.assertIsNotNone(buffer)
+        self.assertEqual(b"1=1\x012=foo\x013=bar\x014=3.1415679\x01", buffer)
+        return
+
+    def test_tag_bytes(self):
+        """Test bytes tag value returns bytes."""
+        self.assertEqual(b"123", fix_tag(b"123"))
+        self.assertEqual(bytes, type(fix_tag(b"123")))
+        return
+
+    def test_tag_str(self):
+        """Test string tag value returns bytes."""
+        self.assertEqual(b"123", fix_tag("123"))
+        self.assertEqual(bytes, type(fix_tag("123")))
+        return
+
+    def test_tag_int(self):
+        """Test integer tag value returns bytes."""
+        self.assertEqual(b"123", fix_tag(123))
+        self.assertEqual(bytes, type(fix_tag(123)))
+        return
+
+    def test_val_bytes(self):
+        """Test bytes value returns bytes."""
+        self.assertEqual(b"123", fix_val(b"123"))
+        self.assertEqual(bytes, type(fix_val(b"123")))
+        return
+
+    def test_val_str(self):
+        """Test string value returns bytes."""
+        self.assertEqual(b"123", fix_val("123"))
+        self.assertEqual(bytes, type(fix_val("123")))
+        return
 
 if __name__ == "__main__":
     unittest.main()
