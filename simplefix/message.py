@@ -60,7 +60,12 @@ def fix_tag(value):
     if sys.version_info[0] == 2:
         return bytes(value)
     else:
-        return bytes(str(value), 'ASCII')
+        if type(value) == bytes:
+            return value
+        elif type(value) == str:
+            return value.encode('ASCII')
+        return str(value).encode('ASCII')
+
 
 
 class FixMessage(object):
