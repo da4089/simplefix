@@ -1041,9 +1041,9 @@ class MessageTests(unittest.TestCase):
         msg.append_pair(3, b"bar")
         msg.append_pair(4, 3.1415679)
 
-        buffer = msg.encode(True)
+        buffer = str(msg)
         self.assertIsNotNone(buffer)
-        self.assertEqual(b"1=1\x012=foo\x013=bar\x014=3.1415679\x01", buffer)
+        self.assertEqual("1=1|2=foo|3=bar|4=3.1415679", buffer)
         return
 
     def test_tag_bytes(self):
