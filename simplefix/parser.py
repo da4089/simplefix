@@ -10,8 +10,8 @@
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 #
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 #
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -148,7 +148,7 @@ class FixParser(object):
                     if raw_len > len(self.buf) - point:
                         break
 
-                    value = self.buf[point:point+raw_len]
+                    value = self.buf[point:point + raw_len]
                     self.pairs.append((tag, value))
                     self.buf = self.buf[point + raw_len + 1:]
                     point = 0
@@ -171,7 +171,6 @@ class FixParser(object):
                     raw_len = int(value)
 
             point += 1
-
 
         if len(self.pairs) == 0:
             return None
