@@ -1046,6 +1046,46 @@ class MessageTests(unittest.TestCase):
         self.assertEqual("1=1|2=foo|3=bar|4=3.1415679", buffer)
         return
 
+    def test_eq(self):
+        """Test __equals__ override."""
+        m1 = FixMessage()
+        m1.append_pair(1, "one")
+        m1.append_pair(2, "two")
+        m1.append_pair(2, "to")
+        m1.append_pair(2, "too")
+        m1.append_pair(3, "end")
+
+        m2 = FixMessage()
+        m2.append_pair(3, "end")
+        m2.append_pair(2, "too")
+        m2.append_pair(2, "to")
+        self.assertFalse(m1 == m2)
+
+        m2.append_pair(2, "two")
+        m2.append_pair(1, "one")
+        self.assertTrue(m1 == m2)
+        return
+
+    def test_ne(self):
+        """Test __ne__ override."""
+        m1 = FixMessage()
+        m1.append_pair(1, "one")
+        m1.append_pair(2, "two")
+        m1.append_pair(2, "to")
+        m1.append_pair(2, "too")
+        m1.append_pair(3, "end")
+
+        m2 = FixMessage()
+        m2.append_pair(3, "end")
+        m2.append_pair(2, "too")
+        m2.append_pair(2, "to")
+        self.assertTrue(m1 != m2)
+
+        m2.append_pair(2, "two")
+        m2.append_pair(1, "one")
+        self.assertFalse(m1 != m2)
+        return
+
     def test_tag_bytes(self):
         """Test bytes tag value returns bytes."""
         self.assertEqual(b"123", fix_tag(b"123"))
@@ -1075,6 +1115,7 @@ class MessageTests(unittest.TestCase):
         self.assertEqual(b"123", fix_val("123"))
         self.assertEqual(bytes, type(fix_val("123")))
         return
+
 
 if __name__ == "__main__":
     unittest.main()
