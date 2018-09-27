@@ -169,6 +169,26 @@ class FixMessage(object):
 
         return self.append_pair(tag, s, header=header)
 
+    def _append_utc_datetime(self, tag, format, ts, precision, header):
+        """(Internal) Append formatted datetime."""
+
+        if ts is None:
+            t = datetime.datetime.utcnow()
+        elif type(ts) is float:
+            t = datetime.datetime.utcfromtimestamp(ts)
+        else:
+            t = ts
+
+        s = t.strftime(format)
+        if precision == 3:
+            s += ".%03d" % (t.microsecond / 1000)
+        elif precision == 6:
+            s += ".%06d" % t.microsecond
+        elif precision != 0:
+            raise ValueError("Precision should be one of 0, 3 or 6 digits")
+
+        return self.append_pair(tag, s, header=header)
+
     def append_utc_timestamp(self, tag, timestamp=None, precision=3,
                              header=False):
         """Append a field with a UTCTimestamp value.
@@ -188,22 +208,11 @@ class FixMessage(object):
         or 6 (microseconds) will raise an exception.  Note that prior
         to FIX 5.0, only values of 0 or 3 comply with the standard."""
 
-        if timestamp is None:
-            t = datetime.datetime.utcnow()
-        elif type(timestamp) is float:
-            t = datetime.datetime.utcfromtimestamp(timestamp)
-        else:
-            t = timestamp
-
-        s = t.strftime("%Y%m%d-%H:%M:%S")
-        if precision == 3:
-            s += ".%03d" % (t.microsecond / 1000)
-        elif precision == 6:
-            s += ".%06d" % t.microsecond
-        elif precision != 0:
-            raise ValueError("Precision should be one of 0, 3 or 6 digits")
-
-        return self.append_pair(tag, s, header=header)
+        return self._append_utc_datetime(tag,
+                                         "%Y%m%d-%H:%M:%S",
+                                         timestamp,
+                                         precision,
+                                         header)
 
     def append_utc_time_only(self, tag, timestamp=None, precision=3,
                              header=False):
@@ -224,22 +233,11 @@ class FixMessage(object):
         or 6 (microseconds) will raise an exception.  Note that prior
         to FIX 5.0, only values of 0 or 3 comply with the standard."""
 
-        if timestamp is None:
-            t = datetime.datetime.utcnow()
-        elif type(timestamp) is float:
-            t = datetime.datetime.utcfromtimestamp(timestamp)
-        else:
-            t = timestamp
-
-        s = t.strftime("%H:%M:%S")
-        if precision == 3:
-            s += ".%03u" % (t.microsecond / 1000)
-        elif precision == 6:
-            s += ".%06u" % t.microsecond
-        elif precision != 0:
-            raise ValueError("Precision should be one of 0, 3 or 6 digits")
-
-        return self.append_pair(tag, s, header=header)
+        return self._append_utc_datetime(tag,
+                                         "%H:%M:%S",
+                                         timestamp,
+                                         precision,
+                                         header)
 
     def append_utc_time_only_parts(self, tag, h, m, s, ms=None, us=None,
                                    header=False):
