@@ -624,6 +624,18 @@ class FixMessage(object):
 
         return True
 
+    def __ne__(self, other):
+        """Inverse compare with another FixMessage.
+
+        :param other: Message to compare.
+
+        Compares the tag=value pairs, message_type and FIX version
+        of this message against the `other`."""
+        return not self == other
+
+    # Disable hashing, since FixMessage is mutable.
+    __hash__ = None
+
     def __getitem__(self, item_index):
         """Enable messages to be iterated over, and treated as a sequence.
 
