@@ -4,8 +4,8 @@ Installation
 ============
 
 simplefix has a few dependencies.  Firstly, it is known to run on
-Python_ 2.7, 3.3, 3.4, 3.5, and 3.6.  It will not run on Python 2.6 or
-earlier.
+Python_ 2.6, 2.7, 3.3, 3.4, 3.5, 3.6, and 3.7.  It will not run on
+Python 2.5 or earlier.
 
 You can install it using pip_::
 
@@ -41,10 +41,10 @@ easily::
 
 
 
-.. _easy_install: http://pypi.python.org/pypi/setuptools
-.. _GitHub: https://github.com/hgrecco/pint
+.. _easy_install: http://github.com/pypa/setuptools
+.. _GitHub: https://github.com/da4089/simplefix
 .. _Python: http://www.python.org/
-.. _PyPI: https://pypi.python.org/pypi/Pint/
+.. _PyPI: https://pypi.org/project/simplefix/
 .. _pip: http://www.pip-installer.org/
 
 
