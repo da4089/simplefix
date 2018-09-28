@@ -621,9 +621,6 @@ class FixMessage(object):
             except ValueError:
                 return False
 
-        if len(tmp) > 0:
-            return False
-
         return True
 
     def __getitem__(self, item_index):
