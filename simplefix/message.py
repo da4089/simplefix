@@ -619,9 +619,6 @@ class FixMessage(object):
             except ValueError:
                 return False
 
-        if len(tmp) > 0:
-            return False
-
         return True
 
     def __ne__(self, other):
