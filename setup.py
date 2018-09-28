@@ -30,7 +30,7 @@ with open("README.rst") as readme:
     long_description = readme.read()
 
 setup(name="simplefix",
-      version="1.0.10",
+      version="1.0.11",
       description="Simple FIX Protocol implementation for Python",
       long_description=long_description,
       url="https://github.com/da4089/simplefix",
