@@ -21,12 +21,12 @@ install:
 build: off
 
 test_script:
-    - CMD "cd test"
-    - CMD "%PYTHON%\\python.exe -m unittest --verbose all"
-    - CMD "coverage run test\\all.py"
+    - "cd test"
+    - "%PYTHON%\\python.exe -m unittest --verbose all"
+    - "coverage run test\\all.py"
 
 after_test:
-    - CMD "coveralls"
+    - "coveralls"
 
 artifacts:
     - path: dist\*
