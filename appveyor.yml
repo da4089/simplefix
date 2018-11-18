@@ -24,13 +24,10 @@ test_script:
     - CMD "cd test; %PYTHON%\\python.exe -m unittest --verbose all"
     - CMD "coverage run test\\all.py"
 
-after_success:
-    - CMD: echo "Success"
-
 after_test:
     - CMD "coveralls"
 
-artifects:
+artifacts:
     - path: dist\*
 
 #on_success:
