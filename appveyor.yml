@@ -21,7 +21,8 @@ install:
 build: off
 
 test_script:
-    - CMD "cd test; %PYTHON%\\python.exe -m unittest --verbose all"
+    - CMD "cd test"
+    - CMD "%PYTHON%\\python.exe -m unittest --verbose all"
     - CMD "coverage run test\\all.py"
 
 after_test:
