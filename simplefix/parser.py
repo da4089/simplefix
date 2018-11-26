@@ -57,6 +57,9 @@ class FixParser(object):
 
         # Copy raw field data tags.
         self.raw_data_tags = RAW_DATA_TAGS[:]
+
+        # Parsed length of data field.
+        self.raw_len = 0
         return
 
     def add_raw(self, length_tag, value_tag):
@@ -98,6 +101,7 @@ class FixParser(object):
 
         self.buf = b""
         self.pairs = []
+        self.raw_len = 0
         return
 
     def append_buffer(self, buf):
@@ -135,7 +139,6 @@ class FixParser(object):
         start = 0
         point = 0
         in_tag = True
-        raw_len = 0
         tag = 0
 
         while point < len(self.buf):
@@ -144,15 +147,15 @@ class FixParser(object):
                 point += 1
 
                 tag = int(tag_string)
-                if tag in self.raw_data_tags and raw_len > 0:
-                    if raw_len > len(self.buf) - point:
+                if tag in self.raw_data_tags and self.raw_len > 0:
+                    if self.raw_len > len(self.buf) - point:
                         break
 
-                    value = self.buf[point:point + raw_len]
+                    value = self.buf[point:point + self.raw_len]
                     self.pairs.append((tag, value))
-                    self.buf = self.buf[point + raw_len + 1:]
+                    self.buf = self.buf[point + self.raw_len + 1:]
                     point = 0
-                    raw_len = 0
+                    self.raw_len = 0
                     start = point
 
                 else:
@@ -168,7 +171,7 @@ class FixParser(object):
                 in_tag = True
 
                 if tag in self.raw_len_tags:
-                    raw_len = int(value)
+                    self.raw_len = int(value)
 
             point += 1
 
