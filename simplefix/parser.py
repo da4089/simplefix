@@ -28,6 +28,9 @@ from .message import FixMessage, fix_val
 from .data import RAW_DATA_TAGS, RAW_LEN_TAGS
 
 
+# By default, messages start with tag 8.
+DEFAULT_START_STRING = b"8=FIX"
+
 # By default, messages are terminated by the Checksum (10) tag.
 DEFAULT_STOP_TAG = 10
 
@@ -64,6 +67,12 @@ class FixParser(object):
 
         # Parsed length of data field.
         self.raw_len = 0
+
+        # Ignore prefix characters.
+        self.ignore_prefix = False
+
+        # Message start string.
+        self.start_string = DEFAULT_START_STRING
 
         # Stop tag (default).
         self.stop_tag = DEFAULT_STOP_TAG
@@ -112,6 +121,32 @@ class FixParser(object):
         self.buf = b""
         self.pairs = []
         self.raw_len = 0
+        return
+
+    def set_ignore_prefix(self, value=True):
+        """If set, ignore characters prior to the start of message.
+
+        :param value: True to ignore prefix, False otherwise.
+
+        For example, when parsing a FIX log file, it is common that
+        each line represents a message, and is prefixed with a
+        timestamp and direction.  If this flag is set, any such
+        characters before the first tag=value pair are ignored."""
+        self.ignore_prefix = True if value else False
+        return
+
+    def set_message_start(self, start=None):
+        """Set the expected start string for a message.
+
+        :param start: Start of message string.
+
+        For all FIX 4.x and 5.x, including FIXT.1.1, a legal message
+        will begin with the string '8=FIX'.  When parsing variants of
+        proper FIX, this might sometimes need to be overridden."""
+        if start is not None:
+            self.start_string = start
+        else:
+            self.start_string = DEFAULT_START_STRING
         return
 
     def set_message_terminator(self, tag=None, char=None):
