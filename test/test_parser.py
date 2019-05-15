@@ -258,6 +258,81 @@ class ParserTests(unittest.TestCase):
         msg = parser.get_message()
         checksum = msg.get(10)
         self.assertEqual(checksum, b'169')
+        return
+
+    def test_stop_tag(self):
+        """Test termination using alternative tag number."""
+
+        pkt = FixMessage()
+        pkt.append_pair(8, "FIX.4.2")
+        pkt.append_pair(35, "D")
+        pkt.append_pair(29, "A")
+        pkt.append_pair(20000, "xxx")
+        pkt.append_pair(10, "000")
+        buf = pkt.encode()
+
+        p = FixParser()
+        p.set_message_terminator(tag=20000)
+        p.append_buffer(buf)
+        m = p.get_message()
+
+        self.assertIsNotNone(m)
+        self.assertEqual(b"FIX.4.2", m.get(8))
+        self.assertEqual(b"D", m.get(35))
+        self.assertEqual(b"A", m.get(29))
+        self.assertEqual(b"xxx", m.get(20000))
+        self.assertEqual(False, 10 in m)
+        return
+
+    def test_stop_char_with_field_terminator(self):
+        """Test stop character with field terminator."""
+
+        buf = \
+            b'8=FIX.4.2\x0135=d\x0134=1\x01369=XX\x01\n' + \
+            b'8=FIX.4.2\x0135=d\x0134=2\x01369=XX\x01\n' + \
+            b'8=FIX.4.2\x0135=d\x0134=3\x01369=XX\x01\n'
+
+        p = FixParser()
+        p.set_message_terminator(char='\n')
+        p.append_buffer(buf)
+
+        m = p.get_message()
+        self.assertIsNotNone(m)
+        self.assertEqual(b"1", m.get(34))
+
+        m = p.get_message()
+        self.assertIsNotNone(m)
+        self.assertEqual(b"2", m.get(34))
+
+        m = p.get_message()
+        self.assertIsNotNone(m)
+        self.assertEqual(b"3", m.get(34))
+        return
+
+    def test_stop_char_without_field_terminator(self):
+        """Test stop character without field terminator."""
+
+        buf = \
+            b'8=FIX.4.2\x0135=d\x0134=1\x01369=XX\n' + \
+            b'8=FIX.4.2\x0135=d\x0134=2\x01369=XX\n' + \
+            b'8=FIX.4.2\x0135=d\x0134=3\x01369=XX\n'
+
+        p = FixParser()
+        p.set_message_terminator(char='\n')
+        p.append_buffer(buf)
+
+        m = p.get_message()
+        self.assertIsNotNone(m)
+        self.assertEqual(b"1", m.get(34))
+
+        m = p.get_message()
+        self.assertIsNotNone(m)
+        self.assertEqual(b"2", m.get(34))
+
+        m = p.get_message()
+        self.assertIsNotNone(m)
+        self.assertEqual(b"3", m.get(34))
+        return
 
 
 if __name__ == "__main__":

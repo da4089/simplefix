@@ -28,6 +28,10 @@ from .message import FixMessage, fix_val
 from .data import RAW_DATA_TAGS, RAW_LEN_TAGS
 
 
+# By default, messages are terminated by the Checksum (10) tag.
+DEFAULT_STOP_TAG = 10
+
+
 class FixParser(object):
     """FIX protocol message parser.
 
@@ -60,6 +64,12 @@ class FixParser(object):
 
         # Parsed length of data field.
         self.raw_len = 0
+
+        # Stop tag (default).
+        self.stop_tag = DEFAULT_STOP_TAG
+
+        # Stop character (optional).
+        self.stop_char = None
         return
 
     def add_raw(self, length_tag, value_tag):
@@ -104,6 +114,30 @@ class FixParser(object):
         self.raw_len = 0
         return
 
+    def set_message_terminator(self, tag=None, char=None):
+        """Set the end-of-message detection scheme.
+
+        :param tag: FIX tag number of terminating field.  Default is 10.
+        :param char: Alternative, terminating character.
+
+        By default, messages are terminated by the FIX Checksum (10)
+        field.  This can be changed to use a different tag, or a reserved
+        character using this function.
+
+        Note that only one of 'tag' or 'char' should be set, using a
+        named parameter."""
+
+        if tag is not None and char is not None:
+            raise ValueError("Only supply one of 'tag' or 'char'.")
+        elif tag is not None:
+            self.stop_tag = tag
+            self.stop_char = None
+        else:
+            self.stop_tag = None
+            bs = char.encode() if type(char) == str else char
+            self.stop_char = bs[0]
+        return
+
     def append_buffer(self, buf):
         """Append a byte string to the parser buffer.
 
@@ -142,7 +176,8 @@ class FixParser(object):
         tag = 0
 
         while point < len(self.buf):
-            if in_tag and self.buf[point] == EQUALS_BYTE:
+            c = self.buf[point]
+            if in_tag and c == EQUALS_BYTE:
                 tag_string = self.buf[start:point]
                 point += 1
 
@@ -162,21 +197,31 @@ class FixParser(object):
                     in_tag = False
                     start = point
 
-            elif self.buf[point] == SOH_BYTE:
+            elif c == self.stop_char:
+                if start != point:
+                    value = self.buf[start:point]
+                    self.pairs.append((tag, value))
+                    self.buf = self.buf[point + 1:]
+                else:
+                    self.buf = self.buf[1:]
+                break
+
+            elif c == SOH_BYTE:
                 value = self.buf[start:point]
                 self.pairs.append((tag, value))
                 self.buf = self.buf[point + 1:]
-                point = 0
-                start = point
+
+                if tag == self.stop_tag:
+                    break
+
+                start = 0
+                point = -1
                 in_tag = True
 
                 if tag in self.raw_len_tags:
                     self.raw_len = int(value)
 
             point += 1
-
-        if len(self.pairs) == 0:
-            return None
 
         # Check first pair is FIX BeginString.
         while self.pairs and self.pairs[0][0] != 8:
@@ -187,19 +232,15 @@ class FixParser(object):
             return None
 
         # Look for checksum.
-        index = 0
-        while index < len(self.pairs) and self.pairs[index][0] != 10:
-            index += 1
-
-        if index == len(self.pairs):
-            return None
+        if self.stop_tag is not None:
+            if self.pairs[-1][0] != self.stop_tag:
+                return None
 
         # Found checksum, so we have a complete message.
         m = FixMessage()
-        pairs = self.pairs[:index + 1]
-        for tag, value in pairs:
+        for tag, value in self.pairs:
             m.append_pair(tag, value)
-        self.pairs = self.pairs[index + 1:]
+        self.pairs = []
 
         return m
 
