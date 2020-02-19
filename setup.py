@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 ########################################################################
 # SimpleFIX
-# Copyright (C) 2016-2018, David Arnold.
+# Copyright (C) 2016-2020, David Arnold.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ with open("README.rst") as readme:
     long_description = readme.read()
 
 setup(name="simplefix",
-      version="1.0.12",
+      version="1.0.13",
       description="Simple FIX Protocol implementation for Python",
       long_description=long_description,
       url="https://github.com/da4089/simplefix",
@@ -46,13 +46,12 @@ setup(name="simplefix",
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         ],
       )
 

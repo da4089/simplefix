@@ -4,9 +4,9 @@ Running the Unit Tests
 In my development environment, I have three venvs: 2.7, 3.3 and 3.6.  I run
 the tests in each of these environments before committing changes.
 
-Once committed, TravisCI runs the tests in 2.7, 3.3, 3.4, 3.5 and 3.6.  It will
-build pull-request branches also.  Travis will email your commit address the
-results of its build.
+Once committed, TravisCI runs the tests in 2.7, 3.4, 3.5, 3.6, 3.7 and 3.8.
+It will build pull-request branches also.  Travis will email your commit
+address the results of its build.
 
 To run tests from a local shell, I use:
 
