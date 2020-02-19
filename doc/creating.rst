@@ -158,9 +158,9 @@ used.  It will correctly add both the length field and the value field.
 
     message.append_data(95, 96, "RAW DATA \x00\x01 VALUE")
 
-which will result in the FIX message content (where ◆ represents the SOH):
+which will result in the FIX message content (where | represents the SOH):
 
 .. epigraph::
 
-    95=17◆96=RAW DATA \\x00\\x01 VALUE◆
+    95=17|96=RAW DATA \\x00\\x01 VALUE|
 
