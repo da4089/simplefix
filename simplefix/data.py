@@ -88,7 +88,7 @@ RAW_DATA = (
     (41710, 41711),  # EncodedUnderlyingAdditionalTermBondDesc
     (41806, 41807),  # EncodedUnderlyingDeliveryStreamCycleDesc
     (41811, 41812),  # EncodedUnderlyingExerciseDesc
-    (41873, 41874),  # EncodedUnderlyingMarketDisruptionFallbackUnderlierSecurityDesc
+    (41873, 41874),  # EncodedUnderlyingMarketDisruptionFallbackUnderlierSecDesc
     (41969, 41970),  # EncodedUnderlyingStreamCommodityDesc
     (42025, 42026),  # EncodedUnderlyingAdditionalTermBondIssuer
     (42171, 42172))  # EncodedUnderlyingProvisionText
