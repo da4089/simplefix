@@ -30,11 +30,17 @@ from .parser import FixParser
 from .constants import *
 
 
-def pretty_print(buf):
+def pretty_print(buf, sep='|'):
+    """Pretty-print a raw FIX buffer.
+
+    :param buf: Byte sequence containing raw message.
+    :param sep: Separator character to use for output, default is '|'.
+    :returns: Formatted byte array."""
+
     raw = bytearray(buf)
     cooked = bytearray(len(raw))
     for i, value in enumerate(raw):
-        cooked[i] = 124 if value == 1 else value
+        cooked[i] = ord(sep) if value == 1 else value
     return bytes(cooked)
 
 

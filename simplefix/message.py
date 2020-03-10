@@ -70,7 +70,6 @@ def fix_tag(value):
     return str(value).encode('ASCII')
 
 
-
 class FixMessage(object):  # skipcq: PYL-R0205
     """FIX protocol message.
 
@@ -531,7 +530,6 @@ class FixMessage(object):  # skipcq: PYL-R0205
                     return v
 
         return None
-
 
     def encode(self, raw=False):
         """Convert message to on-the-wire FIX format.
