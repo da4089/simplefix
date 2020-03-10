@@ -309,12 +309,14 @@ class MessageTests(unittest.TestCase):
         """Test no supplied timestamp value"""
         msg = FixMessage()
         msg.append_time(52)
+        self.assertIsNotNone(msg.get(52))
         return
 
     def test_time_explicit_none(self):
         """Test explicit None as timestamp value"""
         msg = FixMessage()
         msg.append_time(52, None)
+        self.assertIsNotNone(msg.get(52))
         return
 
     def test_time_float(self):
@@ -384,12 +386,14 @@ class MessageTests(unittest.TestCase):
         """Test UTCTimestamp with no supplied timestamp value"""
         msg = FixMessage()
         msg.append_utc_timestamp(52)
+        self.assertIsNotNone(msg.get(52))
         return
 
     def test_utcts_explicit_none(self):
         """Test UTCTimestamp with explicit None timestamp value"""
         msg = FixMessage()
         msg.append_utc_timestamp(52, None)
+        self.assertIsNotNone(msg.get(52))
         return
 
     def test_utcts_float(self):
@@ -445,12 +449,14 @@ class MessageTests(unittest.TestCase):
         """Test UTCTimeOnly with no supplied timestamp value"""
         msg = FixMessage()
         msg.append_utc_time_only(273)
+        self.assertIsNotNone(msg.get(273))
         return
 
     def test_utcto_explicit_none(self):
         """Test UTCTimeOnly with explicit None time value"""
         msg = FixMessage()
         msg.append_utc_time_only(273, None)
+        self.assertIsNotNone(msg.get(273))
         return
 
     def test_utcto_float(self):
@@ -621,12 +627,14 @@ class MessageTests(unittest.TestCase):
         """Test TZTimeOnly with no supplied timestamp value"""
         msg = FixMessage()
         msg.append_tz_time_only(1253)
+        self.assertIsNotNone(msg.get(1253))
         return
 
     def test_append_tzts_none(self):
         """Test TimezoneTimeOnly with explicit None"""
         msg = FixMessage()
         msg.append_tz_timestamp(1253, None)
+        self.assertIsNotNone(msg.get(1253))
         return
 
     @staticmethod
