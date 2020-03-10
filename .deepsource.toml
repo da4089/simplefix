@@ -1,6 +1,6 @@
 version = 1
 
-test_patterns = ["test/all.py"]
+test_patterns = ["simplefix/*.py"]
 
 [[analyzers]]
 name = "python"
