@@ -48,14 +48,28 @@ VERSION = (sys.version_info[0] * 10) + sys.version_info[1]
 def fix_str(s):
     if sys.version_info[0] == 2:
         return bytes(s)
-    else:
-        return bytes(s, 'ASCII')
+
+    return bytes(s, 'ASCII')
+
+
+# Python 2.6's unittest.TestCase doesn't have assertIsNone()
+def test_none(_, other):  # skipcq: PYL-R1719
+    return other is None
+
+
+# Python 2.6's unittest.TestCase doesn't have assertIsNotNone()
+def test_not_none(_, other):  # skipcq: PYL-R1719
+    return other is not None
 
 
 class MessageTests(unittest.TestCase):
 
     def setUp(self):
-        pass
+        if not hasattr(self, "assertIsNotNone"):
+            MessageTests.assertIsNotNone = test_not_none
+        if not hasattr(self, "assertIsNone"):
+            MessageTests.assertIsNone = test_none
+        return
 
     def tearDown(self):
         pass

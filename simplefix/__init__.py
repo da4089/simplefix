@@ -33,8 +33,8 @@ from .constants import *
 def pretty_print(buf):
     raw = bytearray(buf)
     cooked = bytearray(len(raw))
-    for i in range(len(raw)):
-        cooked[i] = 124 if raw[i] == 1 else raw[i]
+    for i, value in enumerate(raw):
+        cooked[i] = 124 if value == 1 else value
     return bytes(cooked)
 
 

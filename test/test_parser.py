@@ -32,18 +32,18 @@ from simplefix import FixMessage, FixParser, SOH_STR
 def make_str(s):
     if sys.version_info.major == 2:
         return bytes(s)
-    else:
-        return bytes(s, 'ASCII')
+
+    return bytes(s, 'ASCII')
 
 
 # Python 2.6's unittest.TestCase doesn't have assertIsNone()
-def test_none(self, other):
-    return True if other is None else False
+def test_none(_, other):  # skipcq: PYL-R1719
+    return other is None
 
 
 # Python 2.6's unittest.TestCase doesn't have assertIsNotNone()
-def test_not_none(self, other):
-    return False if other is None else True
+def test_not_none(_, other):  # skipcq: PYL-R1719
+    return other is not None
 
 
 class ParserTests(unittest.TestCase):

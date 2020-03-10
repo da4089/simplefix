@@ -44,27 +44,30 @@ from .constants import SOH_STR
 
 def fix_val(value):
     """Make a FIX value from a string, bytes, or number."""
-    if type(value) == bytes:
+    if type(value) is bytes:
         return value
 
     if sys.version_info[0] == 2:
         return bytes(value)
-    elif type(value) == str:
+
+    if type(value) is str:
         return bytes(value, 'UTF-8')
-    else:
-        return bytes(str(value), 'ASCII')
+
+    return bytes(str(value), 'ASCII')
 
 
 def fix_tag(value):
     """Make a FIX tag value from string, bytes, or integer."""
     if sys.version_info[0] == 2:
         return bytes(value)
-    else:
-        if type(value) == bytes:
-            return value
-        elif type(value) == str:
-            return value.encode('ASCII')
-        return str(value).encode('ASCII')
+
+    if type(value) is bytes:
+        return value
+
+    if type(value) is str:
+        return value.encode('ASCII')
+
+    return str(value).encode('ASCII')
 
 
 
@@ -169,7 +172,7 @@ class FixMessage(object):
 
         return self.append_pair(tag, s, header=header)
 
-    def _append_utc_datetime(self, tag, format, ts, precision, header):
+    def _append_utc_datetime(self, tag, fmt, ts, precision, header):
         """(Internal) Append formatted datetime."""
 
         if ts is None:
@@ -179,7 +182,7 @@ class FixMessage(object):
         else:
             t = ts
 
-        s = t.strftime(format)
+        s = t.strftime(fmt)
         if precision == 3:
             s += ".%03d" % (t.microsecond / 1000)
         elif precision == 6:
@@ -653,7 +656,7 @@ class FixMessage(object):
         :param item: Tag value to check."""
 
         needle = fix_tag(item)
-        for tag, value in self.pairs:
+        for tag, _ in self.pairs:
             if tag == needle:
                 return True
 

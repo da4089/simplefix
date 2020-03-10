@@ -129,12 +129,13 @@ class FixParser(object):
 
         if tag is not None and char is not None:
             raise ValueError("Only supply one of 'tag' or 'char'.")
-        elif tag is not None:
+
+        if tag is not None:
             self.stop_tag = tag
             self.stop_char = None
         else:
             self.stop_tag = None
-            bs = char.encode() if type(char) == str else char
+            bs = char.encode() if type(char) is str else char
             self.stop_char = bs[0]
         return
 
