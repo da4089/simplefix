@@ -54,7 +54,6 @@ class ParserTests(unittest.TestCase):
             ParserTests.assertIsNotNone = test_not_none
         if not hasattr(self, "assertIsNone"):
             ParserTests.assertIsNone = test_none
-        return
 
     def tearDown(self):
         pass
@@ -64,7 +63,6 @@ class ParserTests(unittest.TestCase):
         parser = FixParser()
         msg = parser.get_message()
         self.assertIsNone(msg)
-        return
 
     def test_basic_fix_message(self):
         """Test parsing basic FIX message."""
@@ -82,7 +80,6 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(b"FIX.4.2", m.get(8))
         self.assertEqual(b"D", m.get(35))
         self.assertEqual(b"A", m.get(29))
-        return
 
     def test_parse_partial_string(self):
         """Test parsing incomplete FIX message."""
@@ -98,7 +95,6 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(b"5", msg.get(9))
         self.assertEqual(b"0", msg.get(35))
         self.assertEqual(b"161", msg.get(10))
-        return
 
     def test_get_buffer(self):
         """Test reassembly of message fragments."""
@@ -116,7 +112,6 @@ class ParserTests(unittest.TestCase):
 
         buf = parser.get_buffer()
         self.assertEqual(b"", buf)
-        return
 
     def test_leading_junk_pairs(self):
         """Test that leading junk pairs are ignored."""
@@ -126,7 +121,6 @@ class ParserTests(unittest.TestCase):
         self.assertIsNotNone(msg)
         self.assertIsNone(msg.get(1))
         self.assertIsNone(msg.get(3))
-        return
 
     def test_junk_pairs(self):
         """Test that complete junk paris are ignored."""
@@ -134,7 +128,6 @@ class ParserTests(unittest.TestCase):
         parser.append_buffer("1=2\x013=4\x015=6\x01")
         msg = parser.get_message()
         self.assertIsNone(msg)
-        return
 
     def test_raw_data(self):
         """Test parsing of raw data fields."""
@@ -157,7 +150,6 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(len(raw), int(msg.get(95)))
         self.assertEqual(raw, msg.get(96))
         self.assertEqual(b"private tag", msg.get(20000))
-        return
 
     def test_raw_data_tags(self):
         """Test functions to add and remove raw data tags."""
@@ -194,7 +186,6 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(b"raw", msg.get(5002))
         self.assertEqual(b"1", msg.get(5000))
         self.assertEqual(b"private tag", msg.get(20000))
-        return
 
     def test_embedded_equals_96_no_95(self):
         """Test a Logon with 96 but no 95, and an embedded equals."""
@@ -218,7 +209,6 @@ class ParserTests(unittest.TestCase):
         msg = parser.get_message()
 
         self.assertIsNotNone(msg)
-        return
 
     def test_simplefix_on_split_execution_report(self):
         """Test parsing with length and data appended separately."""
@@ -258,7 +248,6 @@ class ParserTests(unittest.TestCase):
         msg = parser.get_message()
         checksum = msg.get(10)
         self.assertEqual(checksum, b'169')
-        return
 
     def test_stop_tag(self):
         """Test termination using alternative tag number."""
@@ -282,7 +271,6 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(b"A", m.get(29))
         self.assertEqual(b"xxx", m.get(20000))
         self.assertEqual(False, 10 in m)
-        return
 
     def test_stop_char_with_field_terminator(self):
         """Test stop character with field terminator."""
@@ -307,7 +295,6 @@ class ParserTests(unittest.TestCase):
         m = p.get_message()
         self.assertIsNotNone(m)
         self.assertEqual(b"3", m.get(34))
-        return
 
     def test_stop_char_without_field_terminator(self):
         """Test stop character without field terminator."""
@@ -332,7 +319,6 @@ class ParserTests(unittest.TestCase):
         m = p.get_message()
         self.assertIsNotNone(m)
         self.assertEqual(b"3", m.get(34))
-        return
 
 
 if __name__ == "__main__":

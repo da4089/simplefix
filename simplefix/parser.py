@@ -70,7 +70,6 @@ class FixParser(object):  # skipcq: PYL-R0205
 
         # Stop character (optional).
         self.stop_char = None
-        return
 
     def add_raw(self, length_tag, value_tag):
         """Define the tags used for a private raw data field.
@@ -87,7 +86,6 @@ class FixParser(object):  # skipcq: PYL-R0205
 
         self.raw_len_tags.append(length_tag)
         self.raw_data_tags.append(value_tag)
-        return
 
     def remove_raw(self, length_tag, value_tag):
         """Remove the tags for a data type field.
@@ -101,7 +99,6 @@ class FixParser(object):  # skipcq: PYL-R0205
 
         self.raw_len_tags.remove(length_tag)
         self.raw_data_tags.remove(value_tag)
-        return
 
     def reset(self):
         """Reset the internal parser state.
@@ -112,7 +109,6 @@ class FixParser(object):  # skipcq: PYL-R0205
         self.buf = b""
         self.pairs = []
         self.raw_len = 0
-        return
 
     def set_message_terminator(self, tag=None, char=None):
         """Set the end-of-message detection scheme.
@@ -137,7 +133,6 @@ class FixParser(object):  # skipcq: PYL-R0205
             self.stop_tag = None
             bs = char.encode() if type(char) is str else char
             self.stop_char = bs[0]
-        return
 
     def append_buffer(self, buf):
         """Append a byte string to the parser buffer.
@@ -149,7 +144,6 @@ class FixParser(object):  # skipcq: PYL-R0205
         call to get_message() will try to remove the bytes of a
         complete messages from the head of the buffer."""
         self.buf += fix_val(buf)
-        return
 
     def get_buffer(self):
         """Return a reference to the internal buffer."""

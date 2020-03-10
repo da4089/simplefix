@@ -37,7 +37,6 @@ class ConstantsTests(unittest.TestCase):
 
     def test_35(self):
         self.assertEqual(b'0', simplefix.MSGTYPE_HEARTBEAT)
-        return
 
 
 if __name__ == "__main__":

@@ -39,7 +39,6 @@ class InitTests(unittest.TestCase):
         str_input = b"1=2\x013=foo\x01"
         str_output = simplefix.pretty_print(str_input)
         self.assertEqual(b"1=2|3=foo|", str_output)
-        return
 
 
 if __name__ == "__main__":
