@@ -71,7 +71,7 @@ def fix_tag(value):
 
 
 
-class FixMessage(object):
+class FixMessage(object):  # skipcq: PYL-R0205
     """FIX protocol message.
 
     FIX messages consist of an ordered list of tag=value pairs.  Tags
