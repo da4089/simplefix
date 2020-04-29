@@ -35,6 +35,7 @@ Publishing a Release
 ====================
 
 * Check the setup.py version.
+# Check doc/conf.py version (search for "release =").
 * Commit and push everything.
 * Activate the 3.6 venv (to get twine, wheel, etc)
 * Run: rm -rf dist
