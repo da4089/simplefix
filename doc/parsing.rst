@@ -15,8 +15,8 @@ otherwise, it'll return a ``FixMessage`` instance.
 
 .. code-block:: python
 
-    fix_buffer = parser.append_buffer()
-    message = fix_buffer.get_message()
+    parser.append_buffer(response_from_socket)
+    message = parser.get_message()
 
 
 Once you've received a ``FixMessage`` from ``get_message()`` , you can: check
@@ -42,4 +42,4 @@ that the first group is number one, not zero).
 .. code-block:: python
 
     messsage = get(9061, 2)
-    >>> 22 
+    >>> 22
