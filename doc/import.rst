@@ -9,7 +9,7 @@ or you can import some or all bindings directly.
 
     import simplefix
 
-    fix_msg = simplefix.Message()
+    message = simplefix.FixMessage()
 
 
 Or
@@ -19,7 +19,7 @@ Or
 
     from simplefix import *
 
-    fix_msg = Message()
+    message = FixMessage()
 
 
 Note that the "import *" form is explicitly supported, with the exposed
@@ -28,6 +28,3 @@ package.
 
 All the example code in this document will use the first form, which is
 recommended.
-
-
-
