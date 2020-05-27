@@ -7,7 +7,7 @@ To create a FIX message, first create an instance of the FixMessage class.
 
 .. code-block:: python
 
-    msg = simplefix.FixMessage()
+    messsage = simplefix.FixMessage()
 
 
 You can then add fields to the message as required.  You should add the
@@ -163,4 +163,3 @@ which will result in the FIX message content (where | represents the SOH):
 .. epigraph::
 
     95=17|96=RAW DATA \\x00\\x01 VALUE|
-
