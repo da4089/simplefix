@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 ########################################################################
 # SimpleFIX
-# Copyright (C) 2016-2020, David Arnold.
+# Copyright (C) 2016-2021, David Arnold.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -46,12 +46,10 @@ setup(name="simplefix",
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         ],
       )
 

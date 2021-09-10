@@ -34,15 +34,7 @@ against the master branch.
 Ground Rules
 ------------
 
-* Ensure all code works across Python 2.6 and 2.7, 3.3, 3.4, 3.5, 3.6,
-  and 3.7.  Maintaining support for 2.6 is probably the hardest part of
-  this, but until RHEL6 / CentOS6 is no longer supported, its default
-  interpreter remains 2.6, and we'd like to continue to support it.
-
-  There's some concessions to this rule in the unit tests, where the
-  unittest module in 2.6 lacks a lot of useful features.  But you'll
-  see that the core code goes to some effort to maintain 2.6
-  compatibility.
+* Ensure all code works across Python 3.6, 3.7, 3.8 and 3.9.
 
 * Ensure all code is cross-platform: Linux, Windows and MacOS.  While it
   Normally shouldn't matter, at least Ubuntu and Red Hat/CentOS Linuxes
