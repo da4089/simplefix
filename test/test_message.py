@@ -32,43 +32,10 @@ from simplefix import FixMessage
 from simplefix.message import fix_tag, fix_val
 
 
-# NOTE: RHEL6 ships with Python 2.6, which is increasingly difficult to
-# support as both 2.7 and 3.x have added numerous features that seem like
-# they've been around forever, but actually aren't in 2.6.
-#
-# While in a few cases, I try to monkey-patch stuff up to 2.7-equivalent,
-# in a lot of the test code, I just skip the tests if they're run on
-# a 2.6 interpreter -- or I would but unittest in 2.6 doesn't understand
-# skipping, so they just pass without testing anything.
-#
-# This constant is used to check the version and alter behaviour to suit.
-VERSION = (sys.version_info[0] * 10) + sys.version_info[1]
-
-
-def fix_str(s):
-    if sys.version_info[0] == 2:
-        return bytes(s)
-
-    return bytes(s, 'ASCII')
-
-
-# Python 2.6's unittest.TestCase doesn't have assertIsNone()
-def test_none(_, other):  # skipcq: PYL-R1719
-    return other is None
-
-
-# Python 2.6's unittest.TestCase doesn't have assertIsNotNone()
-def test_not_none(_, other):  # skipcq: PYL-R1719
-    return other is not None
-
-
 class MessageTests(unittest.TestCase):
 
     def setUp(self):
-        if not hasattr(self, "assertIsNotNone"):
-            MessageTests.assertIsNotNone = test_not_none
-        if not hasattr(self, "assertIsNone"):
-            MessageTests.assertIsNone = test_none
+        pass
 
     def tearDown(self):
         pass
@@ -77,22 +44,16 @@ class MessageTests(unittest.TestCase):
         """Test field set with tag=value string"""
         msg = FixMessage()
         msg.append_string("8=FIX.4.2")
-        self.assertEqual(fix_str("FIX.4.2"), msg.get(8))
+        self.assertEqual(b"FIX.4.2", msg.get(8))
 
     def test_string_without_equals(self):
         """Test field set with string not containing equals sign"""
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.append_string("FIX.4.2")
 
     def test_string_with_bad_tag(self):
         """Test field set with bad tag in tag=value string"""
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.append_string("foo=bar")
@@ -100,73 +61,64 @@ class MessageTests(unittest.TestCase):
     def test_raw_empty_message(self):
         """Test raw encoding of empty message"""
         pkt = FixMessage()
-        self.assertEqual(fix_str(""), pkt.encode(True))
+        self.assertEqual(b"", pkt.encode(True))
 
     def test_raw_begin_string(self):
         """Test raw encoding of BeginString(8)"""
         pkt = FixMessage()
         pkt.append_pair(8, "FIX.4.4")
-        self.assertEqual(fix_str("8=FIX.4.4\x01"), pkt.encode(True))
+        self.assertEqual(b"8=FIX.4.4\x01", pkt.encode(True))
 
     def test_set_session_version(self):
         """Test minimal message"""
         pkt = FixMessage()
         pkt.append_pair(8, "FIX.4.4")
         pkt.append_pair(35, "0")
-        self.assertEqual(fix_str("8=FIX.4.4\x01"
-                                 "9=5\x01"
-                                 "35=0\x01"
-                                 "10=163\x01"),
+        self.assertEqual(b"8=FIX.4.4\x01"
+                         b"9=5\x01"
+                         b"35=0\x01"
+                         b"10=163\x01",
                          pkt.encode())
 
     def test_get_repeating(self):
         """Test retrieval of repeating field's value"""
-        if VERSION == 26:
-            return
-
         pkt = FixMessage()
         pkt.append_pair(42, "a")
         pkt.append_pair(42, "b")
         pkt.append_pair(42, "c")
 
-        self.assertEqual(fix_str("a"), pkt.get(42))
-        self.assertEqual(fix_str("b"), pkt.get(42, 2))
-        self.assertEqual(fix_str("c"), pkt.get(42, 3))
-        self.assertEqual(fix_str("a"), pkt.get(42, 1))
+        self.assertEqual(b"a", pkt.get(42))
+        self.assertEqual(b"b", pkt.get(42, 2))
+        self.assertEqual(b"c", pkt.get(42, 3))
+        self.assertEqual(b"a", pkt.get(42, 1))
         self.assertIsNone(pkt.get(42, 4))
 
     def test_raw_body_length(self):
         """Test encoding of BodyLength(9) in raw mode"""
         pkt = FixMessage()
         pkt.append_pair(9, 42)
-        self.assertEqual(fix_str("9=42\x01"), pkt.encode(True))
+        self.assertEqual(b"9=42\x01", pkt.encode(True))
 
     def test_raw_checksum(self):
         """Test encoding of CheckSum(10) in raw mode"""
         pkt = FixMessage()
         pkt.append_pair(10, 42)
-        self.assertEqual(fix_str("10=42\x01"), pkt.encode(True))
+        self.assertEqual(b"10=42\x01", pkt.encode(True))
 
     def test_raw_msg_type(self):
         """Test encoding of MessageType(35) in raw mode"""
         pkt = FixMessage()
         pkt.append_pair(35, "D")
-        self.assertEqual(fix_str("35=D\x01"), pkt.encode(True))
+        self.assertEqual(b"35=D\x01", pkt.encode(True))
 
     def test_empty_message(self):
         """Test encoding of empty message"""
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.encode()
 
     def test_encode_no_35(self):
         """Test encoding without MessageType(35) field"""
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         msg.append_pair(8, "FIX.4.2")
         with self.assertRaises(ValueError):
@@ -174,9 +126,6 @@ class MessageTests(unittest.TestCase):
 
     def test_encode_no_8(self):
         """Test encoding without BeginString(8) field"""
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         msg.append_pair(35, "D")
         with self.assertRaises(ValueError):
@@ -300,7 +249,7 @@ class MessageTests(unittest.TestCase):
         msg = FixMessage()
         t = 1484581872.933458
         msg.append_time(52, t)
-        self.assertEqual(fix_str("20170116-15:51:12.933"), msg.get(52))
+        self.assertEqual(b"20170116-15:51:12.933", msg.get(52))
 
     def test_time_datetime(self):
         """Test use of built-in datetime timestamp values"""
@@ -308,30 +257,26 @@ class MessageTests(unittest.TestCase):
         t = 1484581872.933458
         dt = datetime.datetime.utcfromtimestamp(t)
         msg.append_time(52, dt)
-        self.assertEqual(fix_str("20170116-15:51:12.933"), msg.get(52))
+        self.assertEqual(b"20170116-15:51:12.933", msg.get(52))
 
     def test_time_microseconds(self):
         """Test formatting of time values with microseconds"""
         msg = FixMessage()
         t = 1484581872.933458
         msg.append_time(52, t, 6)
-        self.assertEqual(fix_str("20170116-15:51:12.933458"), msg.get(52))
+        self.assertEqual(b"20170116-15:51:12.933458", msg.get(52))
 
     def test_time_seconds_only(self):
         """Test formatting of time values with no decimal component"""
         msg = FixMessage()
         t = 1484581872.933458
         msg.append_time(52, t, 0)
-        self.assertEqual(fix_str("20170116-15:51:12"), msg.get(52))
+        self.assertEqual(b"20170116-15:51:12", msg.get(52))
 
     def test_time_bad_precision(self):
         """Test bad time precision values"""
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         t = 1484581872.933458
-
         with self.assertRaises(ValueError):
             msg.append_time(52, t, 9)
 
@@ -346,7 +291,7 @@ class MessageTests(unittest.TestCase):
             (test.tm_year, test.tm_mon, test.tm_mday,
              test.tm_hour, test.tm_min, test.tm_sec,
              int((t - int(t)) * 1000))
-        self.assertEqual(fix_str(s), msg.get(52))
+        self.assertEqual(s.encode('ascii'), msg.get(52))
 
     def test_utcts_default(self):
         """Test UTCTimestamp with no supplied timestamp value"""
@@ -365,7 +310,7 @@ class MessageTests(unittest.TestCase):
         msg = FixMessage()
         t = 1484581872.933458
         msg.append_utc_timestamp(52, t)
-        self.assertEqual(fix_str("20170116-15:51:12.933"), msg.get(52))
+        self.assertEqual(b"20170116-15:51:12.933", msg.get(52))
 
     def test_utcts_datetime(self):
         """Test UTCTimestamp with datetime timestamp values"""
@@ -373,30 +318,26 @@ class MessageTests(unittest.TestCase):
         t = 1484581872.933458
         dt = datetime.datetime.utcfromtimestamp(t)
         msg.append_utc_timestamp(52, dt)
-        self.assertEqual(fix_str("20170116-15:51:12.933"), msg.get(52))
+        self.assertEqual(b"20170116-15:51:12.933", msg.get(52))
 
     def test_utcts_microseconds(self):
         """Test UTCTimestamp formatting of microseconds"""
         msg = FixMessage()
         t = 1484581872.933458
         msg.append_utc_timestamp(52, t, 6)
-        self.assertEqual(fix_str("20170116-15:51:12.933458"), msg.get(52))
+        self.assertEqual(b"20170116-15:51:12.933458", msg.get(52))
 
     def test_utcts_seconds_only(self):
         """Test UTCTimestamp formatting of seconds only"""
         msg = FixMessage()
         t = 1484581872.933458
         msg.append_utc_timestamp(52, t, 0)
-        self.assertEqual(fix_str("20170116-15:51:12"), msg.get(52))
+        self.assertEqual(b"20170116-15:51:12", msg.get(52))
 
     def test_utcts_bad_precision(self):
         """Test UTCTimestamp bad time precision values"""
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         t = 1484581872.933458
-
         with self.assertRaises(ValueError):
             msg.append_utc_timestamp(52, t, 9)
 
@@ -417,7 +358,7 @@ class MessageTests(unittest.TestCase):
         msg = FixMessage()
         t = 1484581872.933458
         msg.append_utc_time_only(273, t)
-        self.assertEqual(fix_str("15:51:12.933"), msg.get(273))
+        self.assertEqual(b"15:51:12.933", msg.get(273))
 
     def test_utcto_datetime(self):
         """Test UTCTimeOnly with datetime timestamp values"""
@@ -425,27 +366,24 @@ class MessageTests(unittest.TestCase):
         t = 1484581872.933458
         dt = datetime.datetime.utcfromtimestamp(t)
         msg.append_utc_time_only(273, dt)
-        self.assertEqual(fix_str("15:51:12.933"), msg.get(273))
+        self.assertEqual(b"15:51:12.933", msg.get(273))
 
     def test_utcto_microseconds(self):
         """Test UTCTimeOnly formatting of microseconds"""
         msg = FixMessage()
         t = 1484581872.933458
         msg.append_utc_time_only(273, t, 6)
-        self.assertEqual(fix_str("15:51:12.933458"), msg.get(273))
+        self.assertEqual(b"15:51:12.933458", msg.get(273))
 
     def test_utcto_seconds_only(self):
         """Test UTCTimeOnly formatting of seconds only"""
         msg = FixMessage()
         t = 1484581872.933458
         msg.append_utc_time_only(273, t, 0)
-        self.assertEqual(fix_str("15:51:12"), msg.get(273))
+        self.assertEqual(b"15:51:12", msg.get(273))
 
     def test_utcto_bad_precision(self):
         """Test UTCTimeOnly bad time precision values"""
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         t = 1484581872.933458
         with self.assertRaises(ValueError):
@@ -454,22 +392,19 @@ class MessageTests(unittest.TestCase):
     def test_utcto_parts_15_51_12(self):
         msg = FixMessage()
         msg.append_utc_time_only_parts(1, 15, 51, 12)
-        self.assertEqual(fix_str("15:51:12"), msg.get(1))
+        self.assertEqual(b"15:51:12", msg.get(1))
 
     def test_utcto_parts_15_51_12_933(self):
         msg = FixMessage()
         msg.append_utc_time_only_parts(1, 15, 51, 12, 933)
-        self.assertEqual(fix_str("15:51:12.933"), msg.get(1))
+        self.assertEqual(b"15:51:12.933", msg.get(1))
 
     def test_utcto_parts_15_51_12_933_458(self):
         msg = FixMessage()
         msg.append_utc_time_only_parts(1, 15, 51, 12, 933, 458)
-        self.assertEqual(fix_str("15:51:12.933458"), msg.get(1))
+        self.assertEqual(b"15:51:12.933458", msg.get(1))
 
     def test_utcto_parts_bad_hour(self):
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.append_utc_time_only_parts(1, 24, 0, 0)
@@ -479,9 +414,6 @@ class MessageTests(unittest.TestCase):
             msg.append_utc_time_only_parts(1, "a", 0, 0)
 
     def test_utcto_parts_bad_minute(self):
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.append_utc_time_only_parts(1, 15, 60, 0)
@@ -491,9 +423,6 @@ class MessageTests(unittest.TestCase):
             msg.append_utc_time_only_parts(1, 0, "b", 0)
 
     def test_utcto_parts_bad_seconds(self):
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.append_utc_time_only_parts(1, 15, 51, 61)
@@ -503,9 +432,6 @@ class MessageTests(unittest.TestCase):
             msg.append_utc_time_only_parts(1, 0, 0, "c")
 
     def test_utcto_parts_bad_ms(self):
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.append_utc_time_only_parts(1, 15, 51, 12, 1000)
@@ -515,9 +441,6 @@ class MessageTests(unittest.TestCase):
             msg.append_utc_time_only_parts(1, 0, 0, 0, "d")
 
     def test_utcto_parts_bad_us(self):
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.append_utc_time_only_parts(1, 15, 51, 12, 0, 1000)
@@ -527,9 +450,6 @@ class MessageTests(unittest.TestCase):
             msg.append_utc_time_only_parts(1, 0, 0, 0, 0, "e")
 
     def test_offset_range(self):
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg._tz_offset_string(1500)
@@ -601,7 +521,7 @@ class MessageTests(unittest.TestCase):
             if offset_mins > 0:
                 s += ":%02u" % offset_mins
 
-        self.assertEqual(fix_str(s), msg.get(1132))
+        self.assertEqual(s.encode('ascii'), msg.get(1132))
 
     def test_append_tzts_datetime(self):
         msg = FixMessage()
@@ -625,7 +545,7 @@ class MessageTests(unittest.TestCase):
             if offset_mins > 0:
                 s += ":%02u" % offset_mins
 
-        self.assertEqual(fix_str(s), msg.get(1132))
+        self.assertEqual(s.encode('ascii'), msg.get(1132))
 
     def test_tzts_microseconds(self):
         """Test formatting of TZTimestamp values with microseconds"""
@@ -649,7 +569,7 @@ class MessageTests(unittest.TestCase):
             if offset_mins > 0:
                 s += ":%02u" % offset_mins
 
-        self.assertEqual(fix_str(s), msg.get(1253))
+        self.assertEqual(s.encode('ascii'), msg.get(1253))
 
     def test_tzts_seconds_only(self):
         """Test formatting of TZTimestamp values with seconds only"""
@@ -672,13 +592,10 @@ class MessageTests(unittest.TestCase):
             if offset_mins > 0:
                 s += ":%02u" % offset_mins
 
-        self.assertEqual(fix_str(s), msg.get(1253))
+        self.assertEqual(s.encode('ascii'), msg.get(1253))
 
     def test_tzts_bad_precision(self):
         """Test bad TZTimestamp precision value"""
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         t = 1484581872.933458
         with self.assertRaises(ValueError):
@@ -704,7 +621,7 @@ class MessageTests(unittest.TestCase):
             if offset_mins > 0:
                 s += ":%02u" % offset_mins
 
-        self.assertEqual(fix_str(s), msg.get(1079))
+        self.assertEqual(s.encode('ascii'), msg.get(1079))
 
     def test_tzto_minutes(self):
         """Test TZTimeOnly formatting without seconds"""
@@ -725,7 +642,7 @@ class MessageTests(unittest.TestCase):
             if offset_mins > 0:
                 s += ":%02u" % offset_mins
 
-        self.assertEqual(fix_str(s), msg.get(1079))
+        self.assertEqual(s.encode('ascii'), msg.get(1079))
 
     def test_tzto_microseconds(self):
         """Test formatting of TZTimeOnly values with microseconds"""
@@ -747,7 +664,7 @@ class MessageTests(unittest.TestCase):
             if offset_mins > 0:
                 s += ":%02u" % offset_mins
 
-        self.assertEqual(fix_str(s), msg.get(1079))
+        self.assertEqual(s.encode('ascii'), msg.get(1079))
 
     def test_tzto_seconds_only(self):
         """Test formatting of TZTimeOnly values with seconds only"""
@@ -769,13 +686,10 @@ class MessageTests(unittest.TestCase):
             if offset_mins > 0:
                 s += ":%02u" % offset_mins
 
-        self.assertEqual(fix_str(s), msg.get(1079))
+        self.assertEqual(s.encode('ascii'), msg.get(1079))
 
     def test_tzto_bad_precision(self):
         """Test bad TZTimeOnly precision value"""
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         t = 1484581872.933458
         with self.assertRaises(ValueError):
@@ -786,48 +700,45 @@ class MessageTests(unittest.TestCase):
          full hour offset"""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, offset=-240)
-        self.assertEqual(fix_str("15:51-04"), msg.get(1))
+        self.assertEqual(b"15:51-04", msg.get(1))
 
     def test_tzto_parts_15_51_270(self):
         """Test TZTimeOnly with hour, minute and second components,
          full hour offset"""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, offset=-270)
-        self.assertEqual(fix_str("15:51-04:30"), msg.get(1))
+        self.assertEqual(b"15:51-04:30", msg.get(1))
 
     def test_tzto_parts_15_51_12_270(self):
         """Test TZTimeOnly with hour, minute and second components,
          partial hour offset."""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, 12, offset=-270)
-        self.assertEqual(fix_str("15:51:12-04:30"), msg.get(1))
+        self.assertEqual(b"15:51:12-04:30", msg.get(1))
 
     def test_tzto_parts_15_51_12_933_270(self):
         """Test TZTimeOnly with h, m, s and ms components,
          partial hour offset."""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, 12, 933, offset=-270)
-        self.assertEqual(fix_str("15:51:12.933-04:30"), msg.get(1))
+        self.assertEqual(b"15:51:12.933-04:30", msg.get(1))
 
     def test_tzto_parts_15_51_12_933_458_270(self):
         """Test TZTimeOnly with h, m, s, ms, and us components,
          partial hour offset."""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, 12, 933, 458, offset=-270)
-        self.assertEqual(fix_str("15:51:12.933458-04:30"), msg.get(1))
+        self.assertEqual(b"15:51:12.933458-04:30", msg.get(1))
 
     def test_tzto_parts_15_51_12_933_458_150(self):
         """Test TZTimeOnly with h, m, s, ms, and us components,
          partial hour offset."""
         msg = FixMessage()
         msg.append_tz_time_only_parts(1, 15, 51, 12, 933, 458, offset=150)
-        self.assertEqual(fix_str("15:51:12.933458+02:30"), msg.get(1))
+        self.assertEqual(b"15:51:12.933458+02:30", msg.get(1))
 
     def test_tzto_parts_bad_hour(self):
         """Test TZTimeOnly with out-of-range hour components"""
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.append_tz_time_only_parts(1, 24, 0, 0)
@@ -838,9 +749,6 @@ class MessageTests(unittest.TestCase):
 
     def test_tzto_parts_bad_minute(self):
         """Test TZTimeOnly with out-of-range minute components"""
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.append_tz_time_only_parts(1, 15, 60, 0)
@@ -851,9 +759,6 @@ class MessageTests(unittest.TestCase):
 
     def test_tzto_parts_bad_seconds(self):
         """Test TZTimeOnly with out-of-range seconds components"""
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.append_tz_time_only_parts(1, 15, 51, 61)
@@ -864,9 +769,6 @@ class MessageTests(unittest.TestCase):
 
     def test_tzto_parts_bad_ms(self):
         """Test TZTimeOnly with out-of-range milliseconds components"""
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.append_tz_time_only_parts(1, 15, 51, 12, 1000)
@@ -877,9 +779,6 @@ class MessageTests(unittest.TestCase):
 
     def test_tzto_parts_bad_us(self):
         """Test TZTimeOnly with out-of-range microseconds components"""
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         with self.assertRaises(ValueError):
             msg.append_tz_time_only_parts(1, 15, 51, 12, 0, 1000)
@@ -894,26 +793,23 @@ class MessageTests(unittest.TestCase):
         msg.append_pair(20000, "third")
         msg.append_pair(20001, "first", header=True)
         msg.append_pair(20002, "second", header=True)
-        self.assertEqual(fix_str("20001=first\x01"
-                                 "20002=second\x01"
-                                 "20000=third\x01"),
+        self.assertEqual(b"20001=first\x01"
+                         b"20002=second\x01"
+                         b"20000=third\x01",
                          msg.encode(True))
 
     def test_strings(self):
         """Test adding fields from a sequence of tag=value strings"""
         msg = FixMessage()
         msg.append_strings(["8=FIX.4.4", "35=0"])
-        self.assertEqual(fix_str("8=FIX.4.4\x01"
-                                 "9=5\x01"
-                                 "35=0\x01"
-                                 "10=163\x01"),
+        self.assertEqual(b"8=FIX.4.4\x01"
+                         b"9=5\x01"
+                         b"35=0\x01"
+                         b"10=163\x01",
                          msg.encode())
 
     def test_contains(self):
         """Test use of 'in' and 'not in' operators"""
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         msg.append_strings(["8=FIX.4.4", "35=0"])
         self.assertIn(8, msg)
@@ -923,9 +819,6 @@ class MessageTests(unittest.TestCase):
 
     def test_none_value(self):
         """Test encoding of None value"""
-        if VERSION == 26:
-            return
-
         msg = FixMessage()
         msg.append_pair(99999, None)
         self.assertNotIn(b'99999', msg)
