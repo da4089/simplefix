@@ -1,11 +1,11 @@
 Running the Unit Tests
 ======================
 
-In my development environment, I have three venvs: 2.7, 3.3 and 3.6.  I run
+In my development environment, I have multiple virtualenvs.  I run
 the tests in each of these environments before committing changes.
 
-Once committed, TravisCI runs the tests in 2.7, 3.4, 3.5, 3.6, 3.7 and 3.8.
-It will build pull-request branches also.  Travis will email your commit
+Once committed, the CI runs the tests in all supported interpreters.
+It will build pull-request branches also.  CI will email your commit
 address the results of its build.
 
 To run tests from a local shell, I use:
@@ -28,7 +28,6 @@ To run just a single test, pass the test case class and method name:
 .. code-block:: bash
 
    env PYTHONPATH=. python test/all.py ParserTest.test_raw_data
-
 
 
 Publishing a Release
