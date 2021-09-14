@@ -38,13 +38,14 @@ import datetime
 import sys
 import time
 import warnings
+from enum import Enum
 
 from .constants import SOH_STR, TAG_BEGINSTRING, TAG_BODYLENGTH, TAG_CHECKSUM, TAG_MSGTYPE
 from .enums import TagType
 
 
 def fix_val(value):
-    """Make a FIX value from a string, bytes, or number."""
+    """Make a FIX value from a string, bytes, number, or bytes Enums."""
     if type(value) is bytes:
         return value
 
@@ -54,11 +55,15 @@ def fix_val(value):
     if type(value) is str:
         return bytes(value, 'UTF-8')
 
+    # e.g. members of simplefix.enums
+    if isinstance(value, Enum):
+        return value.value
+
     return bytes(str(value), 'ASCII')
 
 
 def fix_tag(value):
-    """Make a FIX tag value from string, bytes, or integer."""
+    """Make a FIX tag value from string, bytes, integer, or TagType."""
     if sys.version_info[0] == 2:
         return bytes(value)
 
@@ -67,6 +72,9 @@ def fix_tag(value):
 
     if type(value) is str:
         return value.encode('ASCII')
+
+    if isinstance(value, TagType):
+        value = value.value
 
     return str(value).encode('ASCII')
 

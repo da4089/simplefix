@@ -24,11 +24,11 @@
 ########################################################################
 
 import datetime
-import sys
 import time
 import unittest
 
 from simplefix import FixMessage
+from simplefix.enums import TagType, MSGTYPE
 from simplefix.message import fix_tag, fix_val
 
 
@@ -922,6 +922,11 @@ class MessageTests(unittest.TestCase):
         self.assertEqual(b"123", fix_tag(123))
         self.assertEqual(bytes, type(fix_tag(123)))
 
+    def test_tag_enum(self):
+        """Test enum tag value returns bytes."""
+        self.assertEqual(b"123", fix_tag(TagType.GAPFILLFLAG))
+        self.assertEqual(bytes, type(fix_tag(TagType.GAPFILLFLAG)))
+
     def test_val_bytes(self):
         """Test bytes value returns bytes."""
         self.assertEqual(b"123", fix_val(b"123"))
@@ -931,6 +936,11 @@ class MessageTests(unittest.TestCase):
         """Test string value returns bytes."""
         self.assertEqual(b"123", fix_val("123"))
         self.assertEqual(bytes, type(fix_val("123")))
+
+    def test_val_enum(self):
+        """Test bytes value returns bytes."""
+        self.assertEqual(b"1", fix_val(MSGTYPE.TEST_REQUEST))
+        self.assertEqual(bytes, type(fix_val(MSGTYPE.TEST_REQUEST)))
 
 
 if __name__ == "__main__":
