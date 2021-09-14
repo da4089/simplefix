@@ -39,7 +39,8 @@ import sys
 import time
 import warnings
 
-from .constants import SOH_STR
+from .constants import SOH_STR, TAG_BEGINSTRING, TAG_BODYLENGTH, TAG_CHECKSUM, TAG_MSGTYPE
+from .enums import TagType
 
 
 def fix_val(value):
@@ -110,10 +111,10 @@ class FixMessage(object):  # skipcq: PYL-R0205
         if tag is None or value is None:
             return
 
-        if int(tag) == 8:
+        if int(tag) == TagType.BEGINSTRING.value:
             self.begin_string = fix_val(value)
 
-        if int(tag) == 35:
+        elif int(tag) == TagType.MSGTYPE.value:
             self.message_type = fix_val(value)
 
         if header:
@@ -556,7 +557,7 @@ class FixMessage(object):  # skipcq: PYL-R0205
         if self.message_type is None:
             raise ValueError("No message type set")
 
-        buf = b"35=" + self.message_type + SOH_STR + buf
+        buf = TAG_MSGTYPE + b'=' + self.message_type + SOH_STR + buf
 
         # Calculate body length.
         #
@@ -568,15 +569,15 @@ class FixMessage(object):  # skipcq: PYL-R0205
         if not self.begin_string:
             raise ValueError("No begin string set")
 
-        buf = b"8=" + self.begin_string + SOH_STR + \
-              b"9=" + fix_val("%u" % body_length) + SOH_STR + \
+        buf = TAG_BEGINSTRING + b'=' + self.begin_string + SOH_STR + \
+              TAG_BODYLENGTH + b'=' + fix_val("%u" % body_length) + SOH_STR + \
               buf
 
         # Calculate and append the checksum.
         checksum = 0
         for c in buf:
             checksum += ord(c) if sys.version_info[0] == 2 else c
-        buf += b"10=" + fix_val("%03u" % (checksum % 256,)) + SOH_STR
+        buf += TAG_CHECKSUM + b'=' + fix_val("%03u" % (checksum % 256,)) + SOH_STR
 
         return buf
 
@@ -676,6 +677,5 @@ class FixMessage(object):  # skipcq: PYL-R0205
                 raise ValueError("Timezone `offset` (%u) out of range "
                                  "-1439 to +1439 minutes" % io)
         return s
-
 
 ########################################################################
