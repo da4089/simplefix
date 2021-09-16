@@ -516,7 +516,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
         tag = fix_tag(tag)
         nth = int(nth)
 
-        for t,v in enumerate(self.pairs):
+        for i in range(len(self.pairs)):
+            t, v = self.pairs[i]
             if t == tag:
                 nth -= 1
                 if nth == 0:
