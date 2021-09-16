@@ -37,37 +37,39 @@ class FixElement:
         self._added = None
         self._updated = None
         self._text_id = None
-        return
 
     @property
     def added(self) -> str:
-        """Return 'added' property value."""
+        """Return FIX version element was added."""
         return self._added
 
     def set_added(self, added: str) -> str:
-        """Set 'added' property value."""
+        """Set FIX version element was added."""
         self._added = added
         return added
 
     @property
     def updated(self) -> str:
+        """Return FIX version element definition last updated."""
         return self._updated
 
     def set_updated(self, updated: str) -> str:
+        """Set FIX version element definition last updated."""
         self._updated = updated
         return updated
 
     @property
     def text_id(self) -> str:
+        """Return FIX element textual identifier."""
         return self._text_id
 
     def set_text_id(self, text_id: str) -> str:
+        """Set FIX element's textual identifier."""
         self._text_id = text_id
         return text_id
 
     def set_attribs(self, attrib: dict) -> None:
         """Set properties from a dictionary of parsed attributes."""
-
         added = attrib.get("added")
         if added:
             self.set_added(added)
@@ -77,7 +79,6 @@ class FixElement:
         text_id = attrib.get("textId")
         if text_id:
             self.set_text_id(text_id)
-        return
 
 
 class DataType(FixElement):
@@ -85,16 +86,15 @@ class DataType(FixElement):
 
     def __init__(self, name):
         """Constructor."""
-
         super().__init__()
         self._name = name
         self._added = None
         self._updated = None
         self._text_id = None
-        return
 
     @property
     def name(self):
+        """Return name of data type."""
         return self._name
 
 
@@ -103,7 +103,6 @@ class Field(FixElement):
 
     def __init__(self, tag):
         """Constructor."""
-
         super().__init__()
         self._tag = tag
         self._name = None
@@ -111,49 +110,57 @@ class Field(FixElement):
         self._enums = []
 
         self._values = {}
-        return
 
     @property
     def tag(self):
+        """Return field's tag number."""
         return self._tag
 
     @property
     def name(self):
+        """Return field's name."""
         return self._name
 
-    def set_name(self, name):
+    def set_name(self, name: str):
+        """Set field's name."""
         self._name = name
-        return
+        return name
 
     @property
     def type(self):
+        """Return field's type."""
         return self._type
 
     def set_type(self, data_type):
+        """Set field's type."""
         self._type = data_type
-        return
+        return data_type
 
     def append_enum(self, ev):
+        """Append an allowed value for this enumerated field."""
         self._enums.append(ev)
         self._values[ev.value] = ev
         return ev
 
     @property
     def enums(self):
+        """Return the collection of enumerated values for this field."""
         return self._enums
 
     def get_ev(self, index):
+        """Get the index-th enumerated value for this field."""
         return self._enums[index]
 
     def is_enum(self):
+        """Return True if this field has enumerated values defined."""
         return len(self._enums) > 0
 
     def get_name_for_value(self, value):
+        """Get the name for an enumerated value for this field."""
         ev = self._values.get(value)
         if ev:
             return ev.name
-        else:
-            return "Unknown"
+        return "Unknown"
 
 
 class EnumValue(FixElement):
@@ -165,35 +172,40 @@ class EnumValue(FixElement):
         self._value = None
         self._name = None
         self._sort = None
-        return
 
     @property
     def value(self):
+        """Return the data value for this enumerated value."""
         return self._value
 
     def set_value(self, value):
+        """Set the data value for this enumerated value."""
         self._value = value
         return value
 
     @property
-    def name(self):
+    def name(self) -> str:
+        """Return the name of this enumerated value."""
         return self._name
 
-    def set_name(self, value):
+    def set_name(self, value: str) -> str:
+        """Set the name of this enumerated value."""
         self._name = value
         return value
 
     @property
     def sort(self):
+        """Return the sort order of this enumerated value."""
         return self._sort
 
     def set_sort(self, value):
+        """Set the sort order of this enumerated value."""
         self._sort = int(value)
         return int(value)
 
     def set_attribs(self, attrib: dict):
+        """Set all attributes of this enumerated value from dict."""
         super().set_attribs(attrib)
-
         value = attrib.get("value")
         if value:
             self.set_value(value)
@@ -205,22 +217,18 @@ class EnumValue(FixElement):
         sort = attrib.get("sort")
         if sort:
             self.set_sort(sort)
-        return
 
 
-class FixDatabase(object):
+class FixDatabase:
     """FIX specifications database."""
 
     def __init__(self):
         """Constructor."""
-
         self._data_types = {}
         self._fields_by_tag = {}
-        return
 
-    def add_datatype(self, name) -> DataType:
+    def add_datatype(self, name: str) -> DataType:
         """Add a datatype."""
-
         d = DataType(name)
         self._data_types[name] = d
         return d
@@ -229,7 +237,7 @@ class FixDatabase(object):
         """Return number of known datatypes."""
         return len(self._data_types)
 
-    def get_data_type(self, name) -> DataType:
+    def get_data_type(self, name: str) -> DataType:
         """Get details of a named data type."""
         return self._data_types.get(name)
 
@@ -259,19 +267,16 @@ class FixDatabase(object):
         return self._fields_by_tag.get(str(tag))
 
 
-
 class Parser:
     """Parser for FIX Repository specification of FIX protocol elements."""
 
     def __init__(self, database: FixDatabase):
         """Constructor."""
         self._db = database
-        return
 
-    def parse(self, raw: bytes):
+    def parse(self, text: bytes):
         """Parse text of XML Repository specification."""
-
-        root: lxml.etree.Element = lxml.objectify.fromstring(raw)
+        root: lxml.etree.Element = lxml.objectify.fromstring(text)
 
         # Datatypes
         data_types = root.fix.datatypes.getchildren()
@@ -307,42 +312,42 @@ class Parser:
                 ev.set_attribs(child.attrib)
                 f.append_enum(ev)
 
-        return
-
 
 ########################################################################
 
 if __name__ == "__main__":
 
-    database = FixDatabase()
-    parser = Parser(database)
+    fix_database = FixDatabase()
+    parser = Parser(fix_database)
 
-    f = open(sys.argv[1], "rb")
-    raw = f.read()
-    f.close()
+    with open(sys.argv[1], "rb") as xml_file:
+        xml_text = xml_file.read()
+        parser.parse(xml_text)
 
-    parser.parse(raw)
+    if fix_database.count_fields() == 0:
+        print("Error: no fields parsed from file", file=sys.stderr)
+        sys.exit(1)
 
     # TagType.
     print("class TagType(int, Enum):")
     print('    """Enumeration of FIX tag types."""')
     print()
 
-    for field in database.fields:
-        print(f"    {field.name.upper()} = {field.tag}")
+    for fix_field in fix_database.fields:
+        print(f"    {fix_field.name.upper()} = {fix_field.tag}")
 
     print("\n")
 
     # Enums.
-    for field in database.fields:
-        if not field.is_enum():
+    for fix_field in fix_database.fields:
+        if not fix_field.is_enum():
             continue
 
-        print(f"class {field.name.upper()}(bytes, Enum):")
-        print(f'    """Tag {field.tag} values."""')
+        print(f"class {fix_field.name.upper()}(bytes, Enum):")
+        print(f'    """Tag {fix_field.tag} values."""')
         print()
-        for enum_value in field.enums:
-            print(f"    {enum_value.name} = b'{enum_value.value}'")
+        for enum_value in fix_field.enums:
+            print(f"    {enum_value.name.upper()} = b'{enum_value.value}'")
 
         print("\n")
 
