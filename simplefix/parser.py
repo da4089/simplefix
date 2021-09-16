@@ -227,9 +227,8 @@ class FixParser(object):  # skipcq: PYL-R0205
             return None
 
         # Look for checksum.
-        if self.stop_tag is not None:
-            if self.pairs[-1][0] != self.stop_tag:
-                return None
+        if self.stop_tag is not None and self.pairs[-1][0] != self.stop_tag:
+            return None
 
         # Found checksum, so we have a complete message.
         m = FixMessage()
