@@ -29,12 +29,6 @@ import simplefix
 
 class InitTests(unittest.TestCase):
 
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
     def test_pretty_print(self):
         str_input = b"1=2\x013=foo\x01"
         str_output = simplefix.pretty_print(str_input)

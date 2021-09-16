@@ -29,12 +29,6 @@ import simplefix
 
 class ConstantsTests(unittest.TestCase):
 
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
     def test_35(self):
         self.assertEqual(b'0', simplefix.MSGTYPE_HEARTBEAT)
 

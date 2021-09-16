@@ -55,9 +55,6 @@ class ParserTests(unittest.TestCase):
         if not hasattr(self, "assertIsNone"):
             ParserTests.assertIsNone = test_none
 
-    def tearDown(self):
-        pass
-
     def test_parse_empty_string(self):
         """Test parsing empty string."""
         parser = FixParser()

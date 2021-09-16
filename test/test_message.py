@@ -34,12 +34,6 @@ from simplefix.message import fix_tag, fix_val
 
 class MessageTests(unittest.TestCase):
 
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
     def test_string_with_equals(self):
         """Test field set with tag=value string"""
         msg = FixMessage()
