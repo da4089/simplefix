@@ -34,7 +34,7 @@ against the master branch.
 Ground Rules
 ------------
 
-* Ensure all code works across Python 3.6, 3.7, 3.8 and 3.9.
+* Ensure all code works across Python 3.6, 3.7, 3.8, 3.9, and 3.10.
 
 * Ensure all code is cross-platform: Linux, Windows and MacOS.  While it
   Normally shouldn't matter, at least Ubuntu and Red Hat/CentOS Linuxes
@@ -52,10 +52,10 @@ Ground Rules
 Continual Integration
 ---------------------
 
-The project uses `TravisCI <https://travis-ci.org>`_ (thanks Travis
-people!) to automatically build and test changes.
+The project uses `itHub Actions <https://github.com/features/actions>`_
+to automatically build and test changes.
 
-Check the Travis CI `dashboard <https://travis-ci.org/da4089/simplefix>`_
+Check the CI `dashboard <https://github.com/da4089/simplefix/actions>`_
 for current build status.
 
 Coding Style
