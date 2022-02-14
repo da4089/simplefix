@@ -105,8 +105,8 @@ See the CONTRIBUTING.rst file for more detailed instructions.
 
 
 
-.. |Build Status| image:: https://travis-ci.org/da4089/simplefix.svg?branch=master
-    :target: https://travis-ci.org/da4089/simplefix
+.. |Build Status| image:: https://github.com/github/docs/actions/workflows/build.yml/badge.svg?event=push
+    :target: https://github.com/da4089/simplefix/actions/workflows/build.yml
     :alt: Build status
 .. |Docs| image:: https://readthedocs.org/projects/simplefix/badge/?version=latest
     :target: http://simplefix.readthedocs.io/en/latest/
