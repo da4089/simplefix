@@ -46,7 +46,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'SimpleFIX'
-copyright = u'2016-2021, David Arnold'  # skipcq: PYL-W0622
+copyright = u'2016-2022, David Arnold'  # skipcq: PYL-W0622
 author = u'David Arnold'
 
 # The version info for the project you're documenting, acts as replacement for
