@@ -3,7 +3,7 @@
 simplefix
 =========
 
-|  |Build Status|  |Docs|  |Code Health|  |Coverage|  |PyPI|  |Python|
+|  |Build Status|  |Docs|  |Coverage|  |PyPI|  |Python|
 
 Introduction
 ============
@@ -111,9 +111,6 @@ See the CONTRIBUTING.rst file for more detailed instructions.
 .. |Docs| image:: https://readthedocs.org/projects/simplefix/badge/?version=latest
     :target: http://simplefix.readthedocs.io/en/latest/
     :alt: Docs
-.. |Code Health| image:: https://landscape.io/github/da4089/simplefix/master/landscape.svg?style=flat
-    :target: https://landscape.io/github/da4089/simplefix/master
-    :alt: Code Health
 .. |Coverage| image:: https://coveralls.io/repos/github/da4089/simplefix/badge.svg?branch=master
     :target: https://coveralls.io/github/da4089/simplefix?branch=master
     :alt: Coverage
