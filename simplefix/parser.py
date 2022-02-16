@@ -32,7 +32,7 @@ from .data import RAW_DATA_TAGS, RAW_LEN_TAGS
 DEFAULT_STOP_TAG = 10
 
 
-class FixParser(object):  # skipcq: PYL-R0205
+class FixParser:
     """FIX protocol message parser.
 
     This class translates FIX application messages in raw (wire)
