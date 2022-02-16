@@ -657,8 +657,7 @@ class FixMessage:
 
     @staticmethod
     def _tz_offset_string(offset):
-        """(Internal) Convert TZ offset in minutes east to string.
-        """
+        """(Internal) Convert TZ offset in minutes east to string."""
         s = ""
         io = int(offset)
         if io == 0:

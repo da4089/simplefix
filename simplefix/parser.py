@@ -289,7 +289,7 @@ class FixParser:
 
             if in_tag:
                 # Check for end of tag.
-                if b == EQUALS_BYTE:   # PYL-R1724
+                if b == EQUALS_BYTE:   # skipcq: PYL-R1724
                     tag_string = self.buf[start:point]
                     point += 1
 
