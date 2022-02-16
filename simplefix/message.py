@@ -70,7 +70,7 @@ def fix_tag(value):
     return str(value).encode('ASCII')
 
 
-class FixMessage(object):  # skipcq: PYL-R0205
+class FixMessage:
     """FIX protocol message.
 
     FIX messages consist of an ordered list of tag=value pairs.  Tags
@@ -79,11 +79,11 @@ class FixMessage(object):  # skipcq: PYL-R0205
 
     This class stores a FIX message: it does not perform any validation
     of the content of tags or values, nor the presence of tags required
-    for compliance with a specific FIX protocol version."""
+    for compliance with a specific FIX protocol version.
+    """
 
     def __init__(self):
         """Initialise a FIX message."""
-
         self.begin_string = None
         self.message_type = None
         self.pairs = []
@@ -105,8 +105,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
         your program logic.
 
         Note: a Python 'None' value will be silently ignored, and
-        no field is appended."""
-
+        no field is appended.
+        """
         if tag is None or value is None:
             return
 
@@ -142,8 +142,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
         datetime.datetime value.
 
         Note that prior to FIX 5.0, precision must be zero or three to be
-        compliant with the standard."""
-
+        compliant with the standard.
+        """
         warnings.warn("simplefix.FixMessage.append_time() is deprecated. "
                       "Use append_utc_timestamp() or append_tz_timestamp() "
                       "instead.", DeprecationWarning)
@@ -171,7 +171,6 @@ class FixMessage(object):  # skipcq: PYL-R0205
 
     def _append_utc_datetime(self, tag, fmt, ts, precision, header):
         """(Internal) Append formatted datetime."""
-
         if ts is None:
             t = datetime.datetime.utcnow()
         elif type(ts) is float:
@@ -206,8 +205,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
 
         Precision values other than zero (seconds), 3 (milliseconds),
         or 6 (microseconds) will raise an exception.  Note that prior
-        to FIX 5.0, only values of 0 or 3 comply with the standard."""
-
+        to FIX 5.0, only values of 0 or 3 comply with the standard.
+        """
         return self._append_utc_datetime(tag,
                                          "%Y%m%d-%H:%M:%S",
                                          timestamp,
@@ -231,8 +230,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
 
         Precision values other than zero (seconds), 3 (milliseconds),
         or 6 (microseconds) will raise an exception.  Note that prior
-        to FIX 5.0, only values of 0 or 3 comply with the standard."""
-
+        to FIX 5.0, only values of 0 or 3 comply with the standard.
+        """
         return self._append_utc_datetime(tag,
                                          "%H:%M:%S",
                                          timestamp,
@@ -255,8 +254,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
 
         If `ms` or `us` are None, the precision is truncated at
         that point.  Note that seconds are not optional, unlike in
-        TZTimeOnly."""
-
+        TZTimeOnly.
+        """
         ih = int(h)
         if ih < 0 or ih > 23:
             raise ValueError("Hour value `h` (%u) out of range "
@@ -304,8 +303,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
 
         Precision values other than zero (seconds), 3 (milliseconds),
         or 6 (microseconds) will raise an exception.  Note that prior
-        to FIX 5.0, only values of 0 or 3 comply with the standard."""
-
+        to FIX 5.0, only values of 0 or 3 comply with the standard.
+        """
         # Get float offset from Unix epoch.
         if timestamp is None:
             now = time.time()
@@ -351,8 +350,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
         Precision values other than None (minutes), zero (seconds),
         3 (milliseconds), or 6 (microseconds) will raise an exception.
         Note that prior to FIX 5.0, only values of 0 or 3 comply with the
-        standard."""
-
+        standard.
+        """
         if timestamp is None:
             t = datetime.datetime.now()
         elif type(timestamp) is float:
@@ -397,8 +396,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
         Formats the TZTimeOnly value from its components.
 
         If `s`, `ms` or `us` are None, the precision is truncated at
-        that point."""
-
+        that point.
+        """
         ih = int(h)
         if ih < 0 or ih > 23:
             raise ValueError("Hour value `h` (%u) out of range "
@@ -442,8 +441,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
         :param header: Append to header if True; default to body.
 
         The string is split at the first '=' character, and the resulting
-        tag and value strings are appended to the message."""
-
+        tag and value strings are appended to the message.
+        """
         # Split into tag and value.
         bits = field.split('=', 1)
         if len(bits) != 2:
@@ -465,8 +464,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
         :param header: Append to header if True; default to body.
 
         Each string is split, and the resulting tag and value strings
-        are appended to the message."""
-
+        are appended to the message.
+        """
         for s in string_list:
             self.append_string(s, header=header)
 
@@ -480,8 +479,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
 
         Appends two pairs: a length pair, followed by a data pair,
         containing the raw data supplied.  Example fields that should
-        use this method include: 95/96, 212/213, 354/355, etc."""
-
+        use this method include: 95/96, 212/213, 354/355, etc.
+        """
         self.append_pair(len_tag, len(data), header=header)
         self.append_pair(val_tag, data, header=header)
 
@@ -493,8 +492,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
         :return: None if nothing found, otherwise value matching tag.
 
         Defaults to returning the first matching value of 'tag', but if
-        the 'nth' parameter is overridden, can get repeated fields."""
-
+        the 'nth' parameter is overridden, can get repeated fields.
+        """
         tag = fix_tag(tag)
         nth = int(nth)
 
@@ -511,8 +510,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
 
         :param tag: FIX field tag number to be removed.
         :param nth: Index of tag if repeating, first is 1.
-        :returns: Value of the field if removed, None otherwise."""
-
+        :returns: Value of the field if removed, None otherwise.
+        """
         tag = fix_tag(tag)
         nth = int(nth)
 
@@ -536,8 +535,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
         ensure that the BeginString (8), Body Length (9), Message Type
         (35) and Checksum (10) fields are in the right positions.
 
-        This function does no further validation of the message content."""
-
+        This function does no further validation of the message content.
+        """
         buf = b""
         if raw:
             # Walk pairs, creating string.
@@ -595,8 +594,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
         :param other: Message to compare.
 
         Compares the tag=value pairs, message_type and FIX version
-        of this message against the `other`."""
-
+        of this message against the `other`.
+        """
         if not hasattr(other, "pairs"):
             return False
 
@@ -623,7 +622,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
         :param other: Message to compare.
 
         Compares the tag=value pairs, message_type and FIX version
-        of this message against the `other`."""
+        of this message against the `other`.
+        """
         return not self == other
 
     # Disable hashing, since FixMessage is mutable.
@@ -635,8 +635,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
         :param item_index: Numeric index in range 0 to length - 1
 
         Supports both 'for tag, value in message' usage, and
-        'message[n]' access."""
-
+        'message[n]' access.
+        """
         if item_index >= len(self.pairs):
             raise IndexError
 
@@ -646,8 +646,8 @@ class FixMessage(object):  # skipcq: PYL-R0205
     def __contains__(self, item):
         """Directly support 'in' and 'not in' operators.
 
-        :param item: Tag value to check."""
-
+        :param item: Tag value to check.
+        """
         needle = fix_tag(item)
         for tag, _ in self.pairs:
             if tag == needle:
@@ -658,7 +658,6 @@ class FixMessage(object):  # skipcq: PYL-R0205
     @staticmethod
     def _tz_offset_string(offset):
         """(Internal) Convert TZ offset in minutes east to string."""
-
         s = ""
         io = int(offset)
         if io == 0:

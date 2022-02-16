@@ -26,7 +26,7 @@
 import sys
 import unittest
 
-from simplefix import FixMessage, FixParser, SOH_STR
+from simplefix import FixMessage, FixParser, SOH_STR, errors
 
 
 def make_str(s):
@@ -110,10 +110,45 @@ class ParserTests(unittest.TestCase):
         buf = parser.get_buffer()
         self.assertEqual(b"", buf)
 
+    def test_empty_value(self):
+        """Test empty value in message."""
+        buf = b'8=FIX.4.2\x019=9\x0135=D\x0129=\x0110=098\x01'
+        p = FixParser(allow_empty_values=True)
+        p.append_buffer(buf)
+        m = p.get_message()
+        self.assertIsNotNone(m)
+        self.assertEqual(b"D", m.get(35))
+        self.assertEqual(b"", m.get(29))
+
+        p = FixParser()
+        p.append_buffer(buf)
+        try:
+            m = p.get_message()
+        except errors.EmptyValueError:
+            pass
+        else:
+            self.fail("Should not accept empty value")
+
+    def test_bad_tag(self):
+        """Test that tag value is an integer."""
+        buf = b'8=FIX.4.2\x019=10\x0135=D\x01xx=A\x0110=203\x01'
+        p = FixParser()
+        p.append_buffer(buf)
+        try:
+            p.get_message()
+        except errors.TagNotNumberError:
+            pass
+        else:
+            self.fail("Expected TagNotNumberError")
+
+    # FIXME: test stop_byte == \n, but have at least one tag digit first.
+    # FIXME: bad value for raw_length tag, eg 96=xx
+
     def test_leading_junk_pairs(self):
         """Test that leading junk pairs are ignored."""
         parser = FixParser()
-        parser.append_buffer("1=2\x013=4\x018=FIX.4.2\x019=5\x0135=0\x0110=161\x01")
+        parser.append_buffer("1=2\x013=4\x018=FIX.4.2\x01"
+                             "9=5\x0135=0\x0110=161\x01")
         msg = parser.get_message()
         self.assertIsNotNone(msg)
         self.assertIsNone(msg.get(1))
@@ -186,7 +221,6 @@ class ParserTests(unittest.TestCase):
 
     def test_embedded_equals_96_no_95(self):
         """Test a Logon with 96 but no 95, and an embedded equals."""
-
         raw = b"8=FIX.4.2" + SOH_STR + \
               b"9=169" + SOH_STR + \
               b"35=A" + SOH_STR + \
@@ -209,7 +243,6 @@ class ParserTests(unittest.TestCase):
 
     def test_simplefix_on_split_execution_report(self):
         """Test parsing with length and data appended separately."""
-
         part1 = b'8=FIX.4.2\x019=606\x0135=n\x0134=18\x01369=XX\x01' \
                 b'52=XXXXXXXX-XX:XX:XX.XXX\x0143=Y\x0149=CME\x0150=G\x01' \
                 b'56=XXXXXXX\x0157=NULL\x01122=XXXXXXXX-XX:XX:XX.XXX\x01' \
@@ -248,7 +281,27 @@ class ParserTests(unittest.TestCase):
 
     def test_stop_tag(self):
         """Test termination using alternative tag number."""
+        pkt = FixMessage()
+        pkt.append_pair(8, "FIX.4.2")
+        pkt.append_pair(35, "D")
+        pkt.append_pair(29, "A")
+        pkt.append_pair(20000, "xxx")
+        pkt.append_pair(10, "000")
+        buf = pkt.encode()
 
+        p = FixParser(stop_tag=20000)
+        p.append_buffer(buf)
+        m = p.get_message()
+
+        self.assertIsNotNone(m)
+        self.assertEqual(b"FIX.4.2", m.get(8))
+        self.assertEqual(b"D", m.get(35))
+        self.assertEqual(b"A", m.get(29))
+        self.assertEqual(b"xxx", m.get(20000))
+        self.assertEqual(False, 10 in m)
+
+    def test_stop_tag_deprecated(self):
+        """Test deprecated setting of stop tag."""
         pkt = FixMessage()
         pkt.append_pair(8, "FIX.4.2")
         pkt.append_pair(35, "D")
@@ -271,14 +324,12 @@ class ParserTests(unittest.TestCase):
 
     def test_stop_char_with_field_terminator(self):
         """Test stop character with field terminator."""
-
         buf = \
             b'8=FIX.4.2\x0135=d\x0134=1\x01369=XX\x01\n' + \
             b'8=FIX.4.2\x0135=d\x0134=2\x01369=XX\x01\n' + \
             b'8=FIX.4.2\x0135=d\x0134=3\x01369=XX\x01\n'
 
-        p = FixParser()
-        p.set_message_terminator(char='\n')
+        p = FixParser(stop_byte = b'\n')
         p.append_buffer(buf)
 
         m = p.get_message()
@@ -295,14 +346,12 @@ class ParserTests(unittest.TestCase):
 
     def test_stop_char_without_field_terminator(self):
         """Test stop character without field terminator."""
-
         buf = \
             b'8=FIX.4.2\x0135=d\x0134=1\x01369=XX\n' + \
             b'8=FIX.4.2\x0135=d\x0134=2\x01369=XX\n' + \
             b'8=FIX.4.2\x0135=d\x0134=3\x01369=XX\n'
 
-        p = FixParser()
-        p.set_message_terminator(char='\n')
+        p = FixParser(stop_byte=b'\n')
         p.append_buffer(buf)
 
         m = p.get_message()
@@ -316,6 +365,148 @@ class ParserTests(unittest.TestCase):
         m = p.get_message()
         self.assertIsNotNone(m)
         self.assertEqual(b"3", m.get(34))
+
+    def test_stop_char_deprecated(self):
+        """Test stop character set with deprecated method."""
+        buf = \
+            b'8=FIX.4.2\x0135=d\x0134=1\x01369=XX\n' + \
+            b'8=FIX.4.2\x0135=d\x0134=2\x01369=XX\n' + \
+            b'8=FIX.4.2\x0135=d\x0134=3\x01369=XX\n'
+
+        p = FixParser()
+        p.set_message_terminator(char=b'\n')
+        p.append_buffer(buf)
+
+        m = p.get_message()
+        self.assertIsNotNone(m)
+        self.assertEqual(b"1", m.get(34))
+
+        m = p.get_message()
+        self.assertIsNotNone(m)
+        self.assertEqual(b"2", m.get(34))
+
+        m = p.get_message()
+        self.assertIsNotNone(m)
+        self.assertEqual(b"3", m.get(34))
+
+    def test_eol_is_eom_after_soh(self):
+        """Test parsing with EOL indicating EOM."""
+        raw = b"8=FIX.4.2" + SOH_STR + \
+              b"9=169" + SOH_STR + \
+              b"35=A" + SOH_STR + \
+              b"52=20171213-01:41:08.063" + SOH_STR + \
+              b"49=HelloWorld" + SOH_STR + \
+              b"56=1234" + SOH_STR + \
+              b"34=1" + SOH_STR + \
+              b"96=ABC=DE" + SOH_STR + \
+              b"98=0" + SOH_STR + \
+              b"108=30" + SOH_STR + \
+              b"554=HelloWorld" + SOH_STR + \
+              b"8013=Y" + SOH_STR + \
+              b"\n" + \
+              b"8=FIX.4,2" + SOH_STR
+
+        parser = FixParser(stop_byte=b'\n')
+        # FIXME: deprecate and test  parser.set_message_terminator(char=b'\n')
+        parser.append_buffer(raw)
+        msg = parser.get_message()
+
+        self.assertIsNotNone(msg)
+
+    def test_eol_is_eom_ends_last_field(self):
+        """Test parsing with EOL indicating EOM."""
+        raw = b"8=FIX.4.2" + SOH_STR + \
+              b"9=169" + SOH_STR + \
+              b"35=A" + SOH_STR + \
+              b"52=20171213-01:41:08.063" + SOH_STR + \
+              b"49=HelloWorld" + SOH_STR + \
+              b"56=1234" + SOH_STR + \
+              b"34=1" + SOH_STR + \
+              b"96=ABC=DE" + SOH_STR + \
+              b"98=0" + SOH_STR + \
+              b"108=30" + SOH_STR + \
+              b"554=HelloWorld" + SOH_STR + \
+              b"8013=Y" + b"\n" + \
+              b"8=FIX.4,2" + SOH_STR
+
+        parser = FixParser(stop_byte=b'\n')
+        parser.append_buffer(raw)
+        msg = parser.get_message()
+
+        self.assertIsNotNone(msg)
+
+    def test_cme_secdef(self):
+        """Test parsing CME's secdef file."""
+        raw = "35=d\x015799=00000000\x01980=A\x01779=20180408160519000025\x01" \
+              "1180=310\x011300=64\x01462=5\x01207=XCME\x011151=ES\x01" \
+              "6937=ES\x0155=ESM9\x0148=736\x0122=8\x01167=FUT\x01" \
+              "461=FFIXSX\x01200=201906\x0115=USD\x011142=F\x01562=1\x01" \
+              "1140=3000\x01969=25.0000000\x019787=0.0100000\x01996=IPNT\x01" \
+              "1147=50.0000000\x011150=263175.0000000\x01731=00000111\x01" \
+              "5796=20180406\x011149=275950.0000000\x01" \
+              "1148=249950.0000000\x01" \
+              "1143=600.0000000\x011146=12.5000000\x019779=N\x01864=2\x01" \
+              "865=5\x011145=20180316133000000000\x01865=7\x01" \
+              "1145=20190621133000000000\x011141=1\x011022=GBX\x01264=10\x01" \
+              "870=1\x01871=24\x01872=00000000000001000010000000001111\x01" \
+              "1234=0\x01\n" \
+              "35=d\x015799=00000000\x01980=A\x01779=20180408160519000025\x01" \
+              "1180=310\x011300=64\x01462=5\x01207=XCME\x011151=ES\x01" \
+              "6937=ES\x0155=ESM8-ESZ8\x0148=1691\x0122=8\x01167=FUT\x01" \
+              "461=FMIXSX\x01200=201806\x0115=USD\x01762=EQ\x019779=N\x01" \
+              "1142=F\x01562=1\x011140=7500\x01969=5.0000000\x01" \
+              "9787=0.0100000\x01996=CTRCT\x011150=810.0000000\x01" \
+              "731=00000011\x015796=20180406\x011143=150.0000000\x01864=2\x01" \
+              "865=5\x011145=20170915133000000000\x01865=7\x01" \
+              "1145=20180615133000000000\x011141=1\x011022=GBX\x01264=10\x01" \
+              "870=1\x01871=24\x01872=00000000000001000010010000001011\x01" \
+              "1234=0\x01555=2\x01602=23252\x01603=8\x01624=2\x01623=1\x01" \
+              "602=16114\x01603=8\x01624=1\x01623=1\x01\n" \
+              "35=d\x015799=00000000\x01980=A\x01779=20180408160519000025\x01" \
+              "1180=310\x011300=64\x01462=5\x01207=XCME\x011151=ES\x01" \
+              "6937=ES\x0155=ESU8-ESZ8\x0148=2171\x0122=8\x01167=FUT\x01" \
+              "461=FMIXSX\x01200=201809\x0115=USD\x01762=EQ\x019779=N\x01" \
+              "1142=F\x01562=1\x011140=7500\x01969=5.0000000\x01" \
+              "9787=0.0100000\x01996=CTRCT\x011150=370.0000000\x01" \
+              "731=00000011\x015796=20180406\x011143=150.0000000\x01" \
+              "864=2\x01865=5\x011145=20170915133000000000\x01865=7\x01" \
+              "1145=20180921133000000000\x011141=1\x011022=GBX\x01264=10\x01" \
+              "870=1\x01871=24\x01872=00000000000001000010010000001011\x01" \
+              "1234=0\x01555=2\x01602=57287\x01603=8\x01624=2\x01623=1\x01" \
+              "602=16114\x01603=8\x01624=1\x01623=1\x01\n" \
+              "35=d\x015799=00000000\x01980=A\x01779=20180408160519000025\x01" \
+              "1180=310\x011300=64\x01462=5\x01207=XCME\x011151=ES\x01" \
+              "6937=ES\x0155=ESU8-ESH9\x0148=7293\x0122=8\x01167=FUT\x01" \
+              "461=FMIXSX\x01200=201809\x0115=USD\x01762=EQ\x019779=N\x01" \
+              "1142=F\x01562=1\x011140=7500\x01969=5.0000000\x01" \
+              "9787=0.0100000\x01996=CTRCT\x011150=1040.0000000\x01" \
+              "731=00000011\x015796=20180406\x011143=150.0000000\x01" \
+              "864=2\x01865=5\x011145=20171215143000000000\x01865=7\x01" \
+              "1145=20180921133000000000\x011141=1\x011022=GBX\x01264=10\x01" \
+              "870=1\x01871=24\x01872=00000000000001000010010000001011\x01" \
+              "1234=0\x01555=2\x01602=57287\x01603=8\x01624=2\x01623=1\x01" \
+              "602=18720\x01603=8\x01624=1\x01623=1\x01\n"
+
+        parser = FixParser(allow_missing_begin_string=True,
+                           strip_fields_before_begin_string=False,
+                           stop_byte=b'\n')
+        parser.append_buffer(raw)
+        msg = parser.get_message()
+
+        self.assertIsNotNone(msg)
+
+    def test_begin_string_config(self):
+        """Check validation of constructor args."""
+        try:
+            FixParser(allow_missing_begin_string=True,
+                      strip_fields_before_begin_string=True)
+        except errors.ParserConfigError:
+            pass
+        else:
+            self.fail("These keywords together should fail validation.")
+
+
+# b"2018-05-06 12:34:56.789 RECV "
 
 
 if __name__ == "__main__":
