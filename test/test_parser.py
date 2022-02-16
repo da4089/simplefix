@@ -112,12 +112,9 @@ class ParserTests(unittest.TestCase):
 
     def test_empty_value(self):
         """Test empty value in message."""
-
         buf = b'8=FIX.4.2\x019=9\x0135=D\x0129=\x0110=098\x01'
-
         p = FixParser(allow_empty_values=True)
         p.append_buffer(buf)
-
         m = p.get_message()
         self.assertIsNotNone(m)
         self.assertEqual(b"D", m.get(35))
@@ -133,14 +130,12 @@ class ParserTests(unittest.TestCase):
             self.fail("Should not accept empty value")
 
     def test_bad_tag(self):
-
+        """Test that tag value is an integer."""
         buf = b'8=FIX.4.2\x019=10\x0135=D\x01xx=A\x0110=203\x01'
-
         p = FixParser()
         p.append_buffer(buf)
-
         try:
-            m = p.get_message()
+            p.get_message()
         except errors.TagNotNumberError:
             pass
         else:
@@ -226,7 +221,6 @@ class ParserTests(unittest.TestCase):
 
     def test_embedded_equals_96_no_95(self):
         """Test a Logon with 96 but no 95, and an embedded equals."""
-
         raw = b"8=FIX.4.2" + SOH_STR + \
               b"9=169" + SOH_STR + \
               b"35=A" + SOH_STR + \
@@ -249,7 +243,6 @@ class ParserTests(unittest.TestCase):
 
     def test_simplefix_on_split_execution_report(self):
         """Test parsing with length and data appended separately."""
-
         part1 = b'8=FIX.4.2\x019=606\x0135=n\x0134=18\x01369=XX\x01' \
                 b'52=XXXXXXXX-XX:XX:XX.XXX\x0143=Y\x0149=CME\x0150=G\x01' \
                 b'56=XXXXXXX\x0157=NULL\x01122=XXXXXXXX-XX:XX:XX.XXX\x01' \
@@ -288,7 +281,6 @@ class ParserTests(unittest.TestCase):
 
     def test_stop_tag(self):
         """Test termination using alternative tag number."""
-
         pkt = FixMessage()
         pkt.append_pair(8, "FIX.4.2")
         pkt.append_pair(35, "D")
@@ -310,7 +302,6 @@ class ParserTests(unittest.TestCase):
 
     def test_stop_tag_deprecated(self):
         """Test deprecated setting of stop tag."""
-
         pkt = FixMessage()
         pkt.append_pair(8, "FIX.4.2")
         pkt.append_pair(35, "D")
@@ -333,7 +324,6 @@ class ParserTests(unittest.TestCase):
 
     def test_stop_char_with_field_terminator(self):
         """Test stop character with field terminator."""
-
         buf = \
             b'8=FIX.4.2\x0135=d\x0134=1\x01369=XX\x01\n' + \
             b'8=FIX.4.2\x0135=d\x0134=2\x01369=XX\x01\n' + \
@@ -356,7 +346,6 @@ class ParserTests(unittest.TestCase):
 
     def test_stop_char_without_field_terminator(self):
         """Test stop character without field terminator."""
-
         buf = \
             b'8=FIX.4.2\x0135=d\x0134=1\x01369=XX\n' + \
             b'8=FIX.4.2\x0135=d\x0134=2\x01369=XX\n' + \
@@ -379,7 +368,6 @@ class ParserTests(unittest.TestCase):
 
     def test_stop_char_deprecated(self):
         """Test stop character set with deprecated method."""
-
         buf = \
             b'8=FIX.4.2\x0135=d\x0134=1\x01369=XX\n' + \
             b'8=FIX.4.2\x0135=d\x0134=2\x01369=XX\n' + \
@@ -389,9 +377,20 @@ class ParserTests(unittest.TestCase):
         p.set_message_terminator(char=b'\n')
         p.append_buffer(buf)
 
+        m = p.get_message()
+        self.assertIsNotNone(m)
+        self.assertEqual(b"1", m.get(34))
+
+        m = p.get_message()
+        self.assertIsNotNone(m)
+        self.assertEqual(b"2", m.get(34))
+
+        m = p.get_message()
+        self.assertIsNotNone(m)
+        self.assertEqual(b"3", m.get(34))
+
     def test_eol_is_eom_after_soh(self):
         """Test parsing with EOL indicating EOM."""
-
         raw = b"8=FIX.4.2" + SOH_STR + \
               b"9=169" + SOH_STR + \
               b"35=A" + SOH_STR + \
@@ -413,11 +412,9 @@ class ParserTests(unittest.TestCase):
         msg = parser.get_message()
 
         self.assertIsNotNone(msg)
-        return
 
     def test_eol_is_eom_ends_last_field(self):
         """Test parsing with EOL indicating EOM."""
-
         raw = b"8=FIX.4.2" + SOH_STR + \
               b"9=169" + SOH_STR + \
               b"35=A" + SOH_STR + \
@@ -437,11 +434,9 @@ class ParserTests(unittest.TestCase):
         msg = parser.get_message()
 
         self.assertIsNotNone(msg)
-        return
 
     def test_cme_secdef(self):
         """Test parsing CME's secdef file."""
-
         raw = "35=d\x015799=00000000\x01980=A\x01779=20180408160519000025\x01" \
               "1180=310\x011300=64\x01462=5\x01207=XCME\x011151=ES\x01" \
               "6937=ES\x0155=ESM9\x0148=736\x0122=8\x01167=FUT\x01" \
@@ -499,14 +494,12 @@ class ParserTests(unittest.TestCase):
         msg = parser.get_message()
 
         self.assertIsNotNone(msg)
-        return
 
     def test_begin_string_config(self):
         """Check validation of constructor args."""
-
         try:
-            parser = FixParser(allow_missing_begin_string=True,
-                               strip_fields_before_begin_string=True)
+            FixParser(allow_missing_begin_string=True,
+                      strip_fields_before_begin_string=True)
         except errors.ParserConfigError:
             pass
         else:

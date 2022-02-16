@@ -49,7 +49,8 @@ class FixParser:
 
     It is suitable for streaming processing, accumulating byte data
     from a network connection, and returning complete messages as they
-    are delivered, potentially in multiple fragments."""
+    are delivered, potentially in multiple fragments.
+    """
 
     def __init__(self,
                  allow_empty_values: bool = False,
@@ -69,8 +70,8 @@ class FixParser:
         :param stop_tag: Tag number for final field in a message.  This
         setting is overridden by stop_byte.
         :param stop_byte: Byte that indicates end of message.  Typically
-        CR or LF.  Setting this value overrides stop_tag."""
-
+        CR or LF.  Setting this value overrides stop_tag.
+        """
         # Copy raw field length tags.
         self.raw_len_tags = RAW_LEN_TAGS[:]
 
@@ -111,7 +112,6 @@ class FixParser:
                 "Can't set 'allow_missing_begin_string' "
                 "and 'strip_fields_before_begin_string' "
                 "simultaneously.")
-        return
 
     def set_stop_tag(self, value: int = DEFAULT_STOP_TAG):
         """Set the tag number of the final field in a message.
@@ -120,7 +120,8 @@ class FixParser:
 
         The default value here is CheckSum (10): the parser recognizes
         a 10=xxx field as the end of a message.  Note that this value
-        is overridden if a stop_byte is set."""
+        is overridden if a stop_byte is set.
+        """
         self.stop_tag = value
 
     def set_stop_byte(self, value: Optional[bytes] = None):
@@ -133,7 +134,8 @@ class FixParser:
         multiple messages are recorded in a file, separated by eg. LF.
         Note that this will override the stop_tag value.
 
-        Setting the stop_byte to None will disable it."""
+        Setting the stop_byte to None will disable it.
+        """
         self.stop_byte = ord(value) if value is not None else None
 
     def set_allow_missing_begin_string(self, value=True):
@@ -145,7 +147,8 @@ class FixParser:
         not be a Begin String (8) at the start of each message.
 
         Note this value cannot be True if strip_fields_before_begin_string
-        is also True."""
+        is also True.
+        """
         self.allow_missing_begin_string = value
 
     def set_allow_empty_values(self, value=True):
@@ -159,7 +162,8 @@ class FixParser:
         is accepted by default.
 
         If this setting is disabled, a ValueHasZeroLengthError is
-        raised from get_message() if such a value is encountered.."""
+        raised from get_message() if such a value is encountered.
+        """
         self.allow_empty_values = value
 
     def set_strip_fields_before_begin_string(self, value: bool = True):
@@ -168,7 +172,8 @@ class FixParser:
         :param value: If set, discard any fields before the BeginString (8).
 
         Note that this setting cannot be set if a missing BeginString is
-        also permitted."""
+        also permitted.
+        """
         self.strip_fields_before_begin_string = value
 
     def set_message_terminator(self, tag=None, char=None):
@@ -186,8 +191,8 @@ class FixParser:
         character using this function.
 
         Note that only one of 'tag' or 'char' should be set, using a
-        named parameter."""
-
+        named parameter.
+        """
         warnings.warn("simplefix.FixParser.set_message_terminator() is "
                       "deprecated. Use set_stop_tag(), set_stop_byte(), "
                       "or constructor keywords instead", DeprecationWarning)
@@ -197,11 +202,10 @@ class FixParser:
 
         if tag is not None:
             self.stop_tag = tag
-            self.stop_char = None
+            self.stop_byte = None
         else:
             self.stop_tag = None
-            bs = char.encode() if type(char) is str else char
-            self.stop_char = bs[0]
+            self.stop_byte = ord(char) if char is not None else None
 
     def add_raw(self, length_tag, value_tag):
         """Define the tags used for a private raw data field.
@@ -214,8 +218,8 @@ class FixParser:
         length of the value in bytes.  The parser is initialised with all the
         data fields defined in FIX.5.0, but if your application uses private
         data fields, you can add them here, and the parser will process them
-        correctly. """
-
+        correctly.
+        """
         self.raw_len_tags.append(length_tag)
         self.raw_data_tags.append(value_tag)
 
@@ -227,8 +231,8 @@ class FixParser:
 
         You can remove either private or standard data field definitions in
         case a particular application uses them for a field of a different
-        type. """
-
+        type.
+        """
         self.raw_len_tags.remove(length_tag)
         self.raw_data_tags.remove(value_tag)
 
@@ -236,8 +240,8 @@ class FixParser:
         """Reset the internal parser state.
 
         This will discard any appended buffer content, and any fields
-        parsed so far."""
-
+        parsed so far.
+        """
         self.buf = b""
         self.pairs = []
         self.raw_len = 0
@@ -250,7 +254,8 @@ class FixParser:
         The parser maintains an internal buffer of bytes to be parsed.
         As raw data is read, it can be appended to this buffer.  Each
         call to get_message() will try to remove the bytes of a
-        complete messages from the head of the buffer."""
+        complete messages from the head of the buffer.
+        """
         self.buf += fix_val(buf)
 
     def get_buffer(self):
@@ -270,8 +275,8 @@ class FixParser:
 
         Otherwise, it returns a simplefix.FixMessage instance
         initialised with the fields from the first complete message
-        found in the buffer."""
-
+        found in the buffer.
+        """
         # Break buffer into tag=value pairs.
         start: int = 0
         point: int = 0
@@ -284,7 +289,7 @@ class FixParser:
 
             if in_tag:
                 # Check for end of tag.
-                if b == EQUALS_BYTE:
+                if b == EQUALS_BYTE:   # PYL-R1724
                     tag_string = self.buf[start:point]
                     point += 1
 
@@ -329,7 +334,7 @@ class FixParser:
                     break
 
             else:  # not in_tag
-                if b == SOH_BYTE or b == self.stop_byte:
+                if b in (SOH_BYTE, self.stop_byte):
                     value = self.buf[start:point]
                     if not self.allow_empty_values and len(value) == 0:
                         raise errors.EmptyValueError(tag)
@@ -337,7 +342,7 @@ class FixParser:
                     self.pairs.append((tag, value))
                     self.buf = self.buf[point + 1:]
 
-                    # Check for a stop_char without a preceding end-of-field.
+                    # Check for a stop_byte without a preceding end-of-field.
                     if b == self.stop_byte:
                         eom = True
                         break

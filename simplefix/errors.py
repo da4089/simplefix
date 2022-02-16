@@ -28,44 +28,35 @@
 
 class ParserConfigError(Exception):
     """Parser configuration is invalid."""
-    pass
 
 
 class ParsingError(Exception):
     """Base class for all parsing errors."""
-    pass
 
 
 class TagNotNumberError(ParsingError, ValueError):
     """Tag value could not be converted to integer."""
-    pass
 
 
 class RawLengthNotNumberError(ParsingError, ValueError):
     """Raw length value could not be converted to integer."""
-    pass
 
 
 class BadFieldOrderError(ParsingError):
     """Field not found where required by standard."""
-    pass
 
 
 class BadChecksumValueError(ParsingError):
     """Checksum (10) value incorrect."""
-    pass
 
 
 class BadMessageLengthError(ParsingError):
     """BodyLength (9) value incorrect."""
-    pass
 
 
 class IncompleteTagError(ParsingError):
     """And end-of-message byte was read in the middle of a tag."""
-    pass
 
 
 class EmptyValueError(ParsingError):
     """A zero-length value was parsed."""
-    pass
