@@ -42,7 +42,7 @@ class RawLengthNotNumberError(ParsingError, ValueError):
     """Raw length value could not be converted to integer."""
 
 
-class BadFieldOrderError(ParsingError):
+class FieldOrderError(ParsingError):
     """Field not found where required by standard."""
 
 

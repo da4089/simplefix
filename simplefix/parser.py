@@ -388,7 +388,7 @@ class FixParser:
 
         # Check first pair is FIX BeginString.
         if not self.allow_missing_begin_string and self.pairs[0][0] != 8:
-            raise errors.BadFieldOrderError()
+            raise errors.FieldOrderError()
 
         # If we don't have an explicit end-of-message byte, check
         # the last pair has the configured stop_tag, otherwise
