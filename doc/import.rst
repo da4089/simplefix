@@ -22,7 +22,7 @@ Or
     message = FixMessage()
 
 
-Note that the "import *" form is explicitly supported, with the exposed
+Note that the "import \*" form is explicitly supported, with the exposed
 namespace explicitly managed to contain only the public features of the
 package.
 
