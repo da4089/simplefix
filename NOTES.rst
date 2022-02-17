@@ -34,7 +34,7 @@ Publishing a Release
 ====================
 
 * Check the setup.py version.
-# Check doc/conf.py version (search for "release =").
+* Check doc/conf.py version (search for "release =").
 * Commit and push everything.
 * Activate the 3.6 venv (to get twine, wheel, etc)
 * Run: rm -rf dist
@@ -44,5 +44,6 @@ Publishing a Release
 * Run: git tag v$VERSION
 * Run: git push --tags
 * Go to GitHub and make a release
+* Go to ReadTheDocs and rebuild to pick up new version
 * Bump the setup.py version for next time, and commit.
 
