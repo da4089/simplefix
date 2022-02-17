@@ -4,6 +4,7 @@ Importing
 You can import the *simplefix* module maintaining its internal structure,
 or you can import some or all bindings directly.
 
+.. index:: simplefix, FixMessage
 .. code-block:: python
     :linenos:
 
@@ -21,6 +22,8 @@ Or
 
     message = FixMessage()
 
+
+.. index:: import, namespace
 
 Note that the "import \*" form is explicitly supported, with the exposed
 namespace explicitly managed to contain only the public features of the
