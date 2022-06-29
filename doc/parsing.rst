@@ -51,7 +51,7 @@ that the first group is number one, not zero).
 .. code-block:: python
     :linenos:
 
-    messsage = get(9061, 2)
+    message = get(9061, 2)
     >>> 22
 
 Parser Options

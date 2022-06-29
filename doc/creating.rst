@@ -8,7 +8,7 @@ To create a FIX message, first create an instance of the FixMessage class.
 .. code-block:: python
     :linenos:
 
-    messsage = simplefix.FixMessage()
+    message = simplefix.FixMessage()
 
 .. index:: header
 
