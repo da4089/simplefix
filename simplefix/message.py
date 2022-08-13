@@ -581,10 +581,22 @@ class FixMessage:
 
     def __str__(self):
         """Return string form of message contents."""
+        return self.to_string('|')
+
+    def to_string(self, separator: str = '|') -> str:
+        """Return string form of message.
+
+        :param separator: Field separator, defaults to '|'.
+        :returns: String representation of this FIX message.
+
+        Note that the output from this function is NOT a legal
+        FIX message (see encode() for that): this is for logging
+        or other human-oriented consumption."""
+
         s = ""
         for tag, value in self.pairs:
             if s:
-                s += "|"
+                s += separator
             s += tag.decode("ascii") + "=" + value.decode("ascii")
         return s
 

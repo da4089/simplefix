@@ -861,7 +861,21 @@ class MessageTests(unittest.TestCase):
 
         buffer = str(msg)
         self.assertIsNotNone(buffer)
+        self.assertEqual(type(buffer), type("s"))
         self.assertEqual("1=1|2=foo|3=bar|4=3.1415679", buffer)
+
+    def test_to_String(self):
+        """Test conversion to string with separator."""
+        msg = FixMessage()
+        msg.append_pair(1, 1)
+        msg.append_pair(2, "foo")
+        msg.append_pair(3, b"bar")
+        msg.append_pair(4, 3.1415679)
+
+        buffer = msg.to_string('XXX')
+        self.assertIsNotNone(buffer)
+        self.assertEqual(type(buffer), type("s"))
+        self.assertEqual("1=1XXX2=fooXXX3=barXXX4=3.1415679", buffer)
 
     def test_eq(self):
         """Test __equals__ override."""
