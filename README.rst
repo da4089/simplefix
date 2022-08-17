@@ -3,7 +3,8 @@
 simplefix
 =========
 
-|  |Build Status|  |Docs|  |Coverage|  |PyPI|  |Python|
+|  |Build Status|  |Docs|  |Coverage|  |Python|
+|  |PyPI|  |PePY Downloads|  |PePY Monthly|
 
 Introduction
 ============
@@ -120,5 +121,9 @@ See the CONTRIBUTING.rst file for more detailed instructions.
 .. |Python| image:: https://img.shields.io/pypi/pyversions/simplefix.svg
     :target: https://pypi.python.org/pypi/simplefix
     :alt: Python
-
-
+.. |PePY Downloads| image:: https://pepy.tech/badge/simplefix
+    :target: https://pepy.tech/project/simplefix
+    :alt: PyPI Downloads
+.. |PePY Monthly| image:: https://pepy.tech/badge/simplefix/month
+    :target: https://pepy.tech/project/simplefix
+    :alt: PyPI Monthly Downloads
