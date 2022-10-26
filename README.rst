@@ -35,6 +35,25 @@ While this is not legal advice, in short this means you're free to do
 whatever you like with this code, with the exception of claiming you
 wrote it.
 
+Installation
+============
+
+For most users, the easiest and best way to install simplefix is using `pip`:
+
+.. code-block:: shell
+
+    pip install simplefix
+
+All releases are uploaded to PyPI and available for installation, so you
+can pin a known, tested version in your project's `requirements.txt` or
+`project.toml` (or whatever your build system uses). See the
+`PyPI project page <https://pypi.org/project/simplefix/>`_ for the full
+list of available versions.
+
+Source code releases are also available, together with some basic release
+notes, from the project's
+`GitHub Releases <https://github.com/da4089/simplefix/releases>`_ page.
+
 Basic Usage
 ===========
 
