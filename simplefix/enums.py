@@ -1,0 +1,892 @@
+from enum import Enum, EnumMeta
+
+
+class TagType(int, Enum):
+    """Enumeration of FIX tag types."""
+
+    ACCOUNT = 1
+    ADVID = 2
+    ADVREFID = 3
+    ADVSIDE = 4
+    ADVTRANSTYPE = 5
+    AVGPX = 6
+    BEGINSEQNO = 7
+    BEGINSTRING = 8
+    BODYLENGTH = 9
+    CHECKSUM = 10
+    CLORDID = 11
+    COMMISSION = 12
+    COMMTYPE = 13
+    CUMQTY = 14
+    CURRENCY = 15
+    ENDSEQNO = 16
+    EXECID = 17
+    EXECINST = 18
+    EXECREFID = 19
+    EXECTRANSTYPE = 20
+    HANDLINST = 21
+    SECURITYIDSOURCE = 22
+    IOIID = 23
+    IOIOTHSVC = 24
+    IOIQLTYIND = 25
+    IOIREFID = 26
+    IOIQTY = 27
+    IOITRANSTYPE = 28
+    LASTCAPACITY = 29
+    LASTMKT = 30
+    LASTPX = 31
+    LASTQTY = 32
+    NOLINESOFTEXT = 33
+    MSGSEQNUM = 34
+    MSGTYPE = 35
+    NEWSEQNO = 36
+    ORDERID = 37
+    ORDERQTY = 38
+    ORDSTATUS = 39
+    ORDTYPE = 40
+    ORIGCLORDID = 41
+    ORIGTIME = 42
+    POSSDUPFLAG = 43
+    PRICE = 44
+    REFSEQNUM = 45
+    RELATDSYM = 46
+    RULE80A = 47
+    SECURITY_ID = 48
+    SENDER_COMPID = 49
+    SENDER_SUBID = 50
+    SENDING_DATE = 51
+    SENDING_TIME = 52
+    QUANTITY = 53
+    SIDE = 54
+    SYMBOL = 55
+    TARGET_COMPID = 56
+    TARGET_SUBID = 57
+    TEXT = 58
+    TIMEINFORCE = 59
+    TRANSACTTIME = 60
+    URGENCY = 61
+    VALIDUNTILTIME = 62
+    SETTLTYPE = 63
+    SETTLDATE = 64
+    SYMBOLSFX = 65
+    LISTID = 66
+    LISTSEQNO = 67
+    TOTNOORDERS = 68
+    LISTEXECINST = 69
+    ALLOCID = 70
+    ALLOCTRANSTYPE = 71
+    REFALLOCID = 72
+    NOORDERS = 73
+    AVGPRXPRECISION = 74
+    TRADEDATE = 75
+    EXECBROKER = 76
+    OPENCLOSE = 77
+    NOALLOCS = 78
+    ALLOCACCOUNT = 79
+    ALLOCSHARES = 80
+    PROCESSCODE = 81
+    NORPTS = 82
+    RPTSEQ = 83
+    CXLQTY = 84
+    ALLOCSTATUS = 87
+    ALLOCREJCODE = 88
+    SIGNATURE = 89
+    SECUREDATALEN = 90
+    SECUREDATA = 91
+    BROKEROFCREDIT = 92
+    SIGNATURELENGTH = 93
+    EMAILTYPE = 94
+    RAWDATALENGTH = 95
+    RAWDATA = 96
+    POSSRESEND = 97
+    ENCRYPTMETHOD = 98
+    STOPPX = 99
+    EXDESTINATION = 100
+    CXLREJREASON = 102
+    ORDERREJREASON = 103
+    IOIQUALIFIER = 104
+    WAVENO = 105
+    ISSUER = 106
+    SECURITYDESC = 107
+    HEARTBTINT = 108
+    CLIENTID = 109
+    MINQTY = 110
+    MAXFLOOR = 111
+    TESTREQID = 112
+    REPORTTOEXCH = 113
+    LOCATEREQD = 114
+    ONBEHALFOFCOMPID = 115
+    ONBEHALFOFSUBID = 116
+    QUOTEID = 117
+    NETMONEY = 118
+    SETTLCURRAMT = 119
+    SETTLCURRENCY = 120
+    ORIGSENDINGTIME = 122
+    GAPFILLFLAG = 123
+    QUOTEREQID = 131
+    BIDPX = 132
+    ASKBX = 133
+    RESETSEQNUMFLAG = 141
+    EXECTYPE = 150
+    LEAVESQTY = 151
+    CASHORDERQTY = 152
+    SECURITYTYPE = 167
+    QUOTESTATUS = 297
+    SESSIONREJECTREASON = 373
+    PRICETYPE = 423
+    CXLREJRESPONSETO = 434
+    QUOTEREQUESTREJECTREASON = 658
+    QUOTERESPID = 693
+    GROUPAMOUNT = 2759
+    GROUP_REMAINING_AMOUNT = 2760
+    ALLOCGROUPAMOUNT = 2761
+
+
+class ADVSIDE(bytes, Enum):
+    """Message type 4"""
+
+    BUY = b'B'
+    CROSS = b'X'
+    SELL = b'S'
+    TRADE = b'T'
+
+
+class ADVTRANSTYPE(bytes, Enum):
+    """Message type 5"""
+
+    CANCEL = b'C'
+    NEW = b'N'
+    REPLACE = b'R'
+
+
+class COMMTYPE(bytes, Enum):
+    """Message type 13"""
+
+    PER_UNIT = b'1'
+    PERCENT = b'2'
+    ABSOLUTE = b'3'
+    PERCENT_WAIVED_CASH = b'4'
+    PERCENT_WAIVED_ENHANCED = b'5'
+    POINTS = b'6'
+
+
+class EXECINST(bytes, Enum):
+    """Message type 18"""
+
+    NOT_HELD = b'1'
+    WORK = b'2'
+    GO_ALONG = b'3'
+    OVER_THE_DAY = b'4'
+    HELD = b'5'
+    PARTICIPATE_DONT_INITIATE = b'6'
+    STRICT_SCALE = b'7'
+    TRY_TO_SCALE = b'8'
+    STAY_ON_BID_SIDE = b'9'
+    STAY_ON_OFFER_SIDE = b'0'
+    NO_CROSS = b'A'
+    OK_TO_CROSS = b'B'
+    CALL_FIRST = b'C'
+    PERCENT_OF_VOLUME = b'D'
+    DO_NOT_INCREASE = b'E'
+    DO_NOT_REDUCE = b'F'
+    ALL_OR_NONE = b'G'
+    REINSTATE_ON_SYSTEM_FAILURE = b'H'
+    INSTITUTIONS_ONLY = b'I'
+    REINSTATE_ON_TRADING_HALT = b'J'
+    CANCEL_ON_TRADING_HALT = b'K'
+    LAST_PEG = b'L'
+    MID_PRICE_PEG = b'M'
+    NON_NEGOTIABLE = b'N'
+    OPENING_PEG = b'O'
+    MARKET_PEG = b'P'
+    CANCEL_ON_SYSTEM_FAILURE = b'Q'
+    PRIMARY_PEG = b'R'
+    SUSPEND = b'S'
+    CUSTOMER_DISPLAY_INSTRUCTION = b'U'
+    NETTING = b'V'
+    PEG_TO_VWAP = b'W'
+    TRADE_ALONG = b'X'
+    TRY_TO_STOP = b'Y'
+    CANCEL_IF_NOT_BEST = b'Z'
+    TRAILING_STOP_PEG = b'a'
+    STRICT_LIMIT = b'b'
+    IGNORE_PRICE_VALIDITY_CHECKS = b'c'
+    PEG_TO_LIMIT_PRICE = b'd'
+    WORK_TO_TARGET_STRATEGY = b'e'
+
+
+class EXECTRANSTYPE(bytes, Enum):
+    """Message type 20"""
+
+    NEW = b'0'
+    CANCEL = b'1'
+    CORRECT = b'2'
+    STATUS = b'3'
+
+
+class HANDLINST(bytes, Enum):
+    """Message type 21"""
+
+    AUTO_PRIVATE = b'1'
+    AUTO_PUBLIC = b'2'
+    MANUAL = b'3'
+
+
+class SECURITYIDSOURCE(bytes, Enum):
+    """Message type 22"""
+
+    CUSIP = b'1'
+    SEDOL = b'2'
+    QUIK = b'3'
+    ISIN = b'4'
+    RIC = b'5'
+    ISO_CURRENCY = b'6'
+    ISO_COUNTRY = b'7'
+    EXCHANGE = b'8'
+    CTA = b'9'
+    BLOOMBERG = b'A'
+    WERTPAPIER = b'B'
+    BUTCH = b'C'
+    VALOREN = b'D'
+    SICOVAM = b'E'
+    BELGIAN = b'F'
+    COMMON = b'G'
+    CLEARING = b'H'
+    IDSA = b'I'
+    OPRA = b'J'
+    IDSA_URL = b'K'
+    LETTER_OF_CREDIT = b'L'
+    MARKETPLACE = b'M'
+    MARKIT_RED_ENTITY_CLIP = b'N'
+    MARKIT_RED_PAIR_CLIP = b'P'
+    CFTC = b'Q'
+    IDSA_COMMODITY_REFERENCE_PRICE = b'R'
+    FINANCIAL_INSTRUMENT_GLOBAL_IDENTIFIER = b'S'
+    LEGAL_ENTITY_IDENTIFIER = b'T'
+    SYNTHETIC = b'U'
+    FIM = b'V'
+    INDEX_NAME = b'W'
+
+
+class IOIOTHSVC(bytes, Enum):
+    """Message type 24"""
+
+    AUTEX = b'A'
+    BRIDGE = b'B'
+    AUTEX_AND_BRIDGE = b'AB'
+    BRIDGE_AND_AUTEX = b'BA'
+
+
+class IOIQLTYIND(bytes, Enum):
+    """Message type 25"""
+
+    HIGH = b'H'
+    MEDIUM = b'M'
+    LOW = b'L'
+
+
+class IOIQTY(bytes, Enum):
+    """Message type 27"""
+
+    SMALL = b'S'
+    MEDIUM = b'M'
+    LARGE = b'L'
+    UNDISCLOSED = b'U'
+
+
+class IOITRANSTYPE(bytes, Enum):
+    """Message type 28"""
+
+    NEW = b'N'
+    CANCEL = b'C'
+    REPLACE = b'R'
+
+
+class LASTCAPACITY(bytes, Enum):
+    """Message type 29"""
+
+    AGENT = b'1'
+    CROSS_AS_AGENT = b'2'
+    CROSS_AS_PRINCIPAL = b'3'
+    PRINCIPAL = b'4'
+    RISKLESS_PRINCIPAL = b'5'
+
+
+class LASTMKT(bytes, Enum):
+    """Message type 30"""
+
+    BLOOMBERG_TRADEBOOK = b'31'
+    BONDBOOK = b'32'
+    BONDCLICK = b'35'
+    BONDHUB = b'36'
+    LIMITRADER = b'37'
+    MARKETAXESS = b'33'
+    MUNICENTER = b'34'
+    NONE = b'0'
+    OTC = b'11'
+    NYFIX_MILLENIUM = b'13'
+    NYSE_BBSS = b'10'
+    POSIT = b'4'
+    STOCKHOLM_OPTIONS_MARKET = b'17'
+    VANCOUVER_OPTIONS_EXCHANGE = b'9'
+    VISIBLE_MARKETS = b'38'
+    TRADEWEB = b'30'
+    ARCHIPELAGO = b'39'
+    ATTAIN = b'40'
+    BRUT = b'41'
+    GLOBENET = b'42'
+    INSTINET = b'43'
+    ISLAND = b'44'
+    MARKETXT = b'45'
+    NEXTRADE = b'46'
+    REDIBOOK = b'47'
+    NQLX = b'49'
+    ONECHICAGO = b'50'
+    TRACK_DATA = b'51'
+    TRACK_TRAC = b'52'
+    PIPELINE = b'53'
+    BATS = b'54'
+    BIDS = b'55'
+    DIRECT_EDGE_X = b'56'
+    DIRECT_EDGE = b'57'
+    LEVELATS = b'58'
+    LAVA_TRADING = b'59'
+    BOSTON_OPTIONS_EXCHANGE = b'60'
+    NATIONAL_STOCK_EXCHANGE = b'61'
+    LIQUIDNET = b'62'
+    NYFIX_EURO_MILLENIUM = b'63'
+    NASDAQ_OPTIONS_MARKET = b'64'
+    BLOCKCROSS_ATS = b'66'
+    MATCH_ATS = b'67'
+    ATHENS_STOCK_EXCHANGE_REUTERS = b'AT'
+    ATHENS_STOCK_EXCHANGE_MARKET = b'ASE'
+    LATIBEX = b'LA'
+    MADRID_STOCK_EXCHANGE = b'MC'
+    OCCIDENTS_STOCK_EXCHANGE = b'OD'
+    SBI_STOCK_EXCHANGE = b'SBI'
+    DOHA_SECURITIES_MARKET = b'DSMD'
+    INTERCONTINENTAL_EXCHANGE = b'IEPA'
+    PINKSHEETS = b'PINX'
+    THE_THIRD_MARKET_CORPORATION = b'THRD'
+    TRADEWEB_LLC = b'TRWB'
+
+
+class MSGTYPE(bytes, Enum):
+    """Message type 35"""
+
+    HEARTBEAT = b'0'
+    TEST_REQUEST = b'1'
+    RESEND_REQUEST = b'2'
+    REJECT = b'3'
+    SEQUENCE_RESET = b'4'
+    LOGOUT = b'5'
+    INDICATION_OF_INTEREST = b'6'
+    ADVERTISEMENT = b'7'
+    EXECUTION_REPORT = b'8'
+    ORDER_CANCEL_REJECT = b'9'
+    LOGON = b'A'
+    NEWS = b'B'
+    EMAIL = b'C'
+    NEW_ORDER_SINGLE = b'D'
+    NEW_ORDER_LIST = b'E'
+    ORDER_CANCEL_REQUEST = b'F'
+    ORDER_CANCEL_REPLACE_REQUEST = b'G'
+    ORDER_STATUS_REQUEST = b'H'
+    ALLOCATION = b'J'
+    LIST_CANCEL_REQUEST = b'K'
+    LIST_EXECUTE = b'L'
+    LIST_STATUS_REQUEST = b'M'
+    LIST_STATUS = b'N'
+    ALLOCATION_ACK = b'P'
+    DONT_KNOW_TRADE = b'Q'
+    QUOTE_REQUEST = b'R'
+    QUOTE = b'S'
+    SETTLEMENT_INSTRUCTIONS = b'T'
+    MARKET_DATA_REQUEST = b'V'
+    MARKET_DATA_SNAPSHOT_FULL_REFRESH = b'W'
+    MARKET_DATA_INCREMENTAL_REFRESH = b'X'
+    MARKET_DATA_REQUEST_REJECT = b'Y'
+    QUOTE_CANCEL = b'Z'
+    QUOTE_STATUS_REQUEST = b'a'
+    QUOTE_ACKNOWLEDGEMENT = b'b'
+    SECURITY_DEFINITION_REQUEST = b'c'
+    SECURITY_DEFINITION = b'd'
+    SECURITY_STATUS_REQUEST = b'e'
+    SECURITY_STATUS = b'f'
+    TRADING_SESSION_STATUS_REQUEST = b'g'
+    TRADING_SESSION_STATUS = b'h'
+    MASS_QUOTE = b'i'
+    BUSINESS_MESSAGE_REJECT = b'j'
+    BID_REQUEST = b'k'
+    BID_RESPONSE = b'l'
+    LIST_STRIKE_PRICE = b'm'
+    XML_MESSAGE = b'n'
+    REGISTRATION_INSTRUCTIONS = b'o'
+    REGISTRATION_INSTRUCTIONS_RESPONSE = b'p'
+    ORDER_MASS_CANCEL_REQUEST = b'q'
+    ORDER_MASS_CANCEL_REPORT = b'r'
+    NEW_ORDER_CROSS = b's'
+    CROSS_ORDER_CANCEL_REPLACE_REQUEST = b't'
+    CROSS_ORDER_CANCEL_REQUEST = b'u'
+    SECURITY_TYPE_REQUEST = b'v'
+    SECURITY_TYPES = b'w'
+    SECURITY_LIST_REQUEST = b'x'
+    SECURITY_LIST = b'y'
+    DERIVATIVE_SECURITY_LIST_REQUEST = b'z'
+    DERIVATIVE_SECURITY_LIST = b'AA'
+    NEW_ORDER_MULTILEG = b'AB'
+    MULTILEG_ORDER_CANCEL_REPLACE_REQUEST = b'AC'
+    TRADE_CAPTURE_REPORT_REQUEST = b'AD'
+    TRADE_CAPTURE_REPORT = b'AE'
+    ORDER_MASS_STATUS_REQUEST = b'AF'
+    QUOTE_REQUEST_REJECT = b'AG'
+    RFQ_REQUEST = b'AH'
+    QUOTE_STATUS_REPORT = b'AI'
+    QUOTE_RESPONSE = b'AJ'
+    CONFIRMATION = b'AK'
+    POSITION_MAINTENANCE_REQUEST = b'AL'
+    POSITION_MAINTENANCE_REPORT = b'AM'
+    REQUEST_FOR_POSITIONS = b'AN'
+    REQUEST_FOR_POSITIONS_ACK = b'AO'
+    POSITION_REPORT = b'AP'
+    TRADE_CAPTURE_REPORT_REQUEST_ACK = b'AQ'
+    TRADE_CAPTURE_REPORT_ACK = b'AR'
+    ALLOCATION_REPORT = b'AS'
+    ALLOCATION_REPORT_ACK = b'AT'
+    CONFIRMATION_ACK = b'AU'
+    SETTLEMENT_INSTRUCTION_REQUEST = b'AV'
+    ASSIGNMENT_REPORT = b'AW'
+    COLLATERAL_REQUEST = b'AX'
+    COLLATERAL_ASSIGNMENT = b'AY'
+    COLLATERAL_RESPONSE = b'AZ'
+    COLLATERAL_REPORT = b'BA'
+    COLLATERAL_INQUIRY = b'BB'
+    NETWORK_STATUS_REQUEST = b'BC'
+    NETWORK_STATUS_RESPONSE = b'BD'
+    USER_REQUEST = b'BE'
+    USER_RESPONSE = b'BF'
+    COLLATERAL_INQUIRY_ACK = b'BG'
+    CONFIRMATION_REQUEST = b'BH'
+
+
+class ORDSTATUS(bytes, Enum):
+    """Message type 39"""
+
+    NEW = b'0'
+    PARTIALLY_FILLED = b'1'
+    FILLED = b'2'
+    DONE_FOR_DAY = b'3'
+    CANCELED = b'4'
+    REPLACED = b'5'
+    PENDING_CANCEL = b'6'
+    STOPPED = b'7'
+    REJECTED = b'8'
+    SUSPENDED = b'9'
+    PENDING_NEW = b'A'
+    CALCULATED = b'B'
+    EXPIRED = b'C'
+    ACCEPTED_FOR_BIDDING = b'D'
+    PENDING_REPLACE = b'E'
+
+
+class ORDTYPE(bytes, Enum):
+    """Message type 40"""
+
+    MARKET = b'1'
+    LIMIT = b'2'
+    STOP = b'3'
+    STOP_LIMIT = b'4'
+    MARKET_ON_CLOSE = b'5'
+    WITH_OR_WITHOUT = b'6'
+    LIMIT_OR_BETTER = b'7'
+    LIMIT_WITH_OR_WITHOUT = b'8'
+    ON_BASIS = b'9'
+    ON_CLOSE = b'A'
+    LIMIT_ON_CLOSE = b'B'
+    FOREX_MARKET = b'C'
+    PREVIOUSLY_QUOTED = b'D'
+    PREVIOUSLY_INDICATED = b'E'
+    FOREX_LIMIT = b'F'
+    FOREX_SWAP = b'G'
+    FOREX_PREVIOUSLY_QUOTED = b'H'
+    FUNARI = b'I'
+    MARKET_IF_TOUCHED = b'J'
+    MARKET_WITH_LEFTOVER_AS_LIMIT = b'K'
+    PREVIOUS_FUND_VALUATION_POINT = b'L'
+    NEXT_FUND_VALUATION_POINT = b'M'
+    PEGGED = b'P'
+    COUNTER_ORDER_SELECTION = b'Q'
+    STOP_ON_BID_OR_OFFER = b'R'
+    STOP_LIMIT_ON_BID_OR_OFFER = b'S'
+
+
+class POSSDUPFLAG(bytes, Enum):
+    """Message type 43"""
+
+    NO = b'N'
+    YES = b'Y'
+
+
+class RULE80A(bytes, Enum):
+    """Message type 47"""
+
+    AGENCY_SINGLE_ORDER = b'A'
+    ALL_OTHER_ORDERS_AS_AGENT_FOR_OTHER_MEMBER = b'W'
+    COMPETING_DEALER_TRADES = b'T'
+    INDIVIDUAL_INVESTOR_SINGLE_ORDER = b'I'
+    PRINCIPAL = b'P'
+    PROGRAM_ORDER_INDEX_ARB_FOR_INDIVIDUAL_CUSTOMER = b'J'
+    PROGRAM_ORDER_INDEX_ARB_FOR_MEMBER_FIRM_ORG = b'D'
+    PROGRAM_ORDER_INDEX_ARB_FOR_OTHER_AGENCY = b'U'
+    PROGRAM_ORDER_INDEX_ARB_FOR_OTHER_MEMBER = b'M'
+    PROGRAM_ORDER_NON_INDEX_ARB_FOR_INDIVIDUAL_CUSTOMER = b'K'
+    PROGRAM_ORDER_NON_INDEX_ARB_FOR_MEMBER_FIRM_ORG = b'C'
+    PROGRAM_ORDER_NON_INDEX_ARB_FOR_OTHER_AGENCY = b'Y'
+    PROGRAM_ORDER_NON_INDEX_ARB_FOR_OTHER_MEMBER = b'N'
+    ROPRIETARY_TRANSACTIONS_FOR_COMPETING_MARKET_MAKER_THAT_IS_AFFILIATED_WITH_THE_CLEARING_MEMBER = b'O'
+    SHORT_EXEMPT_TRANSACTION_B = b'B'
+    SHORT_EXEMPT_TRANSACTION_F = b'F'
+    SHORT_EXEMPT_TRANSACTION_FOR_MEMBER_COMPETING_MARKET_MAKER_AFFILIATED_WITH_THE_FIRM_CLEARING_THE_TRADE = b'L'
+    SHORT_EXEMPT_TRANSACTION_FOR_MEMBER_COMPETING_MARKET_MAKER_NOT_AFFILIATED_WITH_THE_FIRM_CLEARING_THE_THREAD = b'X'
+    SHORT_EXEMPT_TRANSACTION_FOR_NON_MEMBER_COMPETING_MARKET_MAKER = b'Z'
+    SHORT_EXEMPT_TRANSACTION_FOR_PRINCIPAL = b'E'
+    SHORT_EXEMPT_TRANSACTION_H = b'H'
+    SPECIALIST_TRADES = b'S'
+    TRANSACTIONS_FOR_THE_ACCOUNT_OF_A_NON_MEMBER_COMPETING_MARKET_MAKER = b'R'
+
+
+class SIDE(bytes, Enum):
+    """Message type 54"""
+
+    BUY = b'1'
+    SELL = b'2'
+    BUY_MINUS = b'3'
+    SELL_PLUS = b'4'
+    SELL_SHORT = b'5'
+    SELL_SHORT_EXEMPT = b'6'
+    UNDISCLOSED = b'7'
+    CROSS = b'8'
+    CROSS_SHORT = b'9'
+    CROSS_SHORT_EXEMPT = b'A'
+    AS_DEFINED = b'B'
+    OPPOSITE = b'C'
+    SUBSCRIBE = b'D'
+    REDEEM = b'E'
+    LEND = b'F'
+    BORROW = b'G'
+    SELL_UNDISCLOSED = b'H'
+
+
+class TIMEINFORCE(bytes, Enum):
+    """Message type 59"""
+
+    DAY = b'0'
+    GOOD_TILL_CANCEL = b'1'
+    AT_THE_OPENING = b'2'
+    IMMEDIATE_OR_CANCEL = b'3'
+    FILL_OR_KILL = b'4'
+    GOOD_TILL_CROSSING = b'5'
+    GOOD_TILL_DATE = b'6'
+    AT_THE_CLOSE = b'7'
+    GOOD_THROUGH_CROSSING = b'8'
+    AT_CROSSING = b'9'
+    GOOD_FOR_TIME = b'A'
+    GOOD_FOR_AUCTION = b'B'
+
+
+class URGENCY(bytes, Enum):
+    """Message type 61"""
+
+    NORMAL = b'0'
+    FLASH = b'1'
+    BACKGROUND = b'2'
+
+
+class SETTLTYPE(bytes, Enum):
+    """Message type 63"""
+
+    REGULAR = b'0'
+    CASH = b'1'
+    NEXT_DAY = b'2'
+    T2 = b'3'
+    T3 = b'4'
+    T4 = b'5'
+    FUTURE = b'6'
+    WHEN_AND_IF_ISSUED = b'7'
+    SELLERS_OPTION = b'8'
+    T5 = b'9'
+    T1 = b'A'
+    BROKEN_DATE = b'B'
+    SPOT1 = b'C'
+
+
+class ALLOCTRANSTYPE(bytes, Enum):
+    """Message type 71"""
+
+    NEW = b'0'
+    REPLACE = b'1'
+    CANCEL = b'2'
+    PRELIMINARY = b'3'
+    CALCULATED = b'4'
+    CALCULATED_WITHOUT_PRELIMINARY = b'5'
+    REVERSAL = b'6'
+
+
+class OPENCLOSE(bytes, Enum):
+    """Message type 77"""
+
+    OPEN = b'O'
+    CLOSER = b'C'
+
+
+class PROCESSCODE(bytes, Enum):
+    """Message type 81"""
+
+    REGULAR = b'0'
+    SOFT_DOLLAR = b'1'
+    STEP_IN = b'2'
+    STEP_OUT = b'3'
+    SOFT_DOLLAR_STEP_IN = b'4'
+    SOFT_DOLLAR_STEP_OUT = b'5'
+    PLAN_SPONSOR = b'6'
+
+
+class ALLOCSTATUS(bytes, Enum):
+    """Message type 87"""
+
+    ACCEPTED = b'0'
+    REJECTED = b'1'
+    PARTIAL_ACCEPT = b'2'
+    RECEIVED = b'3'
+
+
+class ALLOCREJCODE(bytes, Enum):
+    """Message type 88"""
+
+    UNKNOWN_ACCOUNT = b'0'
+    INCORRECT_QUANTITY = b'1'
+    INCORRECT_AVERAGE_PRICE = b'2'
+    UNKNOWN_EXECUTING_BROKER_MNEMONIC = b'3'
+    COMMISSION_DIFFERENCE = b'4'
+    UNKNOWN_ORDERID = b'5'
+    UNKNOWN_LISTID = b'6'
+    OTHER = b'7'
+
+
+class EMAILTYPE(bytes, Enum):
+    """Message type 94"""
+
+    NEW = b'0'
+    REPLY = b'1'
+    ADMIN_REPLY = b'2'
+
+
+class ENCRYPTMETHOD(bytes, Enum):
+    """Message type 98"""
+
+    NONE = b'0'
+    PKCS = b'1'
+    DES = b'2'
+    PKCS_DES = b'3'
+    PGP_DES = b'4'
+    PGP_DES_MD5 = b'5'
+    PEM_DES_MD5 = b'6'
+
+
+class CXLREJREASON(bytes, Enum):
+    """Message type 102"""
+
+    TOO_LATE_TO_CANCEL = b'0'
+    UNKNOWN_ORDER = b'1'
+    BROKER_OPTION = b'2'
+    ORDER_ALREADY_PENDING_CANCEL = b'3'
+
+
+class ORDERREJREASON(bytes, Enum):
+    """Message type 103"""
+
+    BROKER_OPTION = b'0'
+    UNKNOWN_SYMBOL = b'1'
+    EXCHANGE_CLOSED = b'2'
+    ORDER_EXCEEDS_LIMIT = b'3'
+    TOO_LATE_TO_ENTER = b'4'
+    UNKNOWN_ORDER = b'5'
+    DUPLICATE_ORDER = b'6'
+    DUPLICATE_OF_VERBALLY_COMMUNICATED_ORDER = b'7'
+    STALE_ORDER = b'8'
+
+
+class IOIQUALIFIER(bytes, Enum):
+    """Message type 104"""
+
+    ALL_OR_NONE = b'A'
+    AT_THE_CLOSE = b'C'
+    IN_TOUCH_WITH = b'I'
+    LIMIT = b'L'
+    MORE_BEHIND = b'M'
+    AT_THE_OPEN = b'O'
+    TAKING_A_POSITION = b'P'
+    AT_THE_MARKET = b'Q'
+    PORTFOLIO_SHOWN = b'S'
+    THROUGH_THE_DAY = b'T'
+    VERSUS = b'V'
+    INDICATION_WORKING_AWAY = b'W'
+    CROSSING_OPPORTUNITY = b'X'
+    AT_THE_MIDPOINT = b'Y'
+    PRE_OPEN = b'Z'
+
+
+class GAPFILLFLAG(bytes, Enum):
+    """Message type 123"""
+
+    NO = b'N'
+    YES = b'Y'
+
+
+class RESETSEQNUMFLAG(bytes, Enum):
+    """Message type 141"""
+
+    NO = b'N'
+    YES = b'Y'
+
+
+class EXECTYPE(bytes, Enum):
+    """Message type 150"""
+
+    NEW = b'0'
+    PARTIAL_FILL = b'1'
+    FILL = b'2'
+    DONE_FOR_DAY = b'3'
+    CANCELED = b'4'
+    REPLACE = b'5'
+    PENDING_CANCEL = b'6'
+    STOPPED = b'7'
+    REJECTED = b'8'
+    SUSPENDED = b'9'
+    PENDING_NEW = b'A'
+    CALCULATED = b'B'
+    EXPIRED = b'C'
+    RESTATED = b'D'
+    PENDING_REPLACE = b'E'
+
+
+class SECURITYTYPE(bytes, Enum):
+    """Message type 167"""
+
+    WILDCARD_ENTRY = b'?'
+    BANKERS_ACCEPTANCE = b'BA'
+    CONVERTIBLE_BOND = b'CB'
+    CERTIFICATE_OF_DEPOSIT = b'CD'
+    COLLATERALIZE_MORTGAGE_OBLIGATION = b'CMO'
+    CORPORATE_BOND = b'CORP'
+    COMMERCIAL_PAPER = b'CP'
+    CORPORATE_PRIVATE_PLACEMENT = b'CPP'
+    COMMON_STOCK = b'CS'
+    FEDERAL_HOUSING_AUTHORITY = b'FHA'
+    FEDERAL_HOME_LOAN = b'FHL'
+    FEDERAL_NATIONAL_MORTGAGE_ASSOCIATION = b'FN'
+    FOREIGN_EXCHANGE_CONTRACT = b'FOR'
+    FUTURE = b'FUT'
+    GOVERNMENT_NATIONAL_MORTGAGE_ASSOCIATION = b'GN'
+    TREASURIES_PLUS_AGENCY_DEBENTURE = b'GOVT'
+    MORTGAGE_IOETTE = b'IET'
+    MUTUAL_FUND = b'MF'
+    MORTGAGE_INTEREST_ONLY = b'MIO'
+    MORTGAGE_PRINCIPAL_ONLY = b'MPO'
+    MORTGAGE_PRIVATE_PLACEMENT = b'MPP'
+    MISCELLANEOUS_PASS_THRU = b'MPT'
+    MUNICIPAL_BOND = b'MUNI'
+    NO_ISITC_SECURITY_TYPE = b'NONE'
+    OPTION = b'OPT'
+    PREFERRED_STOCK = b'PS'
+    REPURCHASE_AGREEMENT = b'RP'
+    REVERSE_REPURCHASE_AGREEMENT = b'RVRP'
+    STUDENT_LOAN_MARKETING_ASSOCIATION = b'SL'
+    TIME_DEPOSIT = b'TD'
+    US_TREASURY_BILL = b'USTB'
+    WARRANT = b'WAR'
+    CATS_TIGERS_LIONS = b'ZOO'
+
+
+class QUOTESTATUS(bytes, Enum):
+    """Message type 297"""
+
+    ACCEPTED = b'0'
+    CANCELED_FOR_SYMBOL = b'1'
+    CANCELED_FOR_SECURITY_TYPE = b'2'
+    CANCELED_FOR_UNDERLYING = b'3'
+    CANCELED_ALL = b'4'
+    REJECTED = b'5'
+    REMOVED_FROM_MARKET = b'6'
+    EXPIRED = b'7'
+    QUERY = b'8'
+    QUOTE_NOT_FOUND = b'9'
+    PENDING = b'10'
+    PASS = b'11'
+    LOCKED_MARKET_WARNING = b'12'
+    CROSS_MARKET_WARNING = b'13'
+    CANCELED_DUE_TO_LOCK_MARKET = b'14'
+    CANCELED_DUE_TO_CROSS_MARKET = b'15'
+
+
+class SESSIONREJECTREASON(bytes, Enum):
+    """Message type 373"""
+
+    INVALID_TAG_NUMBER = b'0'
+    REQUIRED_TAG_MISSING = b'1'
+    TAG_NOT_DEFINED_FOR_THIS_MESSAGE_TYPE = b'2'
+    UNDEFINED_TAG = b'3'
+    TAG_SPECIFIED_WITHOUT_A_VALUE = b'4'
+    VALUE_INCORRECT_FOR_THIS_TAG = b'5'
+    INCORRECT_DATA_FORMAT_FOR_VALUE = b'6'
+    DECRYPTION_PROBLEM = b'7'
+    SIGNATURE_PROBLEM = b'8'
+    COMPID_PROBLEM = b'9'
+    SENDINGTIME_ACCURACY_PROBLEM = b'10'
+    INVALID_MSGTYPE = b'11'
+    XML_VALIDATION_ERROR = b'12'
+    TAG_APPEARS_MORE_THAN_ONCE = b'13'
+    TAG_SPECIFIED_OUT_OF_REQUIRED_ORDER = b'14'
+    REPEATING_GROUP_FIELDS_OUT_OF_ORDER = b'15'
+    INCORRECT_NUMINGROUP_COUNT = b'16'
+    NON_DATA_VALUE_INCLUDES_FIELD_DELIMITER = b'17'
+    OTHER = b'99'
+
+
+class PRICETYPE(bytes, Enum):
+    """Message type 423"""
+
+    PERCENTAGE = b'1'
+    PER_UNIT = b'2'
+    FIXED_AMOUNT = b'3'
+
+
+class CXLREJRESPONSETO(bytes, Enum):
+    """Message type 434"""
+
+    ORDER_CANCEL_REQUEST = b'1'
+    ORDER_CANCEL_REPLACE_REQUEST = b'2'
+
+
+class QUOTEREQUESTREJECTREASON(bytes, Enum):
+    """Message type 658"""
+
+    UNKNOWN_SYMBOL = b'1'
+    EXCHANGE = b'2'
+    QUOTE_REQUEST_EXCEEDS_LIMIT = b'3'
+    TOO_LATE_TO_ENTER = b'4'
+    INVALID_PRICE = b'5'
+    NOT_AUTHORIZED_TO_REQUEST_QUOTE = b'6'
+    NO_MATCH_FOR_INQUIRY = b'7'
+    NO_MARKET_FOR_INSTRUMENT = b'8'
+    NO_INVENTORY = b'9'
+    PASS = b'10'
+    OTHER = b'99'
+
+
+# map of TagType to value enum
+TAG_VALUE_TYPES = {
+    TagType[value.__name__]: value
+    for value in globals().values()
+    if isinstance(value, EnumMeta) and value not in (Enum, TagType)
+}

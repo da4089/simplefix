@@ -24,9 +24,7 @@
 ########################################################################
 
 """FIX protocol constants."""
-
 import sys
-
 
 if sys.version_info[0] == 2:
     EQUALS_BYTE = b'='
@@ -94,16 +92,7 @@ TAG_CUMQTY = b'14'
 
 # Tag 15
 TAG_CURRENCY = b'15'
-CURRENCY_AFGHANI = b'AFA'
-CURRENCY_ALGERIAN_DINAR = b'DZD'
-CURRENCY_ANDORRAN_PESETA = b'ADP'
-CURRENCY_ARGENTINE_PESO = b'ARS'
-CURRENCY_ARMENIAN_DRAM = b'AMD'
-CURRENCY_ARUBAN_GUILDER = b'AWG'
-CURRENCY_AUSTRALIAN_DOLLAR = b'AUD'
-CURRENCY_AZERBAIJANIAN_MANAT = b'AZM'
-CURRENCY_BAHAMIAN_DOLLAR = b'BSD'
-# FIXME: many, many, more.
+# omitting the currencies as they are probably better to take as strings
 
 # Tag 16
 TAG_ENDSEQNO = b'16'
@@ -216,7 +205,7 @@ IOIOTHSVC_BRIDGE_AND_AUTEX = b'BA'
 
 # Tag 25
 TAG_IOIQLTYIND = b'25'
-# this is to avoid breaking code using the old typo
+# this is to avoid breaking code using the old typo, but should be removed in the next major version
 TAG_IOIQlTYIND = TAG_IOIQLTYIND
 IOIQLTYIND_HIGH = b'H'
 IOIQLTYIND_MEDIUM = b'M'
