@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 ########################################################################
 # SimpleFIX
-# Copyright (C) 2016-2022, David Arnold.
+# Copyright (C) 2016-2023, David Arnold.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@
 ########################################################################
 
 import datetime
-import sys
 import time
 import unittest
 
@@ -939,6 +938,48 @@ class MessageTests(unittest.TestCase):
         """Test string value returns bytes."""
         self.assertEqual(b"123", fix_val("123"))
         self.assertEqual(bytes, type(fix_val("123")))
+
+    def test_int_value_zero(self):
+        """Test integer value: zero."""
+        m = FixMessage()
+        m.append_pair(34, 0)
+        b = m.encode(raw=True)
+        self.assertEqual(b, b'34=0' + simplefix.SOH_STR)
+
+    def test_int_value_one(self):
+        """Test integer value: one"""
+        m = FixMessage()
+        m.append_pair(34, 1)
+        b = m.encode(raw=True)
+        self.assertEqual(b, b'34=1' + simplefix.SOH_STR)
+
+    def test_int_value_32bit(self):
+        """Test integer value: 2**32-1"""
+        m = FixMessage()
+        m.append_pair(34, 0xffffffff)
+        b = m.encode(raw=True)
+        self.assertEqual(b, b'34=4294967295' + simplefix.SOH_STR)
+
+    def test_int_value_33bit(self):
+        """Test integer value: 2**32"""
+        m = FixMessage()
+        m.append_pair(34, 0xffffffff + 1)
+        b = m.encode(raw=True)
+        self.assertEqual(b, b'34=4294967296' + simplefix.SOH_STR)
+
+    def test_int_value_64bit(self):
+        """Test integer value: 2**64-1"""
+        m = FixMessage()
+        m.append_pair(34, 0xffffffffffffffff)
+        b = m.encode(raw=True)
+        self.assertEqual(b, b'34=18446744073709551615' + simplefix.SOH_STR)
+
+    def test_int_value_65bit(self):
+        """Test integer value: 2**64"""
+        m = FixMessage()
+        m.append_pair(34, 0xffffffffffffffff + 1)
+        b = m.encode(raw=True)
+        self.assertEqual(b, b'34=18446744073709551616' + simplefix.SOH_STR)
 
 
 if __name__ == "__main__":

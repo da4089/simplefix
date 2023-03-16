@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 ########################################################################
 # SimpleFIX
-# Copyright (C) 2016-2022, David Arnold.
+# Copyright (C) 2016-2023, David Arnold.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -160,6 +160,54 @@ class ParserTests(unittest.TestCase):
         parser.append_buffer("1=2\x013=4\x015=6\x01")
         msg = parser.get_message()
         self.assertIsNone(msg)
+
+    def test_int_value_zero(self):
+        """Test integer value: zero."""
+        parser = FixParser()
+        parser.append_buffer(b'8=FIX.4.2\x0134=0\x0110=0\x01')
+        msg = parser.get_message()
+        self.assertIsNotNone(msg)
+        self.assertEqual(int(msg.get(34)), 0)
+
+    def test_int_value_one(self):
+        """Test integer value: zero."""
+        parser = FixParser()
+        parser.append_buffer(b'8=FIX.4.2\x0134=1\x0110=0\x01')
+        msg = parser.get_message()
+        self.assertIsNotNone(msg)
+        self.assertEqual(int(msg.get(34)), 1)
+
+    def test_int_value_32bit(self):
+        """Test integer value: zero."""
+        parser = FixParser()
+        parser.append_buffer(b'8=FIX.4.2\x0134=4294967295\x0110=0\x01')
+        msg = parser.get_message()
+        self.assertIsNotNone(msg)
+        self.assertEqual(int(msg.get(34)), 4294967295)
+
+    def test_int_value_33bit(self):
+        """Test integer value: zero."""
+        parser = FixParser()
+        parser.append_buffer(b'8=FIX.4.2\x0134=4294967296\x0110=0\x01')
+        msg = parser.get_message()
+        self.assertIsNotNone(msg)
+        self.assertEqual(int(msg.get(34)), 4294967296)
+
+    def test_int_value_64bit(self):
+        """Test integer value: zero."""
+        parser = FixParser()
+        parser.append_buffer(b'8=FIX.4.2\x0134=18446744073709551615\x0110=0\x01')
+        msg = parser.get_message()
+        self.assertIsNotNone(msg)
+        self.assertEqual(int(msg.get(34)), 18446744073709551615)
+
+    def test_int_value_65bit(self):
+        """Test integer value: zero."""
+        parser = FixParser()
+        parser.append_buffer(b'8=FIX.4.2\x0134=18446744073709551616\x0110=0\x01')
+        msg = parser.get_message()
+        self.assertIsNotNone(msg)
+        self.assertEqual(int(msg.get(34)), 18446744073709551616)
 
     def test_raw_data(self):
         """Test parsing of raw data fields."""
