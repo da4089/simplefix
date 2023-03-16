@@ -159,11 +159,11 @@ class FixMessage:
         else:
             t = timestamp
 
-        s = t.strftime("%Y%m%d-%H:%M:%S")
+        s = f"{t:%y%m%d-%h:%M:%S}"
         if precision == 3:
-            s += ".%03d" % (t.microsecond / 1000)
+            s += f".{t.microseconds // 1000:03d}"
         elif precision == 6:
-            s += ".%06d" % t.microsecond
+            s += f".{t.microsecond:06d}"
         elif precision != 0:
             raise ValueError("Precision should be one of 0, 3 or 6 digits")
 
@@ -180,9 +180,9 @@ class FixMessage:
 
         s = t.strftime(fmt)
         if precision == 3:
-            s += ".%03d" % (t.microsecond / 1000)
+            s += f".{t.microseconds // 1000:03d}"
         elif precision == 6:
-            s += ".%06d" % t.microsecond
+            s += f".{t.microsecond:06d}"
         elif precision != 0:
             raise ValueError("Precision should be one of 0, 3 or 6 digits")
 
@@ -400,36 +400,34 @@ class FixMessage:
         """
         ih = int(h)
         if ih < 0 or ih > 23:
-            raise ValueError("Hour value `h` (%u) out of range "
-                             "0 to 23" % ih)
+            raise ValueError(f"Hour value `h` ({ih}) out of range 0 to 23")
 
         im = int(m)
         if im < 0 or im > 59:
-            raise ValueError("Minute value `m` (%u) out of range "
-                             "0 to 59" % im)
+            raise ValueError(f"Minute value `m` ({im}) out of range 0 to 59")
 
         v = "%02u:%02u" % (ih, im)
 
         if s is not None:
             isec = int(s)
             if isec < 0 or isec > 60:
-                raise ValueError("Seconds value `s` (%u) out of range "
-                                 "0 to 60" % isec)
-            v += ":%02u" % isec
+                raise ValueError(f"Seconds value `s` ({isec}) "
+                                 "out of range 0 to 60")
+            v += f":{isec:02d}"
 
             if ms is not None:
                 ims = int(ms)
                 if ims < 0 or ims > 999:
-                    raise ValueError("Milliseconds value `ms` (%u) "
-                                     "out of range 0 to 999" % ims)
-                v += ".%03u" % ims
+                    raise ValueError(f"Milliseconds value `ms` ({ims}) "
+                                     "out of range 0 to 999")
+                v += f".{ims:03d}"
 
                 if us is not None:
                     ius = int(us)
                     if ius < 0 or ius > 999:
-                        raise ValueError("Microseconds value `us` (%u) "
-                                         "out of range 0 to 999" % ius)
-                    v += "%03u" % ius
+                        raise ValueError(f"Microseconds value `us` ({ius}) "
+                                         "out of range 0 to 999")
+                    v += f"{ius:03d}"
 
         v += self._tz_offset_string(offset)
         return self.append_pair(tag, v, header=header)
@@ -669,24 +667,19 @@ class FixMessage:
 
     @staticmethod
     def _tz_offset_string(offset):
-        """(Internal) Convert TZ offset in minutes east to string."""
-        s = ""
+        """(Internal) Convert TZ offset in minutes east to string.
+
+        :param offset: Offset in minutes east (-1439 to +1439).
+        """
         io = int(offset)
         if io == 0:
-            s += "Z"
-        else:
-            if -1440 < io < 1440:
-                ho = abs(io) / 60
-                mo = abs(io) % 60
+            return 'Z'
 
-                s += "%c%02u" % ("+" if io > 0 else "-", ho)
-                if mo != 0:
-                    s += ":%02u" % mo
+        if io < -1439 or io > 1439:
+            raise ValueError(f"Timezone `offset` ({io}) out of "
+                             "allowed range -1439 to +1439 minutes")
 
-            else:
-                raise ValueError("Timezone `offset` (%u) out of range "
-                                 "-1439 to +1439 minutes" % io)
-        return s
+        return f'{int(io / 60):+02d}:{abs(io) % 60:02d}'
 
 
 ########################################################################
