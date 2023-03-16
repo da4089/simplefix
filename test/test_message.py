@@ -944,42 +944,42 @@ class MessageTests(unittest.TestCase):
         m = FixMessage()
         m.append_pair(34, 0)
         b = m.encode(raw=True)
-        self.assertEqual(b, b'34=0' + simplefix.SOH_STR)
+        self.assertEqual(b, b'34=0\x01')
 
     def test_int_value_one(self):
         """Test integer value: one"""
         m = FixMessage()
         m.append_pair(34, 1)
         b = m.encode(raw=True)
-        self.assertEqual(b, b'34=1' + simplefix.SOH_STR)
+        self.assertEqual(b, b'34=1\x01')
 
     def test_int_value_32bit(self):
         """Test integer value: 2**32-1"""
         m = FixMessage()
         m.append_pair(34, 0xffffffff)
         b = m.encode(raw=True)
-        self.assertEqual(b, b'34=4294967295' + simplefix.SOH_STR)
+        self.assertEqual(b, b'34=4294967295\x01')
 
     def test_int_value_33bit(self):
         """Test integer value: 2**32"""
         m = FixMessage()
         m.append_pair(34, 0xffffffff + 1)
         b = m.encode(raw=True)
-        self.assertEqual(b, b'34=4294967296' + simplefix.SOH_STR)
+        self.assertEqual(b, b'34=4294967296\x01')
 
     def test_int_value_64bit(self):
         """Test integer value: 2**64-1"""
         m = FixMessage()
         m.append_pair(34, 0xffffffffffffffff)
         b = m.encode(raw=True)
-        self.assertEqual(b, b'34=18446744073709551615' + simplefix.SOH_STR)
+        self.assertEqual(b, b'34=18446744073709551615\x01')
 
     def test_int_value_65bit(self):
         """Test integer value: 2**64"""
         m = FixMessage()
         m.append_pair(34, 0xffffffffffffffff + 1)
         b = m.encode(raw=True)
-        self.assertEqual(b, b'34=18446744073709551616' + simplefix.SOH_STR)
+        self.assertEqual(b, b'34=18446744073709551616\x01')
 
 
 if __name__ == "__main__":
