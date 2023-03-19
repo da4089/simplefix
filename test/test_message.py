@@ -280,7 +280,7 @@ class MessageTests(unittest.TestCase):
         msg.append_time(52, t, utc=False)
 
         test = datetime.datetime.fromtimestamp(t)
-        s = f"{test:%Y%m%d-%H:%M:%D}.{test.microsecond // 1000}"
+        s = f"{test:%Y%m%d-%H:%M:%S}.{test.microsecond // 1000}"
 
         self.assertEqual(s.encode('ascii'), msg.get(52))
 
