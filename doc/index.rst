@@ -13,3 +13,4 @@ SimpleFIX
     creating
     encoding
     parsing
+    changes
