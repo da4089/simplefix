@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 ########################################################################
 # SimpleFIX
-# Copyright (C) 2016-2022, David Arnold.
+# Copyright (C) 2016-2023, David Arnold.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -159,11 +159,11 @@ class FixMessage:
         else:
             t = timestamp
 
-        s = t.strftime("%Y%m%d-%H:%M:%S")
+        s = f"{t:%Y%m%d-%H:%M:%S}"
         if precision == 3:
-            s += ".%03d" % (t.microsecond / 1000)
+            s += f".{t.microsecond // 1000:03d}"
         elif precision == 6:
-            s += ".%06d" % t.microsecond
+            s += f".{t.microsecond:06d}"
         elif precision != 0:
             raise ValueError("Precision should be one of 0, 3 or 6 digits")
 
@@ -178,12 +178,13 @@ class FixMessage:
         else:
             t = ts
 
-        s = t.strftime(fmt)
-        if precision == 3:
-            s += ".%03d" % (t.microsecond / 1000)
+        if precision == 0:
+            s = t.strftime(fmt)
+        elif precision == 3:
+            s = f"{t.strftime(fmt)}.{t.microsecond // 1000:03d}"
         elif precision == 6:
-            s += ".%06d" % t.microsecond
-        elif precision != 0:
+            s = f"{t.strftime(fmt)}.{t.microsecond:06d}"
+        else:
             raise ValueError("Precision should be one of 0, 3 or 6 digits")
 
         return self.append_pair(tag, s, header=header)
@@ -258,31 +259,29 @@ class FixMessage:
         """
         ih = int(h)
         if ih < 0 or ih > 23:
-            raise ValueError("Hour value `h` (%u) out of range "
-                             "0 to 23" % ih)
+            raise ValueError(f"Hour value `h` ({ih}) out of range 0 to 23")
         im = int(m)
         if im < 0 or im > 59:
-            raise ValueError("Minute value `m` (%u) out of range "
-                             "0 to 59" % im)
+            raise ValueError(f"Minute value `m` ({im}) out of range 0 to 59")
         isec = int(s)
         if isec < 0 or isec > 60:
-            raise ValueError("Seconds value `s` (%u) out of range "
-                             "0 to 60" % isec)
-        v = "%02u:%02u:%02u" % (ih, im, isec)
+            raise ValueError(f"Seconds value `s` ({isec}) out of range 0 to 60")
+
+        v = f"{ih:02d}:{im:02d}:{isec:02d}"
 
         if ms is not None:
             ims = int(ms)
             if ims < 0 or ims > 999:
-                raise ValueError("Milliseconds value `ms` (%u) "
-                                 "out of range 0 to 999" % ims)
-            v += ".%03u" % ims
+                raise ValueError(
+                    f"Milliseconds value `ms` ({ims}) out of range 0 to 999")
+            v += f".{ims:03d}"
 
             if us is not None:
                 ius = int(us)
                 if ius < 0 or ius > 999:
-                    raise ValueError("Microseconds value `us` (%u) "
-                                     "out of range 0 to 999" % ius)
-                v += "%03u" % ius
+                    raise ValueError(
+                        f"Microseconds value `us` ({ius}) out of range 0 to 999")
+                v += f"{ius:03d}"
 
         return self.append_pair(tag, v, header=header)
 
@@ -320,14 +319,16 @@ class FixMessage:
         td = local - utc
         offset = int(((td.days * 86400) + td.seconds) / 60)
 
-        s = local.strftime("%Y%m%d-%H:%M:%S")
-        if precision == 3:
-            s += ".%03u" % (local.microsecond / 1000)
+        fmt = "%Y%m%d-%H:%M:%S"
+        if precision == 0:
+            s = local.strftime(fmt)
+        elif precision == 3:
+            s = f"{local.strftime(fmt)}.{local.microsecond // 1000:03d}"
         elif precision == 6:
-            s += ".%06u" % local.microsecond
-        elif precision != 0:
-            raise ValueError("Precision (%u) should be one of "
-                             "0, 3 or 6 digits" % precision)
+            s = f"{local.strftime(fmt)}.{local.microsecond:06d}"
+        else:
+            raise ValueError(
+                f"Precision ({precision}) should be one of 0, 3 or 6 digits")
 
         s += self._tz_offset_string(offset)
         return self.append_pair(tag, s, header=header)
@@ -364,18 +365,17 @@ class FixMessage:
         td = t - utc
         offset = int(((td.days * 86400) + td.seconds) / 60)
 
-        s = t.strftime("%H:%M")
-        if precision == 0:
-            s += t.strftime(":%S")
+        if precision is None:
+            s = f"{t:%H:%M}"
+        elif precision == 0:
+            s = f"{t:%H:%M:%S}"
         elif precision == 3:
-            s += t.strftime(":%S")
-            s += ".%03u" % (t.microsecond / 1000)
+            s = f"{t:%H:%M:%S}.{t.microsecond // 1000:03d}"
         elif precision == 6:
-            s += t.strftime(":%S")
-            s += ".%06u" % t.microsecond
-        elif precision is not None:
-            raise ValueError("Precision should be one of "
-                             "None, 0, 3 or 6 digits")
+            s = f"{t:%H:%M:%S}.{t.microsecond:06d}"
+        else:
+            raise ValueError(
+                "Precision should be one of None, 0, 3 or 6 digits")
 
         s += self._tz_offset_string(offset)
         return self.append_pair(tag, s, header=header)
@@ -400,36 +400,34 @@ class FixMessage:
         """
         ih = int(h)
         if ih < 0 or ih > 23:
-            raise ValueError("Hour value `h` (%u) out of range "
-                             "0 to 23" % ih)
+            raise ValueError(f"Hour value `h` ({ih}) out of range 0 to 23")
 
         im = int(m)
         if im < 0 or im > 59:
-            raise ValueError("Minute value `m` (%u) out of range "
-                             "0 to 59" % im)
+            raise ValueError(f"Minute value `m` ({im}) out of range 0 to 59")
 
         v = "%02u:%02u" % (ih, im)
 
         if s is not None:
             isec = int(s)
             if isec < 0 or isec > 60:
-                raise ValueError("Seconds value `s` (%u) out of range "
-                                 "0 to 60" % isec)
-            v += ":%02u" % isec
+                raise ValueError(f"Seconds value `s` ({isec}) "
+                                 "out of range 0 to 60")
+            v += f":{isec:02d}"
 
             if ms is not None:
                 ims = int(ms)
                 if ims < 0 or ims > 999:
-                    raise ValueError("Milliseconds value `ms` (%u) "
-                                     "out of range 0 to 999" % ims)
-                v += ".%03u" % ims
+                    raise ValueError(f"Milliseconds value `ms` ({ims}) "
+                                     "out of range 0 to 999")
+                v += f".{ims:03d}"
 
                 if us is not None:
                     ius = int(us)
                     if ius < 0 or ius > 999:
-                        raise ValueError("Microseconds value `us` (%u) "
-                                         "out of range 0 to 999" % ius)
-                    v += "%03u" % ius
+                        raise ValueError(f"Microseconds value `us` ({ius}) "
+                                         "out of range 0 to 999")
+                    v += f"{ius:03d}"
 
         v += self._tz_offset_string(offset)
         return self.append_pair(tag, v, header=header)
@@ -568,14 +566,14 @@ class FixMessage:
             raise ValueError("No begin string set")
 
         buf = b"8=" + self.begin_string + SOH_STR + \
-              b"9=" + fix_val("%u" % body_length) + SOH_STR + \
+              b"9=" + fix_val(f"{body_length}") + SOH_STR + \
               buf
 
         # Calculate and append the checksum.
         checksum = 0
         for c in buf:
             checksum += ord(c) if sys.version_info[0] == 2 else c
-        buf += b"10=" + fix_val("%03u" % (checksum % 256,)) + SOH_STR
+        buf += b"10=" + fix_val(f"{checksum % 256}") + SOH_STR
 
         return buf
 
@@ -669,24 +667,23 @@ class FixMessage:
 
     @staticmethod
     def _tz_offset_string(offset):
-        """(Internal) Convert TZ offset in minutes east to string."""
-        s = ""
+        """(Internal) Convert TZ offset in minutes east to string.
+
+        :param offset: Offset in minutes east (-1439 to +1439).
+        """
         io = int(offset)
         if io == 0:
-            s += "Z"
+            return 'Z'
+
+        if io < -1439 or io > 1439:
+            raise ValueError(f"Timezone `offset` ({io}) out of "
+                             "allowed range -1439 to +1439 minutes")
+
+        m = abs(io) % 60
+        if m == 0:
+            return f'{int(io / 60):0=+3d}'
         else:
-            if -1440 < io < 1440:
-                ho = abs(io) / 60
-                mo = abs(io) % 60
-
-                s += "%c%02u" % ("+" if io > 0 else "-", ho)
-                if mo != 0:
-                    s += ":%02u" % mo
-
-            else:
-                raise ValueError("Timezone `offset` (%u) out of range "
-                                 "-1439 to +1439 minutes" % io)
-        return s
+            return f'{int(io / 60):0=+3d}:{m:0=2d}'
 
 
 ########################################################################

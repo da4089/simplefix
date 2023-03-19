@@ -279,11 +279,9 @@ class MessageTests(unittest.TestCase):
         t = 1484581872.933458
         msg.append_time(52, t, utc=False)
 
-        test = time.localtime(t)
-        s = "%04u%02u%02u-%02u:%02u:%02u.%03u" % \
-            (test.tm_year, test.tm_mon, test.tm_mday,
-             test.tm_hour, test.tm_min, test.tm_sec,
-             int((t - int(t)) * 1000))
+        test = datetime.datetime.fromtimestamp(t)
+        s = f"{test:%Y%m%d-%H:%M:%S}.{test.microsecond // 1000}"
+
         self.assertEqual(s.encode('ascii'), msg.get(52))
 
     def test_utcts_default(self):
