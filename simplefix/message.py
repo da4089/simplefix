@@ -35,6 +35,7 @@
 # supply these tags in the wrong order for testing error handling.
 
 import datetime
+import enum
 import sys
 import time
 import warnings
@@ -60,6 +61,9 @@ def fix_tag(value):
     """Make a FIX tag value from string, bytes, or integer."""
     if sys.version_info[0] == 2:
         return bytes(value)
+
+    if isinstance(value, IntEnum):
+        return str(int(value)).encode('ASCII')
 
     if type(value) is bytes:
         return value
