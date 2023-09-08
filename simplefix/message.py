@@ -35,7 +35,6 @@
 # supply these tags in the wrong order for testing error handling.
 
 import datetime
-import enum
 import sys
 import time
 import warnings
