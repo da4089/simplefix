@@ -2,12 +2,13 @@
 Change Log
 ==========
 
-v1.0.16
+v1.0.16 (2023-09-08)
 -------
 * Add missing EXECTYPE constants
 * Better conversion to string (#40)
 * Better installation instructions (#45)
 * Add testing for large (64 bit) integer values (#52)
+* Fixed handling of IntEnum tag values (#56)
 * Added testing for CPython 3.11 (Released: 2022-10-24)
 * Dropped testing for Python 3.6 (EOL: 2021-12-31)
 
