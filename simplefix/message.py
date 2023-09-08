@@ -62,7 +62,7 @@ def fix_tag(value):
     if sys.version_info[0] == 2:
         return bytes(value)
 
-    if isinstance(value, IntEnum):
+    if isinstance(value, enum.IntEnum):
         return str(int(value)).encode('ASCII')
 
     if type(value) is bytes:
