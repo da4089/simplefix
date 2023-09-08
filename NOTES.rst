@@ -41,10 +41,9 @@ Publishing a Release
 * Run: rm -rf dist
 * Run: python setup.py sdist
 * Run: python setup.py bdist_wheel --universal
-* Run: twine upload dist/*
+* Run: twine upload --repository simplefix dist/*
 * Run: git tag v$VERSION
 * Run: git push --tags
 * Go to GitHub and make a release
 * Go to ReadTheDocs and rebuild to pick up new version
 * Bump the setup.py version for next time, and commit.
-
