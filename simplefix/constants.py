@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 ########################################################################
 # SimpleFIX
-# Copyright (C) 2017-2022, David Arnold.
+# Copyright (C) 2017-2023, David Arnold.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -28,14 +28,9 @@
 import sys
 
 
-if sys.version_info[0] == 2:
-    EQUALS_BYTE = b'='
-    SOH_BYTE = b'\x01'
-    SOH_STR = SOH_BYTE
-else:
-    EQUALS_BYTE = 61
-    SOH_BYTE = 1
-    SOH_STR = b'\x01'
+EQUALS_BYTE = 61
+SOH_BYTE = 1
+SOH_STR = b'\x01'
 
 # Tag 1
 TAG_ACCOUNT = b'1'

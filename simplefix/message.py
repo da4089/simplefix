@@ -47,9 +47,6 @@ def fix_val(value):
     if type(value) is bytes:
         return value
 
-    if sys.version_info[0] == 2:
-        return bytes(value)
-
     if type(value) is str:
         return bytes(value, 'UTF-8')
 
@@ -58,9 +55,6 @@ def fix_val(value):
 
 def fix_tag(value):
     """Make a FIX tag value from string, bytes, or integer."""
-    if sys.version_info[0] == 2:
-        return bytes(value)
-
     if hasattr(value, '__int__'):
         return str(int(value)).encode('ASCII')
 
@@ -575,7 +569,7 @@ class FixMessage:
         # Calculate and append the checksum.
         checksum = 0
         for c in buf:
-            checksum += ord(c) if sys.version_info[0] == 2 else c
+            checksum += c
         buf += b"10=" + fix_val(f"{checksum % 256}") + SOH_STR
 
         return buf
