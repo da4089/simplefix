@@ -24,6 +24,7 @@
 ########################################################################
 
 import datetime
+import enum
 import time
 import unittest
 
@@ -978,6 +979,18 @@ class MessageTests(unittest.TestCase):
         m.append_pair(34, 0xffffffffffffffff + 1)
         b = m.encode(raw=True)
         self.assertEqual(b, b'34=18446744073709551616\x01')
+
+    def test_intenum_value(self):
+        class TagEnum(enum.IntEnum):
+            BeginString = 8
+            Length = 9
+            MsgType = 35
+            Checksum = 10
+
+        m = FixMessage()
+        m.append_pair(TagEnum.MsgType, b'D')
+        b = m.encode(raw=True)
+        self.assertEqual(b, b'35=D\x01')
 
 
 if __name__ == "__main__":
