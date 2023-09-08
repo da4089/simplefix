@@ -61,6 +61,9 @@ def fix_tag(value):
     if sys.version_info[0] == 2:
         return bytes(value)
 
+    if hasattr(value, '__int__'):
+        return str(int(value)).encode('ASCII')
+
     if type(value) is bytes:
         return value
 
