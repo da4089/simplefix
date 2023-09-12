@@ -570,7 +570,7 @@ class FixMessage:
         checksum = 0
         for c in buf:
             checksum += c
-        buf += b"10=" + fix_val(f"{checksum % 256}") + SOH_STR
+        buf += b"10=" + fix_val(f"{checksum % 256:03}") + SOH_STR
 
         return buf
 

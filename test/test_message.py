@@ -99,6 +99,19 @@ class MessageTests(unittest.TestCase):
         pkt.append_pair(10, 42)
         self.assertEqual(b"10=42\x01", pkt.encode(True))
 
+    def test_cooked_checksum(self):
+        """Test calculation of Checksum(10) in cooked mode"""
+        msg = FixMessage()
+        msg.append_pair(8, b'FIX.4.2')
+        msg.append_pair(35, b'D')
+        msg.append_pair(5001, b'AAAAA')
+        self.assertEqual(b"8=FIX.4.2\x01"
+                         b"9=16\x01"
+                         b"35=D\x01"
+                         b"5001=AAAAA\x01"
+                         b"10=048\x01",
+                         msg.encode())
+
     def test_raw_msg_type(self):
         """Test encoding of MessageType(35) in raw mode"""
         pkt = FixMessage()
