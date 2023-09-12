@@ -2,8 +2,14 @@
 Change Log
 ==========
 
+v1.0.17 (2023-09-12)
+--------------------
+* Fix checksum calculation bug introduced in v1.0.16.  This will break
+  any usage that relies on simplefix calculating the checksum value:
+  most users will need to upgrade.
+
 v1.0.16 (2023-09-08)
--------
+--------------------
 * Add missing EXECTYPE constants
 * Better conversion to string (#40)
 * Better installation instructions (#45)
