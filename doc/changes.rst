@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v1.0.18
+--------------------
+* Added testing for CPython 3.12 (Released: 2023/10/02)
+* Dropped testing for CPython 3.7 (EOL: 2023/06/27)
+
 v1.0.17 (2023-09-12)
 --------------------
 * Fix checksum calculation bug introduced in v1.0.16.  This will break
