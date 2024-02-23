@@ -1,4 +1,5 @@
 coverage
 setuptools
+sphinx
 twine
 wheel
