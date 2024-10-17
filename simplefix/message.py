@@ -67,6 +67,14 @@ def fix_tag(value):
     return str(value).encode('ASCII')
 
 
+def utcnow():
+    return datetime.datetime.now(datetime.timezone.utc)
+
+
+def utcfromtimestamp(timestamp):
+    return datetime.datetime.fromtimestamp(timestamp, datetime.timezone.utc)
+
+
 class FixMessage:
     """FIX protocol message.
 
@@ -145,11 +153,11 @@ class FixMessage:
                       "Use append_utc_timestamp() or append_tz_timestamp() "
                       "instead.", DeprecationWarning)
         if not timestamp:
-            t = datetime.datetime.utcnow()
+            t = utcnow()
 
         elif type(timestamp) is float:
             if utc:
-                t = datetime.datetime.utcfromtimestamp(timestamp)
+                t = utcfromtimestamp(timestamp)
             else:
                 t = datetime.datetime.fromtimestamp(timestamp)
 
@@ -169,9 +177,9 @@ class FixMessage:
     def _append_utc_datetime(self, tag, fmt, ts, precision, header):
         """(Internal) Append formatted datetime."""
         if ts is None:
-            t = datetime.datetime.utcnow()
+            t = utcnow()
         elif type(ts) is float:
-            t = datetime.datetime.utcfromtimestamp(ts)
+            t = utcfromtimestamp(ts)
         else:
             t = ts
 
@@ -196,9 +204,9 @@ class FixMessage:
         :param header: Append to FIX header if True; default to body.
 
         The `timestamp` value should be a datetime, such as created by
-        datetime.datetime.utcnow(); a float, being the number of seconds
+        utcnow(); a float, being the number of seconds
         since midnight 1 Jan 1970 UTC, such as returned by time.time();
-        or, None, in which case datetime.datetime.utcnow() is used to
+        or, None, in which case utcnow() is used to
         get the current UTC time.
 
         Precision values other than zero (seconds), 3 (milliseconds),
@@ -221,9 +229,9 @@ class FixMessage:
         :param header: Append to FIX header if True; default to body.
 
         The `timestamp` value should be a datetime, such as created by
-        datetime.datetime.utcnow(); a float, being the number of seconds
+        utcnow(); a float, being the number of seconds
         since midnight 1 Jan 1970 UTC, such as returned by time.time();
-        or, None, in which case datetime.datetime.utcnow() is used to
+        or, None, in which case utcnow() is used to
         get the current UTC time.
 
         Precision values other than zero (seconds), 3 (milliseconds),
@@ -311,7 +319,7 @@ class FixMessage:
                   (timestamp.microsecond * 1e-6)
 
         # Get offset of local timezone east of UTC.
-        utc = datetime.datetime.utcfromtimestamp(now)
+        utc = utcfromtimestamp(now)
         local = datetime.datetime.fromtimestamp(now)
         td = local - utc
         offset = int(((td.days * 86400) + td.seconds) / 60)
@@ -358,7 +366,7 @@ class FixMessage:
             t = timestamp
 
         now = time.mktime(t.timetuple()) + (t.microsecond * 1e-6)
-        utc = datetime.datetime.utcfromtimestamp(now)
+        utc = utcfromtimestamp(now)
         td = t - utc
         offset = int(((td.days * 86400) + td.seconds) / 60)
 
