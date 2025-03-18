@@ -499,8 +499,8 @@ class MessageTests(unittest.TestCase):
 
     @staticmethod
     def calculate_tz_offset(t):
-        local = datetime.datetime.fromtimestamp(t)
-        utc = datetime.datetime.utcfromtimestamp(t)
+        local = datetime.datetime.fromtimestamp(t, tz=datetime.datetime.now().astimezone().tzinfo)
+        utc = datetime.datetime.fromtimestamp(t, tz=datetime.timezone.utc)
         td = local - utc
         offset = int(((td.days * 86400) + td.seconds) / 60)
         return offset
@@ -531,7 +531,7 @@ class MessageTests(unittest.TestCase):
     def test_append_tzts_datetime(self):
         msg = FixMessage()
         t = 1484581872.933458
-        local = datetime.datetime.fromtimestamp(t)
+        local = datetime.datetime.fromtimestamp(t, tz=datetime.datetime.now().astimezone().tzinfo)
         msg.append_tz_timestamp(1132, local)
 
         test = time.localtime(t)
@@ -609,7 +609,7 @@ class MessageTests(unittest.TestCase):
     def test_tzto_datetime(self):
         msg = FixMessage()
         t = 1484581872.933458
-        local = datetime.datetime.fromtimestamp(t)
+        local = datetime.datetime.fromtimestamp(t, tz=datetime.datetime.now().astimezone().tzinfo)
         msg.append_tz_time_only(1079, local)
 
         test = time.localtime(t)

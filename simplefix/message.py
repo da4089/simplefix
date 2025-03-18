@@ -67,13 +67,6 @@ def fix_tag(value):
     return str(value).encode('ASCII')
 
 
-def utcnow():
-    return datetime.datetime.now(datetime.timezone.utc)
-
-
-def utcfromtimestamp(timestamp):
-    return datetime.datetime.fromtimestamp(timestamp, datetime.timezone.utc)
-
 
 class FixMessage:
     """FIX protocol message.
@@ -153,13 +146,13 @@ class FixMessage:
                       "Use append_utc_timestamp() or append_tz_timestamp() "
                       "instead.", DeprecationWarning)
         if not timestamp:
-            t = utcnow()
+            t = datetime.datetime.now(datetime.timezone.utc)
 
         elif type(timestamp) is float:
             if utc:
-                t = utcfromtimestamp(timestamp)
+                t = datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)
             else:
-                t = datetime.datetime.fromtimestamp(timestamp)
+                t = datetime.datetime.fromtimestamp(timestamp, tz=datetime.datetime.now().astimezone().tzinfo)
 
         else:
             t = timestamp
@@ -177,9 +170,9 @@ class FixMessage:
     def _append_utc_datetime(self, tag, fmt, ts, precision, header):
         """(Internal) Append formatted datetime."""
         if ts is None:
-            t = utcnow()
+            t = datetime.datetime.now(datetime.timezone.utc)
         elif type(ts) is float:
-            t = utcfromtimestamp(ts)
+            t = datetime.datetime.fromtimestamp(ts, tz=datetime.timezone.utc)
         else:
             t = ts
 
@@ -319,8 +312,8 @@ class FixMessage:
                   (timestamp.microsecond * 1e-6)
 
         # Get offset of local timezone east of UTC.
-        utc = utcfromtimestamp(now)
-        local = datetime.datetime.fromtimestamp(now)
+        utc = datetime.datetime.fromtimestamp(now, tz=datetime.timezone.utc)
+        local = datetime.datetime.fromtimestamp(now, tz=datetime.datetime.now().astimezone().tzinfo)
         td = local - utc
         offset = int(((td.days * 86400) + td.seconds) / 60)
 
@@ -359,14 +352,14 @@ class FixMessage:
         standard.
         """
         if timestamp is None:
-            t = datetime.datetime.now()
+            t = datetime.datetime.now(tz=datetime.timezone.utc)
         elif type(timestamp) is float:
-            t = datetime.datetime.fromtimestamp(timestamp)
+            t = datetime.datetime.fromtimestamp(timestamp, tz=datetime.datetime.now().astimezone().tzinfo)
         else:
             t = timestamp
 
         now = time.mktime(t.timetuple()) + (t.microsecond * 1e-6)
-        utc = utcfromtimestamp(now)
+        utc = datetime.datetime.fromtimestamp(now, tz=datetime.timezone.utc)
         td = t - utc
         offset = int(((td.days * 86400) + td.seconds) / 60)
 

@@ -94,7 +94,6 @@ html_theme_options = {
     'github_type': 'star',
     'github_button': 'true',
     'github_count': 'true',
-    'travis_button': 'true'
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
