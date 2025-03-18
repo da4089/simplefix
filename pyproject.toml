@@ -38,6 +38,7 @@ coverage = "*"
 sphinx = "*"
 twine = "*"
 wheel = "*"
+freezegun = "*"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

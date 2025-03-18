@@ -36,23 +36,19 @@ def make_str(s):
     return bytes(s, 'ASCII')
 
 
-# Python 2.6's unittest.TestCase doesn't have assertIsNone()
-def test_none(_, other):  # skipcq: PYL-R1719
-    return other is None
-
-
-# Python 2.6's unittest.TestCase doesn't have assertIsNotNone()
-def test_not_none(_, other):  # skipcq: PYL-R1719
-    return other is not None
-
-
 class ParserTests(unittest.TestCase):
 
-
     def setUp(self):
+        # These are compatibility methods for older Python versions
+        # Modern Python has them built-in
         if not hasattr(self, "assertIsNotNone"):
+            def test_not_none(other):  # skipcq: PYL-R1719
+                return other is not None
             ParserTests.assertIsNotNone = test_not_none
+            
         if not hasattr(self, "assertIsNone"):
+            def test_none(other):  # skipcq: PYL-R1719
+                return other is None
             ParserTests.assertIsNone = test_none
 
     def test_parse_empty_string(self):
