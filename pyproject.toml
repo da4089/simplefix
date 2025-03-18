@@ -1,0 +1,45 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "simplefix"
+version = "1.0.17"
+description = "Simple FIX Protocol implementation for Python"
+authors = ["David Arnold <d+simplefix@0x1.org>"]
+license = "MIT"
+readme = "README.rst"
+homepage = "https://github.com/da4089/simplefix"
+repository = "https://github.com/da4089/simplefix"
+documentation = "https://simplefix.readthedocs.io"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Networking",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+packages = [{include = "simplefix"}]
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.0.0"
+coverage = "*"
+sphinx = "*"
+twine = "*"
+wheel = "*"
+freezegun = "*"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["test"]

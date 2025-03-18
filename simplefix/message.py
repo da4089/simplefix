@@ -67,6 +67,7 @@ def fix_tag(value):
     return str(value).encode('ASCII')
 
 
+
 class FixMessage:
     """FIX protocol message.
 
@@ -196,9 +197,9 @@ class FixMessage:
         :param header: Append to FIX header if True; default to body.
 
         The `timestamp` value should be a datetime, such as created by
-        datetime.datetime.utcnow(); a float, being the number of seconds
+        utcnow(); a float, being the number of seconds
         since midnight 1 Jan 1970 UTC, such as returned by time.time();
-        or, None, in which case datetime.datetime.utcnow() is used to
+        or, None, in which case utcnow() is used to
         get the current UTC time.
 
         Precision values other than zero (seconds), 3 (milliseconds),
@@ -221,9 +222,9 @@ class FixMessage:
         :param header: Append to FIX header if True; default to body.
 
         The `timestamp` value should be a datetime, such as created by
-        datetime.datetime.utcnow(); a float, being the number of seconds
+        utcnow(); a float, being the number of seconds
         since midnight 1 Jan 1970 UTC, such as returned by time.time();
-        or, None, in which case datetime.datetime.utcnow() is used to
+        or, None, in which case utcnow() is used to
         get the current UTC time.
 
         Precision values other than zero (seconds), 3 (milliseconds),
