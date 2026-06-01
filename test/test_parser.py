@@ -555,7 +555,6 @@ class ParserTests(unittest.TestCase):
 
     def test_raw_data_ending_on_packet_boundary(self):
         """Check parsing when raw data field ends on a packet boundary."""
-
         b1 = b"8=FIX.4.2" + SOH_STR + \
              b"9=169" + SOH_STR + \
              b"35=A" + SOH_STR + \
