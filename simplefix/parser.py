@@ -262,7 +262,7 @@ class FixParser:
         """Return a reference to the internal buffer."""
         return self.buf
 
-    def get_message(self):
+    def get_message(self):  # skipcq: PY-R1000
         """Process the accumulated buffer and return the first message.
 
         If the buffer starts with FIX fields other than BeginString
