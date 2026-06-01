@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 ########################################################################
 # SimpleFIX
-# Copyright (C) 2016-2023, David Arnold.
+# Copyright (C) 2016-2026, David Arnold.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -262,7 +262,7 @@ class FixParser:
         """Return a reference to the internal buffer."""
         return self.buf
 
-    def get_message(self):
+    def get_message(self):  # skipcq: PY-R1000
         """Process the accumulated buffer and return the first message.
 
         If the buffer starts with FIX fields other than BeginString
@@ -299,11 +299,16 @@ class FixParser:
                         raise errors.TagNotNumberError(*e.args)
 
                     if tag in self.raw_data_tags and self.raw_len > 0:
-                        # Try to extract the data value.
-                        if self.raw_len > len(self.buf) - point:
-                            # The buffer doesn't yet contain all the raw data,
-                            # so wait for more to be added.
+                        # Try to extract the data value (and its SOH,
+                        # although that's then ignored)
+                        if self.raw_len + 1 > len(self.buf) - point:
+                            # The buffer doesn't yet contain all the raw data
+                            # plus the following SOH, so wait for more to be added.
                             break
+
+                        # Check for SOH after raw data.
+                        if self.buf[point + self.raw_len] != SOH_BYTE:
+                            raise errors.RawDataNotFollowedByFieldSeparator(tag_string)
 
                         # We've got enough buffer to extract the raw data value.
                         value = self.buf[point:point + self.raw_len]

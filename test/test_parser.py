@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 ########################################################################
 # SimpleFIX
-# Copyright (C) 2016-2023, David Arnold.
+# Copyright (C) 2016-2026, David Arnold.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,33 +23,28 @@
 #
 ########################################################################
 
-import sys
 import unittest
 
 from simplefix import FixMessage, FixParser, SOH_STR, errors
 
 
-def make_str(s):
-    if sys.version_info.major == 2:
-        return bytes(s)
-
-    return bytes(s, 'ASCII')
-
-
 # Python 2.6's unittest.TestCase doesn't have assertIsNone()
 def test_none(_, other):  # skipcq: PYL-R1719
+    """Check for None."""
     return other is None
 
 
 # Python 2.6's unittest.TestCase doesn't have assertIsNotNone()
 def test_not_none(_, other):  # skipcq: PYL-R1719
+    """Check is not None."""
     return other is not None
 
 
 class ParserTests(unittest.TestCase):
-
+    """Tests for FIX tag-value parser."""
 
     def setUp(self):
+        """Initialize the test suite."""
         if not hasattr(self, "assertIsNotNone"):
             ParserTests.assertIsNotNone = test_not_none
         if not hasattr(self, "assertIsNone"):
@@ -552,6 +547,35 @@ class ParserTests(unittest.TestCase):
             pass
         else:
             self.fail("These keywords together should fail validation.")
+
+    def test_raw_data_ending_on_packet_boundary(self):
+        """Check parsing when raw data field ends on a packet boundary."""
+        b1 = b"8=FIX.4.2" + SOH_STR + \
+             b"9=169" + SOH_STR + \
+             b"35=A" + SOH_STR + \
+             b"52=20171213-01:41:08.063" + SOH_STR + \
+             b"49=HelloWorld" + SOH_STR + \
+             b"56=1234" + SOH_STR + \
+             b"34=1" + SOH_STR + \
+             b"95=6" + SOH_STR + \
+             b"96=ABC=DE"
+
+        # Packet boundary between end of data and SOH, as in
+        # https://github.com/da4089/simplefix/issues/64
+
+        b2 = SOH_STR + \
+             b"98=0" + SOH_STR + \
+             b"108=30" + SOH_STR + \
+             b"10=166" + SOH_STR
+
+        parser = FixParser()
+        parser.append_buffer(b1)
+        msg = parser.get_message()
+        self.assertIsNone(msg)
+
+        parser.append_buffer(b2)
+        msg = parser.get_message()
+        self.assertIsNotNone(msg)
 
 
 # b"2018-05-06 12:34:56.789 RECV "
