@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 ########################################################################
 # SimpleFIX
-# Copyright (C) 2016-2023, David Arnold.
+# Copyright (C) 2016-2026, David Arnold.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,6 @@
 #
 ########################################################################
 
-import sys
 import unittest
 
 from simplefix import FixMessage, FixParser, SOH_STR, errors
@@ -43,6 +42,7 @@ def test_not_none(_, other):  # skipcq: PYL-R1719
 
 class ParserTests(unittest.TestCase):
     """Tests for FIX tag-value parser."""
+
     def setUp(self):
         """Initialize the test suite."""
         if not hasattr(self, "assertIsNotNone"):
