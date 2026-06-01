@@ -41,6 +41,8 @@ class TagNotNumberError(ParsingError, ValueError):
 class RawLengthNotNumberError(ParsingError, ValueError):
     """Raw length value could not be converted to integer."""
 
+class RawDataNotFollowedByFieldSeparator(ParsingError):
+    """Raw data field isn't followed by SOH field separator."""
 
 class FieldOrderError(ParsingError):
     """Field not found where required by standard."""

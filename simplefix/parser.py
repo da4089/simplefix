@@ -299,11 +299,16 @@ class FixParser:
                         raise errors.TagNotNumberError(*e.args)
 
                     if tag in self.raw_data_tags and self.raw_len > 0:
-                        # Try to extract the data value.
-                        if self.raw_len > len(self.buf) - point:
-                            # The buffer doesn't yet contain all the raw data,
-                            # so wait for more to be added.
+                        # Try to extract the data value (and its SOH,
+                        # although that's then ignored)
+                        if self.raw_len + 1 > len(self.buf) - point:
+                            # The buffer doesn't yet contain all the raw data
+                            # plus the following SOH, so wait for more to be added.
                             break
+
+                        # Check for SOH after raw data.
+                        if self.buf[point + self.raw_len] != SOH_BYTE:
+                            raise errors.RawDataNotFollowedByFieldSeparator(tag_string)
 
                         # We've got enough buffer to extract the raw data value.
                         value = self.buf[point:point + self.raw_len]

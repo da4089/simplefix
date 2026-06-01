@@ -553,6 +553,36 @@ class ParserTests(unittest.TestCase):
         else:
             self.fail("These keywords together should fail validation.")
 
+    def test_raw_data_ending_on_packet_boundary(self):
+        """Check parsing when raw data field ends on a packet boundary."""
+
+        b1 = b"8=FIX.4.2" + SOH_STR + \
+             b"9=169" + SOH_STR + \
+             b"35=A" + SOH_STR + \
+             b"52=20171213-01:41:08.063" + SOH_STR + \
+             b"49=HelloWorld" + SOH_STR + \
+             b"56=1234" + SOH_STR + \
+             b"34=1" + SOH_STR + \
+             b"95=6" + SOH_STR + \
+             b"96=ABC=DE"
+
+        # Packet boundary between end of data and SOH, as in
+        # https://github.com/da4089/simplefix/issues/64
+
+        b2 = SOH_STR + \
+             b"98=0" + SOH_STR + \
+             b"108=30" + SOH_STR + \
+             b"10=166" + SOH_STR
+
+        parser = FixParser()
+        parser.append_buffer(b1)
+        msg = parser.get_message()
+        self.assertIsNone(msg)
+
+        parser.append_buffer(b2)
+        msg = parser.get_message()
+        self.assertIsNotNone(msg)
+
 
 # b"2018-05-06 12:34:56.789 RECV "
 
