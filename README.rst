@@ -35,6 +35,17 @@ While this is not legal advice, in short this means you're free to do
 whatever you like with this code, with the exception of claiming you
 wrote it.
 
+Version Support
+===============
+
+simplefix will support all CPython releases from the Python Foundation
+until one year after their end-of-life date.  The earliest currently
+supported release is 3.9, which reached end-of-life on 2025-10-31, and
+so will be supported until 2026-10-31.
+
+New releases are normally tested during the beta period, and should be
+supported from their first day of release.
+
 Installation
 ============
 
