@@ -29,27 +29,22 @@ import unittest
 from simplefix import FixMessage, FixParser, SOH_STR, errors
 
 
-def make_str(s):
-    if sys.version_info.major == 2:
-        return bytes(s)
-
-    return bytes(s, 'ASCII')
-
-
 # Python 2.6's unittest.TestCase doesn't have assertIsNone()
 def test_none(_, other):  # skipcq: PYL-R1719
+    """Check for None."""
     return other is None
 
 
 # Python 2.6's unittest.TestCase doesn't have assertIsNotNone()
 def test_not_none(_, other):  # skipcq: PYL-R1719
+    """Check is not None."""
     return other is not None
 
 
 class ParserTests(unittest.TestCase):
-
-
+    """Tests for FIX tag-value parser."""
     def setUp(self):
+        """Initialize the test suite."""
         if not hasattr(self, "assertIsNotNone"):
             ParserTests.assertIsNotNone = test_not_none
         if not hasattr(self, "assertIsNone"):
